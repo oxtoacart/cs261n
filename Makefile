@@ -12,3 +12,4 @@ diagrams/datalen-google.png diagrams/datalen-google-in.png diagrams/datalen-goog
 	Rscript diagrams.R
 
 .PHONY: all
+.SECONDARY: table.dat
