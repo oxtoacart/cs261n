@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+# Usage: ./gentable > table.dat
+
+import csv
+import sys
+
+from scapy.all import PcapReader, IP, TCP
+
+def genrows(reader):
+    for p in reader:
+        row = {}
+        row["src"] = str(p[IP].src)
+        row["dst"] = str(p[IP].dst)
+        if p[TCP].dport == 443:
+            row["dir"] = "OUT"
+        else:
+            row["dir"] = "IN"
+        row["iplen"] = p.len
+        row["datalen"] = p.len - 4 * p.ihl - 4 * p[TCP].dataofs
+        row["google"] = 1
+        yield row
+
+writer = csv.DictWriter(sys.stdout, ("src", "dst", "dir", "iplen", "datalen", "google"), dialect="excel-tab")
+writer.writeheader()
+
+for row in genrows(PcapReader("traces/lbl.https.non-goog.dpriv")):
+    row["google"] = 0
+    writer.writerow(row)
+for row in genrows(PcapReader("traces/lbl.https.goog.dpriv")):
+    row["google"] = 1
+    writer.writerow(row)
