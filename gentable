@@ -7,6 +7,12 @@ import sys
 
 from scapy.all import PcapReader, IP, TCP
 
+def r_boolean(v):
+    if v:
+        return "T"
+    else:
+        return "F"
+
 def genrows(reader):
     for p in reader:
         row = {}
@@ -18,15 +24,14 @@ def genrows(reader):
             row["dir"] = "IN"
         row["iplen"] = p.len
         row["datalen"] = p.len - 4 * p.ihl - 4 * p[TCP].dataofs
-        row["google"] = 1
         yield row
 
 writer = csv.DictWriter(sys.stdout, ("src", "dst", "dir", "iplen", "datalen", "google"), dialect="excel-tab")
 writer.writeheader()
 
 for row in genrows(PcapReader("traces/lbl.https.non-goog.dpriv")):
-    row["google"] = 0
+    row["google"] = r_boolean(False)
     writer.writerow(row)
 for row in genrows(PcapReader("traces/lbl.https.goog.dpriv")):
-    row["google"] = 1
+    row["google"] = r_boolean(True)
     writer.writerow(row)

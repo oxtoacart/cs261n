@@ -16,13 +16,13 @@ hist(x[x$dir=="OUT",]$datalen, max.datalen - min.datalen + 1)
 dev.off()
 
 png("diagrams/datalen-google.png")
-hist(x[x$google!=0,]$datalen, max.datalen - min.datalen + 1)
+hist(x[x$google,]$datalen, max.datalen - min.datalen + 1)
 dev.off()
 
 png("diagrams/datalen-google-in.png")
-hist(x[x$google!=0 & x$dir=="IN",]$datalen, max.datalen - min.datalen + 1)
+hist(x[x$google & x$dir=="IN",]$datalen, max.datalen - min.datalen + 1)
 dev.off()
 
 png("diagrams/datalen-google-out.png")
-hist(x[x$google!=0 & x$dir=="OUT",]$datalen, max.datalen - min.datalen + 1)
+hist(x[x$google & x$dir=="OUT",]$datalen, max.datalen - min.datalen + 1)
 dev.off()
