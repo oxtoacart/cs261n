@@ -7,6 +7,8 @@ import sys
 
 from scapy.all import PcapReader, IP, TCP
 
+FLAG_SYN = 0x02
+
 def r_boolean(v):
     if v:
         return "T"
@@ -24,9 +26,10 @@ def genrows(reader):
             row["dir"] = "IN"
         row["iplen"] = p.len
         row["datalen"] = p.len - 4 * p.ihl - 4 * p[TCP].dataofs
+        row["syn"] = r_boolean(p[TCP].flags & FLAG_SYN)
         yield row
 
-writer = csv.DictWriter(sys.stdout, ("src", "dst", "dir", "iplen", "datalen", "google"), dialect="excel-tab")
+writer = csv.DictWriter(sys.stdout, ("src", "dst", "dir", "syn", "iplen", "datalen", "google"), dialect="excel-tab")
 writer.writeheader()
 
 for row in genrows(PcapReader("traces/lbl.https.non-goog.dpriv")):
