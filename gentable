@@ -18,6 +18,7 @@ def r_boolean(v):
 def genrows(reader):
     for p in reader:
         row = {}
+        row["t"] = "%.9f" % p.time
         row["src"] = str(p[IP].src)
         row["dst"] = str(p[IP].dst)
         if p[TCP].dport == 443:
@@ -29,7 +30,7 @@ def genrows(reader):
         row["syn"] = r_boolean(p[TCP].flags & FLAG_SYN)
         yield row
 
-writer = csv.DictWriter(sys.stdout, ("src", "dst", "dir", "syn", "iplen", "datalen", "google"), dialect="excel-tab")
+writer = csv.DictWriter(sys.stdout, ("t", "src", "dst", "dir", "syn", "iplen", "datalen", "google"), dialect="excel-tab")
 writer.writeheader()
 
 for row in genrows(PcapReader("traces/lbl.https.non-goog.dpriv")):
