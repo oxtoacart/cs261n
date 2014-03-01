@@ -1,3 +1,5 @@
+library(ggplot2)
+
 x <- read.delim("table.dat")
 x <- x[order(x$t),]
 
@@ -35,7 +37,7 @@ intervals <- Reduce(append, lapply(levels(syn.out$src), function(src) {
 	diff(syn.out[syn.out$src==src,]$t)
 }))
 png("diagrams/syninterval-out.png")
-hist(intervals)
+qplot(intervals, geom="histogram")
 dev.off()
 
 syn.google.out <- x[x$syn & x$dir=="OUT" & x$google,]
@@ -43,5 +45,5 @@ intervals <- Reduce(append, lapply(levels(syn.google.out$src), function(src) {
 	diff(syn.google.out[syn.google.out$src==src,]$t)
 }))
 png("diagrams/syninterval-google-out.png")
-hist(intervals)
+qplot(intervals, geom="histogram")
 dev.off()
