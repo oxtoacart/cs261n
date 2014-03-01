@@ -1,4 +1,5 @@
 x <- read.delim("table.dat")
+x <- x[order(x$t),]
 
 min.datalen <- min(x$datalen)
 max.datalen <- max(x$datalen)
