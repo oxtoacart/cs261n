@@ -39,6 +39,9 @@ intervals <- Reduce(append, lapply(levels(syn.out$src), function(src) {
 png("diagrams/syninterval-out.png")
 qplot(intervals, geom="histogram")
 dev.off()
+png("diagrams/syninterval-out-log.png")
+qplot(intervals, geom="histogram") + scale_x_log10(breaks=c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000))
+dev.off()
 
 syn.google.out <- x[x$syn & x$dir=="OUT" & x$google,]
 intervals <- Reduce(append, lapply(levels(syn.google.out$src), function(src) {
@@ -46,4 +49,7 @@ intervals <- Reduce(append, lapply(levels(syn.google.out$src), function(src) {
 }))
 png("diagrams/syninterval-google-out.png")
 qplot(intervals, geom="histogram")
+dev.off()
+png("diagrams/syninterval-google-out-log.png")
+qplot(intervals, geom="histogram") + scale_x_log10(breaks=c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000))
 dev.off()
