@@ -37,10 +37,10 @@ intervals <- Reduce(append, lapply(levels(syn.out$src), function(src) {
 	diff(syn.out[syn.out$src==src,]$t)
 }))
 png("diagrams/syninterval-out.png")
-qplot(intervals, geom="histogram", title="Interval between SYNs") + xlab("time elapsed between SYNs")
+qplot(intervals, geom="histogram", title="Interval between SYNs", binwidth=2) + xlab("time elapsed between SYNs")
 dev.off()
 png("diagrams/syninterval-out-log.png")
-qplot(intervals, geom="histogram", title="Interval between SYNs") + xlab("time elapsed between SYNs")+ scale_x_log10(breaks=c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000))
+qplot(intervals, geom="histogram", title="Interval between SYNs", binwidth=0.02) + xlab("time elapsed between SYNs")+ scale_x_log10(breaks=c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000))
 dev.off()
 
 syn.google.out <- x[x$syn & x$dir=="OUT" & x$google,]
@@ -48,8 +48,8 @@ intervals <- Reduce(append, lapply(levels(syn.google.out$src), function(src) {
 	diff(syn.google.out[syn.google.out$src==src,]$t)
 }))
 png("diagrams/syninterval-google-out.png")
-qplot(intervals, geom="histogram", title="Interval between SYNs (Google only)") + xlab("time elapsed between SYNs")
+qplot(intervals, geom="histogram", title="Interval between SYNs (Google only)", binwidth=2) + xlab("time elapsed between SYNs")
 dev.off()
 png("diagrams/syninterval-google-out-log.png")
-qplot(intervals, geom="histogram", title="Interval between SYNs (Google only)") + xlab("time elapsed between SYNs")+ scale_x_log10(breaks=c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000))
+qplot(intervals, geom="histogram", title="Interval between SYNs (Google only)", binwidth=0.02) + xlab("time elapsed between SYNs")+ scale_x_log10(breaks=c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000))
 dev.off()
