@@ -11,7 +11,7 @@ traces/%: traces/%.gz
 diagrams/datalen.png diagrams/datalen-in.png diagrams/datalen-out.png \
 diagrams/datalen-google.png diagrams/datalen-google-in.png diagrams/datalen-google-out.png \
 diagrams/syninterval-out.png diagrams/syninterval-google-out.png \
-diagrams/syninterval-out-log.png diagrams/syninterval-google-out-log.png: table.dat
+diagrams/syninterval-out-log.png diagrams/syninterval-google-out-log.png: diagrams.R table.dat
 	Rscript diagrams.R
 
 .PHONY: all
