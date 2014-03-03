@@ -7,27 +7,27 @@ min.datalen <- min(x$datalen)
 max.datalen <- max(x$datalen)
 
 png("diagrams/datalen.png")
-hist(x$datalen, max.datalen - min.datalen + 1, main="TCP payload length", xlab="length", ylab="count")
+qplot(x$datalen, geom="histogram", title="TCP payload length", binwidth=1) + xlab("length")
 dev.off()
 
 png("diagrams/datalen-in.png")
-hist(x[x$dir=="IN",]$datalen, max.datalen - min.datalen + 1, main="TCP payload length (incoming)", xlab="length", ylab="count")
+qplot(x[x$dir=="IN",]$datalen, title="TCP payload length (incoming)", binwidth=1) + xlab("length")
 dev.off()
 
 png("diagrams/datalen-out.png")
-hist(x[x$dir=="OUT",]$datalen, max.datalen - min.datalen + 1, main="TCP payload length (outgoing)", xlab="length", ylab="count")
+qplot(x[x$dir=="OUT",]$datalen, title="TCP payload length (outgoing)", binwidth=1) + xlab("length")
 dev.off()
 
 png("diagrams/datalen-google.png")
-hist(x[x$google,]$datalen, max.datalen - min.datalen + 1, main="TCP payload length (Google only)", xlab="length", ylab="count")
+qplot(x[x$google,]$datalen, title="TCP payload length (Google only)", binwidth=1) + xlab("length")
 dev.off()
 
 png("diagrams/datalen-google-in.png")
-hist(x[x$google & x$dir=="IN",]$datalen, max.datalen - min.datalen + 1, main="TCP payload length (incoming, Google only)", xlab="length", ylab="count")
+qplot(x[x$google & x$dir=="IN",]$datalen, title="TCP payload length (incoming, Google only)", binwidth=1) + xlab("length")
 dev.off()
 
 png("diagrams/datalen-google-out.png")
-hist(x[x$google & x$dir=="OUT",]$datalen, max.datalen - min.datalen + 1, main="TCP payload length (outgoing, Google only)", xlab="length", ylab="count")
+qplot(x[x$google & x$dir=="OUT",]$datalen, title="TCP payload length (outgoing, Google only)", binwidth=1) + xlab("length")
 dev.off()
 
 syn.out <- x[x$syn & x$dir=="OUT",]
