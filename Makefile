@@ -28,4 +28,4 @@ diagrams/flowduration.png diagrams/flowduration-google.png: diagrams.R table.dat
 	Rscript diagrams.R
 
 .PHONY: all
-.SECONDARY: table.dat
+.SECONDARY: table.dat goog.log non-goog.log
