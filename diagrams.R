@@ -65,7 +65,7 @@ qplot(y, geom="histogram", title="Flow duration", binwidth=2) + xlab("duration")
 dev.off()
 
 y <- (read.table('goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))$duration
-png("diagrams/flowduration-goog.png")
+png("diagrams/flowduration-google.png")
 qplot(y, geom="histogram", title="Flow duration (Google only)", binwidth=2) + xlab("duration")
 dev.off()
 
