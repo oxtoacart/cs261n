@@ -53,3 +53,14 @@ dev.off()
 png("diagrams/syninterval-google-out-log.png")
 qplot(intervals, geom="histogram", title="Interval between SYNs (Google only)", binwidth=0.02) + xlab("time elapsed between SYNs")+ scale_x_log10(breaks=c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000))
 dev.off()
+
+y <- (read.table('non-goog.log'))[,9]
+png("diagrams/flowduration.png")
+qplot(y, geom="histogram", title="Flow duration", binwidth=2) + xlab("duration")
+dev.off()
+
+y <- (read.table('goog.log'))[,9]
+png("diagrams/flowduration-goog.png")
+qplot(y, geom="histogram", title="Flow duration (Google only)", binwidth=2) + xlab("duration")
+dev.off()
+
