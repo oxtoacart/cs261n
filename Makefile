@@ -23,9 +23,11 @@ non-goog.log: traces/lbl.https.non-goog.dpriv
 diagrams/datalen.png diagrams/datalen-in.png diagrams/datalen-out.png \
 diagrams/datalen-google.png diagrams/datalen-google-in.png diagrams/datalen-google-out.png \
 diagrams/syninterval-out.png diagrams/syninterval-google-out.png \
-diagrams/syninterval-out-log.png diagrams/syninterval-google-out-log.png \
-diagrams/flowduration.png diagrams/flowduration-google.png: diagrams.R table.dat non-goog.log goog.log
+diagrams/syninterval-out-log.png diagrams/syninterval-google-out-log.png: diagrams.R table.dat
 	Rscript diagrams.R
+
+diagrams/flowduration.png diagrams/flowduration-google.png: bro-diagrams.R non-goog.log goog.log
+	Rscript bro-diagrams.R
 
 .PHONY: all
 .SECONDARY: table.dat goog.log non-goog.log

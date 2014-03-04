@@ -53,19 +53,3 @@ dev.off()
 png("diagrams/syninterval-google-out-log.png")
 qplot(intervals, geom="histogram", main="Interval between SYNs (Google only)", binwidth=0.02) + xlab("time elapsed between SYNs")+ scale_x_log10(breaks=c(0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000))
 dev.off()
-
-#fields          ts         uid       id.orig_h    id.orig_p    id.resp_h    id.resp_p    proto     service    duration    orig_bytes    resp_bytes    conn_state    local_orig    missed_bytes    history      orig_pkts    orig_ip_bytes    resp_pkts    resp_ip_bytes    tunnel_parents
-broNames <-   c("ts",      "uid",    "id.orig_h", "id.orig_p", "id.resp_h", "id.resp_p", "proto",  "service", "duration", "orig_bytes", "resp_bytes", "conn_state", "local_orig", "missed_bytes", "history",   "orig_pkts", "orig_ip_bytes", "resp_pkts", "resp_ip_bytes", "tunnel_parents")
-#types           time       string    addr         port         addr         port         enum      string     interval    count         count         string        bool          count           string       count        count            count        count            table[string]
-broClasses <- c("numeric", "factor", "factor",    "factor",    "factor",    "factor",    "factor", "factor",  "numeric",  "integer",    "integer",    "character",  "logical",    "integer",      "character", "integer",   "integer",       "integer",   "integer",       "character")
-
-y <- (read.table('non-goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))$duration
-png("diagrams/flowduration.png")
-qplot(y, geom="histogram", main="Flow duration", binwidth=2) + xlab("duration")
-dev.off()
-
-y <- (read.table('goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))$duration
-png("diagrams/flowduration-google.png")
-qplot(y, geom="histogram", main="Flow duration (Google only)", binwidth=2) + xlab("duration")
-dev.off()
-
