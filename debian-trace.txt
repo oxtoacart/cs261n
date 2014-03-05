@@ -1,6 +1,10 @@
-iptables -I OUTPUT 1 -m owner \! --uid-owner debian-tor -j DROP
+iptables -P OUTPUT DROP
+iptables -I OUTPUT 1 -m owner --uid-owner debian-tor -j ACCEPT
+iptables -I OUTPUT 1 -m state --state RELATED,ESTABLISHED -j ACCEPT
 iptables -I OUTPUT 1 -o lo -j ACCEPT
-ip6tables -I OUTPUT 1 -m owner \! --uid-owner debian-tor -j DROP
+ip6tables -P OUTPUT DROP
+ip6tables -I OUTPUT 1 -m owner --uid-owner debian-tor -j ACCEPT
+ip6tables -I OUTPUT 1 -m state --state RELATED,ESTABLISHED -j ACCEPT
 ip6tables -I OUTPUT 1 -o lo -j ACCEPT
 apt-get install iptables-persistent
 
