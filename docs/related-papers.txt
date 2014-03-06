@@ -1,0 +1,54 @@
+Related Papers
+
+== Censorship Analysis
+
+"How the Great Firewall of China is Blocking Tor"
+http://www.cs.kau.se/philwint/pdf/foci2012.pdf
+Outline: Great Firewall of China might spoof IP addresses for the purpose of scanning Tor bridges.  Tor traffic is currently distinguishable from what is regarded as harmless traffic in China.  It is crucial to minimize the distinguishability.
+
+== Covert Channel
+
+"I Want my Voice to be Heard: IP over Voice-over-IP for Unobservable Censorship Circumvention"
+http://www.cs.utexas.edu/~amir/papers/FreeWave.pdf
+Outline: use Skype as the covert channel to tunnel traffic.
+
+"OSS: Using Online Scanning Services for Censorship Circumvention"
+http://freehaven.net/anonbib/papers/pets2013/paper_29.pdf
+
+"CensorSpoofer: Asymmetric Communication using IP Spoofing for Censorship-Resistant Web Browsing"
+http://www.cs.utexas.edu/~amir/papers/censorspoofer.pdf
+
+== Usability
+
+"Evading Censorship with Browser-Based Proxies"
+https://crypto.stanford.edu/flashproxy/flashproxy.pdf
+
+== Steganography
+
+"ScrambleSuit: A Polymorphic Network Protocol to Circumvent Censorship"
+http://www.cs.kau.se/philwint/pdf/wpes2013.pdf
+Outline: random payload, polymorphic packet shape (packet length, inter-arrival time)
+
+"StegoTorus: A Camouflage Proxy for the Tor Anonymity System"
+http://www.owlfolio.org/media/2010/05/stegotorus.pdf
+Outline: mimic HTTP or Skype traffic. 
+
+"SkypeMorph: Protocol Obfuscation for Tor Bridges"
+https://cs.uwaterloo.ca/~iang/pubs/skypemorph-ccs.pdf
+
+"Protocol Misidentification Made Easy with Format-Transforming Encryption"
+https://eprint.iacr.org/2012/494.pdf
+
+"Dust: A Blocking-Resistant Internet Transport Protocol"
+http://blanu.net/Dust.pdf
+
+== Critiques
+
+"The Parrot is Dead: Observing Unobservable Network Communications"
+http://www.cs.utexas.edu/~shmat/shmat_oak13parrot.pdf
+
+"Cover Your ACKs: Pitfalls of Covert Channel Censorship Circumvention"
+http://www-users.cs.umn.edu/~hopper/ccs13-cya.pdf
+
+"No Direction Home: The True Cost of Routing Around Decoys"
+http://www.cs.utexas.edu/~amir/papers/DecoyCosts.pdf
