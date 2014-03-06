@@ -5,12 +5,25 @@ broNames <-   c("ts",      "uid",    "id.orig_h", "id.orig_p", "id.resp_h", "id.
 #types           time       string    addr         port         addr         port         enum      string     interval    count         count         string        bool          count           string       count        count            count        count            table[string]
 broClasses <- c("numeric", "factor", "factor",    "factor",    "factor",    "factor",    "factor", "factor",  "numeric",  "integer",    "integer",    "character",  "logical",    "integer",      "character", "integer",   "integer",       "integer",   "integer",       "character")
 
-y <- (read.table('non-goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))$duration
+nongoog <- (read.table('non-goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
+goog <- (read.table('goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
+
+y <- nongoog$duration
 png("diagrams/flowduration.png")
 qplot(y, geom="histogram", main="Flow duration", binwidth=2) + xlab("duration")
 dev.off()
 
-y <- (read.table('goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))$duration
+y <- (nongoog$resp_ip_bytes) / (nongoog$orig_ip_bytes)
+png("diagrams/ratio.png")
+qplot(y, geom="histogram", main="Downstream/Upstream Ratio", binwidth=2) + xlab("ratio")
+dev.off()
+
+y <- goog$duration
 png("diagrams/flowduration-google.png")
 qplot(y, geom="histogram", main="Flow duration (Google only)", binwidth=2) + xlab("duration")
+dev.off()
+
+y <- (goog$resp_ip_bytes) / (goog$orig_ip_bytes)
+png("diagrams/ratio-google.png")
+qplot(y, geom="histogram", main="Downstream/Upstream Ratio (Google only)", binwidth=2) + xlab("duration")
 dev.off()
