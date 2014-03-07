@@ -1,5 +1,4 @@
-\documentclass{article} 
-\usepackage{url}
+\documentclass{article}  usepackage{url}
 
 \begin{document}
 
@@ -21,21 +20,26 @@ unblockability: making it difficult for the censor simply to block proxies by
 address. Past works have considered one or both of these problems.\\
 
 To protect the relays from being detected and blocked, a school of research
-tries to use covert channels for the communication with relays. FreeWave~\cite{freewave}
-encodes data into audio streams and use the Skype P2P network to communicate
-with the proxy located outside the censored domain, which is essentially another
-Skype client that decodes the stream. The proxy then forward the traffic to the
-true destination. A technique known as OSS~\cite{oss}, for ``online scanning
-service,'' closely resembles ours in important ways. It uses a third-party web
-service as a conduit to carry traffic, encoded either in a URL or in an HTTP
-body. Because web services cannot in general be assumed to reproduce a web
-server's response exactly (a translation service, for example, returns a
-response after translating it to another language), OSS does not use response
-bodies to carry data, instead requiring the relay to initiate a reflected
-request back to the client. OSS also does not claim that any one service is
-difficult to block, rather that there are many web services that can be used.
-The main ways in which this work differs is that we effectively control the OSS:
-we can count on response bodies being preserved and so use them to send
+tries to use covert channels for the communication with relays.
+FreeWave~\cite{freewave} encodes data into audio streams and use the Skype P2P
+network to communicate with the proxy located outside the censored domain, which
+is essentially another Skype client that decodes the stream. The proxy then
+forward the traffic to the true destination. CensorSpoofer~\cite{censorspoofer}
+decouples the upstream and downstream channel. It assumes the existence of a
+low-bandwidth indirect channel that is immune from censorship. It uses this
+channel for send requests (URLs) to the proxy while sending dummy requests to a
+dummy host. The proxy then fetches the web content and spoofs the dummy host's
+IP address to deliver the content back. A technique known as OSS~\cite{oss}, for
+``online scanning service,'' closely resembles ours in important ways. It uses a
+third-party web service as a conduit to carry traffic, encoded either in a URL
+or in an HTTP body. Because web services cannot in general be assumed to
+reproduce a web server's response exactly (a translation service, for example,
+returns a response after translating it to another language), OSS does not use
+response bodies to carry data, instead requiring the relay to initiate a
+reflected request back to the client. OSS also does not claim that any one
+service is difficult to block, rather that there are many web services that can
+be used. The main ways in which this work differs is that we effectively control
+the OSS: we can count on response bodies being preserved and so use them to send
 downstream data; and we put the OSS on infrastructure that is expensive to
 block.\\
 
@@ -54,8 +58,10 @@ payloads, but takes additional steps to obscure its signature of packet lengths
 and timing, and is designed to resist active scanning for proxies (the proxy
 server says nothing until the client proves knowledge of a shared secret).
 Another path to obfsucation is the steganographic approach: look like something
-the censor doesn't block. StegoTorus~\cite{stegotorus} and Code Talker Tunnel (formerly called SkypeMorph)~\cite{skypemorph} camouflage Tor
-traffic and attempt to mimic HTTP or Skype traffic.\\
+the censor doesn't block. StegoTorus~\cite{stegotorus} and Code Talker Tunnel
+(formerly called SkypeMorph)~\cite{skypemorph} camouflage Tor traffic and
+attempt to mimic HTTP or Skype traffic. CensorSpoofer also mimics SIP-based VoIP
+to hide the upstream channel.\\
 
 Houmansadr et al.~\cite{parrot} evaluate these steganography-based (parrot)
 systems and conclude that unobservability by imitation is a ``fundamentally
@@ -80,8 +86,6 @@ provide a few bridges to anyone who asks, while at the same time making it
 difficult to learn the entire list of secret bridges. The plain Tor protocol
 remains relatively easy to detect, so BridgeDB is also capable of distributing
 obfsproxy and ScrambleSuit bridges.\\
-
-censorspoofer~\cite{censorspoofer} \\
 
 There are a few approaches proposed to address the problem of proxy diversity.
 Flash proxy~\cite{flashproxy-pets12} attempts to address the problem  by
@@ -109,21 +113,18 @@ can take advantage of. \\
 
 How the GFW is blocking Tor. \cite{foci12-winter}\\
 
-GoAgent~\cite{goagent} is a direct inspiration for our work in its use of App Engine
-and Host header--based domain fronting.
-GoAgent requires users to upload a personal copy of the server code to App Engine,
-and App Engine itself makes HTTP requests, not some proxy farther out.
-According to a May 2013 survey~\cite{collateral-freedom},
-GoAgent was then the circumvention tool most used in China,
-with 35\% of survey respondants having used it in the previous month.
-This figure is higher than that of paid~(29\%) and free VPNs~(18\%),
-and far above that of other special-purpose tools like Tor~(2.9\%)
-and Psiphon~(2.5\%).
+GoAgent~\cite{goagent} is a direct inspiration for our work in its use of App
+Engine and Host header--based domain fronting. GoAgent requires users to upload
+a personal copy of the server code to App Engine, and App Engine itself makes
+HTTP requests, not some proxy farther out. According to a May 2013 survey~\cite
+{collateral-freedom}, GoAgent was then the circumvention tool most used in
+China, with 35\% of survey respondants having used it in the previous month.
+This figure is higher than that of paid~(29\%) and free VPNs~(18\%), and far
+above that of other special-purpose tools like Tor~(2.9\%) and Psiphon~(2.5\%).
 \\
 
 % CORDON? Say how meek would be classified in it?
 
-\bibliographystyle{plain} 
-\bibliography{related-work}
+\bibliographystyle{plain}  bibliography{related-work}
 
 \end{document}
