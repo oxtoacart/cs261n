@@ -1,2 +1,7 @@
 /traces/*.gz
 table.dat
+
+# R stuff
+/.RData
+/.Rhistory
+/.state
