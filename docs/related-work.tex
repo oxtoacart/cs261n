@@ -12,13 +12,13 @@ In response to Internet censorship, many research papers and pragmatic systems
 such Freegate, Psiphon, and Lantern have explored the design space of censorship
 circumvention. All these schemes are based on a simple idea: deploy a set of
 proxies outside the censor's domain, and let the user connect to one of them
-which can pass data on to the true destination for the user.
+which can pass data on to the true destination for the user.\\
 
 Broadly speaking, there are two main challenges to proxy-based circumvention.
 The first is obfuscation: making circumvention traffic difficult to distinguish
 from traffic the censor wishes to allow. The second is proxy address
 unblockability: making it difficult for the censor simply to block proxies by
-address. Past works have considered one or both of these problems.
+address. Past works have considered one or both of these problems.\\
 
 To protect the relays from being detected and blocked, a school of research
 tries to use covert channels for the communication with relays. FreeWave~\cite{freewave}
@@ -37,7 +37,7 @@ difficult to block, rather that there are many web services that can be used.
 The main ways in which this work differs is that we effectively control the OSS:
 we can count on response bodies being preserved and so use them to send
 downstream data; and we put the OSS on infrastructure that is expensive to
-block.
+block.\\
 
 Traffic using covert channels may exhibit distinguishable characteristics. As
 noted by Winter et al.~\cite{foci12-winter}, Tor traffic is currently
@@ -55,7 +55,7 @@ and timing, and is designed to resist active scanning for proxies (the proxy
 server says nothing until the client proves knowledge of a shared secret).
 Another path to obfsucation is the steganographic approach: look like something
 the censor doesn't block. StegoTorus~\cite{stegotorus} and SkypeMorph~\cite{skypemorph} camouflage Tor
-traffic and attempt to mimic HTTP or Skype traffic.
+traffic and attempt to mimic HTTP or Skype traffic.\\
 
 Houmansadr et al.~\cite{parrot} evaluate these steganography-based (parrot)
 systems and conclude that unobservability by imitation is a ``fundamentally
@@ -70,7 +70,7 @@ attacks that disrupt that covert communication while having no effect or less
 effect on legitimate traffic. Their examination is specific to VoIP protocols,
 where packet losses and duplication are acceptable. The censor then can
 deliberately drop or inject ACKs to disrupt the covert channel without causing
-much collateral damage.
+much collateral damage.\\
 
 Tor has long faced the problem of its entry relays being blocked. The list of
 relays is public, so it easy to block all of them by IP address. Tor
@@ -79,9 +79,9 @@ to serve as entry points for censored users. A system called BridgeDB seeks to
 provide a few bridges to anyone who asks, while at the same time making it
 difficult to learn the entire list of secret bridges. The plain Tor protocol
 remains relatively easy to detect, so BridgeDB is also capable of distributing
-obfsproxy and ScrambleSuit bridges.
+obfsproxy and ScrambleSuit bridges.\\
 
-telex censorspoofer no direction home
+telex censorspoofer no direction home\\
 
 Flash proxy~\cite{flashproxy-pets12} attempts to address the problem of proxy
 diversity by conscripting web users as temporary proxies. Proxies last only as
@@ -91,14 +91,15 @@ sense opposite to this work's: where flash proxy uses many, cheap, unreliable
 proxies, we use just one high-value proxy, to block which would cause expensive
 collateral damage. There exists a prototype transport that combines flash proxy
 with obfsproxy~\cite{obfs-flash}, however it is limited because it is not
-possible to obfuscate flash proxy's outermost WebSocket layer.
+possible to obfuscate flash proxy's outermost WebSocket layer.\\
 
-How the GFW is blocking Tor. \cite{foci12-winter}
+How the GFW is blocking Tor. \cite{foci12-winter}\\
 
-GoAgent
+GoAgent\\
 
 % CORDON? Say how meek would be classified in it?
 
-\bibliographystyle{plain} bibliography{related-work}
+\bibliographystyle{plain} 
+\bibliography{related-work}
 
 \end{document}
