@@ -7,6 +7,6 @@ related-work.pdf:
 	pdflatex $*
 
 clean:
-	rm -f related-work.pdf
+	rm -f related-work.pdf *.aux *.bbl *.log *.blg
 
 .PHONY: clean
