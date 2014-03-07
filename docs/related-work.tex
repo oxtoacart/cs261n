@@ -81,18 +81,31 @@ difficult to learn the entire list of secret bridges. The plain Tor protocol
 remains relatively easy to detect, so BridgeDB is also capable of distributing
 obfsproxy and ScrambleSuit bridges.\\
 
-telex~\cite{telex} censorspoofer~\cite{censorspoofer} no direction home~\cite{nodirectionhome}
-\\
+censorspoofer~\cite{censorspoofer} \\
 
-Flash proxy~\cite{flashproxy-pets12} attempts to address the problem of proxy
-diversity by conscripting web users as temporary proxies. Proxies last only as
-long as a web user stays on a page, so the pool of proxies is constantly
-changing and difficult to block. Their approach to proxy unblockability is in a
-sense opposite to this work's: where flash proxy uses many, cheap, unreliable
-proxies, we use just one high-value proxy, to block which would cause expensive
+There are a few approaches proposed to address the problem of proxy diversity.
+Flash proxy~\cite{flashproxy-pets12} attempts to address the problem  by
+conscripting web users as temporary proxies. Proxies last only as long as a web
+user stays on a page, so the pool of proxies is constantly changing and
+difficult to block. Their approach to proxy unblockability is in a sense
+opposite to this work's: where flash proxy uses many, cheap, unreliable proxies,
+we use just one high-value proxy, to block which would cause expensive
 collateral damage. There exists a prototype transport that combines flash proxy
 with obfsproxy~\cite{obfs-flash}, however it is limited because it is not
-possible to obfuscate flash proxy's outermost WebSocket layer.\\
+possible to obfuscate flash proxy's outermost WebSocket layer. Decoy routing is
+a recently proposed approach for proxy diversity. Telex~\cite{telex} is an
+instance of circumvention systems that leverages decoy routing. Telex relies on
+friendly ISPs that deploy Telex stations on paths between censors' networks and
+popular, uncensored Internet destinations. Telex stations would divert the
+seemingly  innocuous flows to a forbidden site if a special ``tag'' is
+presented. Telex will prevail only if a large number of ISPs are cooperative and
+willing to deploy such stations. A recent study~\cite{nodirectionhome} on ASes
+topology suggests that defeating decoy routing is likely to be expensive for the
+censors, if the decoy routers are strategically deployed. Despite that decoy
+routing is a sound technical approach, it is still questionable if ISPs are
+willing to act against state-level censors. However, the takeaway is that the
+censors are unwilling to completely block day-to-day Internet access, which we
+can take advantage of. \\
 
 How the GFW is blocking Tor. \cite{foci12-winter}\\
 
