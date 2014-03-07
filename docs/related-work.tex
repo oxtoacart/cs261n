@@ -45,21 +45,22 @@ block.\\
 
 Traffic using covert channels may exhibit distinguishable characteristics. As
 noted by Winter et al.~\cite{foci12-winter}, Tor traffic is currently
-distinguishable from what is regarded as harmless traffic. Therefore, another
-school of research focuses on obfuscation techniques for hiding protocol
-patterns. One technique is to look unlike anything forbidden by the censor; that
-is, fail to match a blacklist. Another is to resemble a protocol that is
-explicitly allowed; that is, match a whitelist. Falling into the first category
-are ``look-like-nothing'' transports whose payloads are indistinguishable from a
-uniformly random byte stream. A examples of such a transport is
-obfsproxy~\cite{obfsproxy}, long the go-to obfuscated transport used by Tor.
-ScrambleSuit~\cite{scramblesuit} is like obfsproxy in the content of its
-payloads, but takes additional steps to obscure its signature of packet lengths
-and timing, and is designed to resist active scanning for proxies (the proxy
-server says nothing until the client proves knowledge of a shared secret).
-Another path to obfsucation is the steganographic approach: look like something
-the censor doesn't block. StegoTorus~\cite{stegotorus} and Code Talker Tunnel
-(formerly called SkypeMorph)~\cite{skypemorph} camouflage Tor traffic and
+distinguishable from what is regarded as harmless traffic. In addition, their
+experiments show that the Great Firewall of China actively scans for Tor bridges
+and block them. Therefore, another school of research focuses on obfuscation
+techniques for hiding protocol patterns. One technique is to look unlike
+anything forbidden by the censor; that is, fail to match a blacklist. Another is
+to resemble a protocol that is explicitly allowed; that is, match a whitelist.
+Falling into the first category are ``look-like-nothing'' transports whose
+payloads are indistinguishable from a uniformly random byte stream. A examples
+of such a transport is obfsproxy~\cite{obfsproxy}, long the go-to obfuscated
+transport used by Tor. ScrambleSuit~\cite{scramblesuit} is like obfsproxy in the
+content of its payloads, but takes additional steps to obscure its signature of
+packet lengths and timing, and is designed to resist active scanning for proxies
+(the proxy server says nothing until the client proves knowledge of a shared
+secret). Another path to obfsucation is the steganographic approach: look like
+something the censor doesn't block. StegoTorus~\cite{stegotorus} and Code Talker
+Tunnel (formerly called SkypeMorph)~\cite{skypemorph} camouflage Tor traffic and
 attempt to mimic HTTP or Skype traffic. CensorSpoofer also mimics SIP-based VoIP
 to hide the upstream channel.\\
 
@@ -70,7 +71,7 @@ protocol. To fully mimic a complex and sometimes proprietary protocol like Skype
 is difficult in that the system must mimic the protocol,  reaction to errors and
 network conditions, typical traffic, and implementation-specific artifacts
 correctly, otherwise a weak censor can recognize such traffic at a low cost.
-Therefore we avoid the parrot approach and use HTTPS as the channel. Geddes  et
+Therefore we avoid the parrot approach and use HTTPS as the channel. Geddes et
 al.~\cite{acks} demonstrate that even non-parrot systems may be vulnerable to
 attacks that disrupt that covert communication while having no effect or less
 effect on legitimate traffic. Their examination is specific to VoIP protocols,
@@ -111,14 +112,12 @@ willing to act against state-level censors. However, the takeaway is that the
 censors are unwilling to completely block day-to-day Internet access, which we
 can take advantage of. \\
 
-How the GFW is blocking Tor. \cite{foci12-winter}\\
-
 GoAgent~\cite{goagent} is a direct inspiration for our work in its use of App
 Engine and Host header--based domain fronting. GoAgent requires users to upload
 a personal copy of the server code to App Engine, and App Engine itself makes
 HTTP requests, not some proxy farther out. According to a May 2013 survey~\cite
-{collateral-freedom}, GoAgent was then the circumvention tool most used in
-China, with 35\% of survey respondants having used it in the previous month.
+{collateral-freedom},  GoAgent was then the circumvention tool most used in
+China, with 35\% of survey respondents having used it in the previous month.
 This figure is higher than that of paid~(29\%) and free VPNs~(18\%), and far
 above that of other special-purpose tools like Tor~(2.9\%) and Psiphon~(2.5\%).
 \\
