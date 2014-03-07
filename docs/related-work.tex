@@ -45,7 +45,7 @@ downstream data; and we put the OSS on infrastructure that is expensive to
 block.\\
 
 Traffic using covert channels may exhibit distinguishable characteristics. As
-noted by Winter et al.~\cite{foci12-winter}, Tor traffic is currently
+noted by Winter et~al.~\cite{foci12-winter}, Tor traffic is currently
 distinguishable from what is regarded as harmless traffic. Therefore, another school of research focuses on obfuscation
 techniques for hiding protocol patterns. One technique is to look unlike
 anything forbidden by the censor; that is, fail to match a blacklist. Another is
@@ -63,15 +63,15 @@ Tunnel (formerly called SkypeMorph)~\cite{skypemorph} camouflage Tor traffic and
 attempt to mimic HTTP or Skype traffic. CensorSpoofer also mimics SIP-based VoIP
 to hide the upstream channel.\\
 
-Houmansadr et al.~\cite{parrot} evaluate these steganography-based (parrot)
+Houmansadr et~al.~\cite{parrot} evaluate these steganography-based (parrot)
 systems and conclude that unobservability by imitation is a ``fundamentally
 flawed approach'', since these kind of systems must successfully mimic another
 protocol. To fully mimic a complex and sometimes proprietary protocol like Skype
 is difficult in that the system must mimic the protocol,  reaction to errors and
 network conditions, typical traffic, and implementation-specific artifacts
 correctly, otherwise a weak censor can recognize such traffic at a low cost.
-Therefore we avoid the parrot approach and use HTTPS as the channel. Geddes et
-al.~\cite{acks} demonstrate that even non-parrot systems may be vulnerable to
+Therefore we avoid the parrot approach and use HTTPS as the channel. Geddes et~al.~\cite{acks}
+demonstrate that even non-parrot systems may be vulnerable to
 attacks that disrupt that covert communication while having no effect or less
 effect on legitimate traffic. Their examination is specific to VoIP protocols,
 where packet losses and duplication are acceptable. The censor then can
