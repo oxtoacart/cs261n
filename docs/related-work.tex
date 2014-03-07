@@ -28,7 +28,7 @@ is essentially another Skype client that decodes the stream. The proxy then
 forward the traffic to the true destination. CensorSpoofer~\cite{censorspoofer}
 decouples the upstream and downstream channel. It assumes the existence of a
 low-bandwidth indirect channel that is immune from censorship. It uses this
-channel for send requests (URLs) to the proxy while sending dummy requests to a
+channel for sending requests (URLs) to the proxy while sending dummy requests to a
 dummy host. The proxy then fetches the web content and spoofs the dummy host's
 IP address to deliver the content back. A technique known as OSS~\cite{oss}, for
 ``online scanning service,'' closely resembles ours in important ways. It uses a
@@ -46,9 +46,7 @@ block.\\
 
 Traffic using covert channels may exhibit distinguishable characteristics. As
 noted by Winter et al.~\cite{foci12-winter}, Tor traffic is currently
-distinguishable from what is regarded as harmless traffic. In addition, their
-experiments show that the Great Firewall of China actively scans for Tor bridges
-and block them. Therefore, another school of research focuses on obfuscation
+distinguishable from what is regarded as harmless traffic. Therefore, another school of research focuses on obfuscation
 techniques for hiding protocol patterns. One technique is to look unlike
 anything forbidden by the censor; that is, fail to match a blacklist. Another is
 to resemble a protocol that is explicitly allowed; that is, match a whitelist.
