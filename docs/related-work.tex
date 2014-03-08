@@ -1,6 +1,8 @@
 \documentclass{article}  
 \usepackage{url}
 
+\setlength{\parskip}{\baselineskip}
+
 \begin{document}
 
 % VPN arms race We seek to build a system that remains difficult to block even
@@ -12,13 +14,13 @@ In response to Internet censorship, many research papers and pragmatic systems
 such Freegate, Psiphon, and Lantern have explored the design space of censorship
 circumvention. All these schemes are based on a simple idea: deploy a set of
 proxies outside the censor's domain, and let the user connect to one of them
-which can pass data on to the true destination for the user.\\
+which can pass data on to the true destination for the user.
 
 Broadly speaking, there are two main challenges to proxy-based circumvention.
 The first is obfuscation: making circumvention traffic difficult to distinguish
 from traffic the censor wishes to allow. The second is proxy address
 unblockability: making it difficult for the censor simply to block proxies by
-address. Past works have considered one or both of these problems.\\
+address. Past works have considered one or both of these problems.
 
 To protect the relays from being detected and blocked, a school of research
 tries to use covert channels for the communication with relays.
@@ -42,7 +44,7 @@ service is difficult to block, rather that there are many web services that can
 be used. The main ways in which this work differs is that we effectively control
 the OSS: we can count on response bodies being preserved and so use them to send
 downstream data; and we put the OSS on infrastructure that is expensive to
-block.\\
+block.
 
 Traffic using covert channels may exhibit distinguishable characteristics. As
 noted by Winter et~al.~\cite{foci12-winter}, Tor traffic is currently
@@ -61,7 +63,7 @@ secret). Another path to obfuscation is the steganographic approach: look like
 something the censor doesn't block. StegoTorus~\cite{stegotorus} and Code Talker
 Tunnel (formerly called SkypeMorph)~\cite{skypemorph} camouflage Tor traffic and
 attempt to mimic HTTP or Skype traffic. CensorSpoofer also mimics SIP-based VoIP
-to hide the upstream channel.\\
+to hide the upstream channel.
 
 Houmansadr et~al.~\cite{parrot} evaluate these steganography-based (parrot)
 systems and conclude that unobservability by imitation is a ``fundamentally
@@ -76,7 +78,7 @@ attacks that disrupt that covert communication while having no effect or less
 effect on legitimate traffic. Their examination is specific to VoIP protocols,
 where packet losses and duplication are acceptable. The censor then can
 deliberately drop or inject ACKs to disrupt the covert channel without causing
-much collateral damage.\\
+much collateral damage.
 
 Tor has long faced the problem of its entry relays being blocked. The list of
 relays is public, so it easy to block all of them by IP address. Tor
@@ -85,7 +87,7 @@ to serve as entry points for censored users. A system called BridgeDB seeks to
 provide a few bridges to anyone who asks, while at the same time making it
 difficult to learn the entire list of secret bridges. The plain Tor protocol
 remains relatively easy to detect, so BridgeDB is also capable of distributing
-obfsproxy and ScrambleSuit bridges.\\
+obfsproxy and ScrambleSuit bridges.
 
 There are a few approaches proposed to address the problem of proxy diversity.
 Flash proxy~\cite{flashproxy-pets12} attempts to address the problem  by
@@ -109,7 +111,7 @@ censors, if the decoy routers are strategically deployed. Despite that decoy
 routing is a sound technical approach, it is still questionable if ISPs are
 willing to act against state-level censors. However, the takeaway is that the
 censors are unwilling to completely block day-to-day Internet access, which we
-can take advantage of.\\
+can take advantage of.
 
 GoAgent~\cite{goagent} is a direct inspiration for our work in its use of App
 Engine and Host header--based domain fronting. GoAgent requires users to upload
@@ -119,7 +121,6 @@ HTTP requests, not some proxy farther out. According to a May 2013 survey~\cite
 China, with 35\% of survey respondents having used it in the previous month.
 This figure is higher than that of paid~(29\%) and free VPNs~(18\%), and far
 above that of other special-purpose tools like Tor~(2.9\%) and Psiphon~(2.5\%).
-\\
 
 Winter and Lindskog~\cite{foci12-winter} investigated how China's Great Firewall blocks Tor.
 They confirmed an earlier discovery of Wilde~\cite{wilde} that the firewall identifies Tor relays using more than passive monitoring:
@@ -128,7 +129,6 @@ blocks them for the future.
 (At the time, the firewall identified connections for future probing by looking for a distinctive
 list of ciphersuites sent by a Tor client in its TLS client hello.) %\cite{bug4744}
 The discovery of active probing was the motivation for probing resistance in ScrambleSuit.
-\\
 
 % CORDON? Say how meek would be classified in it?
 
