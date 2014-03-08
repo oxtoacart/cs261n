@@ -113,6 +113,12 @@ willing to act against state-level censors. However, the takeaway is that the
 censors are unwilling to completely block day-to-day Internet access, which we
 can take advantage of.
 
+Of the decoy routing systems, Telex is the most similar to ours.
+Both use a piece of network infrastructure as a decoy to redirect certain flows
+(for Telex it is an ISP router; for us it is the Google frontend server),
+and both tag flows in a way that is visible only to the decoy
+(for Telex a tag is a hash embedded in the TLS client randomness; for us it is the HTTP Host header).
+
 GoAgent~\cite{goagent} is a direct inspiration for our work in its use of App
 Engine and Host header--based domain fronting. GoAgent requires users to upload
 a personal copy of the server code to App Engine, and App Engine itself makes
