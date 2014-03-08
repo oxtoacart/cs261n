@@ -37,16 +37,16 @@ content of its payloads, but it takes additional steps to obscure its traffic si
 (the proxy server remains silent until the client proves knowledge of a shared
 secret).
 
-The other category of obfuscation contains transports that take the the steganographic approach: look like
+The other category of obfuscation contains transports that take the steganographic approach: look like
 something the censor doesn't block. StegoTorus~\cite{stegotorus}
-encodes traffic so as to look like a cover protocol, such as unencrypted HTTP,
+encodes traffic to look like a cover protocol, such as unencrypted HTTP,
 using special-purpose encoders.
 Code Talker
 Tunnel (formerly called SkypeMorph)~\cite{skypemorph} mimics a Skype video call.
 FreeWave~\cite{freewave} encodes a digital stream into an acoustic signal
 and sends it over VoIP to a proxy which decodes and forwards it to the destination.
-Format-transforming encryption~\cite{fte} encodes data into strings that a given regular expression,
-in order to match a firewall's whitelist or avoid matching its blacklist.
+Format-transforming encryption~\cite{fte} encodes data into strings that match a given regular expression,
+in order to match a firewall's whitelist or avoid matching a blacklist.
 
 Houmansadr et~al.~\cite{parrot} evaluate ``parrot'' systems that imitate a particular implementation of a protocol
 and conclude that unobservability by imitation is a ``fundamentally
@@ -58,7 +58,7 @@ Geddes et~al.~\cite{acks}
 demonstrate that even non-parrot systems may be vulnerable to
 attacks that disrupt covert communication while having little effect
 on legitimate traffic. Their examination is specific to VoIP protocols,
-where packet losses and duplication are acceptable. The censor may
+where packet loss and duplication are acceptable. The censor may
 deliberately drop or inject ACKs in order to disrupt the covert channel, without causing
 much collateral damage.
 
@@ -68,18 +68,18 @@ for which there have been a few approaches proposed.
 Tor has long faced the problem of its entry relays being blocked. The list of
 relays is public, so it easy to block all of them by IP address. Tor
 bridges~\cite{tor-blocking} are relays that are not universally known, intended
-to serve as entry points for censored users. A bridge database (BridgeDB) seeks to
+to serve as entry points for censored users. A database of bridges (BridgeDB) seeks to
 provide a few secret bridges to anyone who asks, while at the same time making it
 difficult to learn the entire list. BridgeDB is capable of distributing
 the addresses of obfsproxy and ScrambleSuit bridges, and the combination
-of selective bridge distribution and traffic obfuscation has had some success as comprehensive circumvention.
+of selective bridge distribution and traffic obfuscation has had some success as a comprehensive circumvention solution.
 It remains the case that there are simply not enough bridges to keep them all secret for long against a resourceful adversary.
 
 Flash proxy~\cite{flashproxy} attempts to address the problem  by
 conscripting web users as temporary proxies. Proxies last only as long as a web
 user stays on a page, so the pool of proxies is constantly changing and
 difficult to block.
-Flash proxy's approach to proxy unblockability is in a sense
+Flash proxy's approach to unblockability is in a sense
 the opposite of ours: where flash proxy uses cheap, disposable, individually blockable proxies,
 we use just one high-value proxy, which shares its fate with network
 infrastructure that is expensive to block.
@@ -108,7 +108,7 @@ Decoy routing is
 a recently proposed anti-blocking approach. Telex~\cite{telex}
 asks friendly ISPs to deploy special software on routers between censored users and
 popular, uncensored Internet destinations.
-Circumvention traffic is marked with a special ``tag'' that is distinguishable from random only
+Circumvention traffic is marked with a special ``tag'' that is distinguishable from a random string only
 by Telex routers (not by the censor).
 On receiving such a tagged communication, the Telex router shunts it away from its apparent destination
 and toward the censored destination requested by the client.
@@ -117,7 +117,7 @@ decouples the upstream and downstream channels.
 Upstream data are carried over a low-bandwidth covert channel such as email.
 The CensorSpoofer proxy protects its address by
 spoofing the source IP address of all downstream data sent back to the client.
-In addition to spoofing, the CensorSpoofer authors propose a obfuscating the downstream with a SIP-based steganographic channel.
+In addition to spoofing, the CensorSpoofer authors propose to obfuscate the downstream with a SIP-based steganographic channel.
 A recent study~\cite{nodirectionhome} on AS
 topology suggests that defeating decoy routing is likely to be expensive for the
 censors, if the decoy routers are strategically deployed. Despite that decoy
@@ -138,8 +138,8 @@ Winter and Lindskog~\cite{foci12-winter} investigated how China's Great Firewall
 They confirmed an earlier discovery of Wilde~\cite{wilde} that the firewall identifies Tor relays using more than passive monitoring:
 it actively probes destination addresses to see if they speak the Tor protocol, and if so,
 blocks them for the future.
-(At the time, the firewall identified connections for future probing by looking for a distinctive
-list of ciphersuites sent by a Tor client in its TLS client hello---a failure of obfuscation.) %\cite{bug4744}
+(At the time, the firewall identified potential Tor connections for future probing by looking for a distinctive
+list of TLS ciphersuites---a failure of obfuscation.) %\cite{bug4744}
 The discovery of Chinese active probing was the motivation for probing resistance in ScrambleSuit
 and in our work.
 
@@ -148,7 +148,7 @@ Engine and Host header--based domain fronting. GoAgent requires users to upload
 a personal copy of the server code to App Engine, and works only with HTTP and HTTPS,
 not other TCP-based protocols.
 According to a May 2013 survey~\cite{collateral-freedom},
-GoAgent was then the circumvention tool most used in
+GoAgent was the circumvention tool most used in
 China, with 35\% of survey respondents having used it in the previous month.
 This figure is higher than that of paid~(29\%) and free VPNs~(18\%), and far
 above that of other special-purpose tools like Tor~(2.9\%) and Psiphon~(2.5\%).
