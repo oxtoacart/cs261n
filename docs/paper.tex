@@ -156,6 +156,32 @@ Users identified reliability, speed, and ease of installation as the most import
 
 % CORDON? Say how meek would be classified in it?
 
+\section{Other third-party services}
+
+A censor can block meek by blocking access to Google entirely.
+To take such a step is extreme, because of its high collateral damage,
+but it is not outside the realm of possibility.
+% Cite when Google and Gmail were completely blocked temporarily.
+We investigated how easily our system can be adapted to hard-to-block systems other than Google,
+and found that CloudFlare, a content delivery network, in principle supports domain fronting.
+
+CloudFlare provides the frontend of $X$ web sites, $Y$ of them supporting HTTPS~\cite{something}.
+CloudFlare supports the domain fronting trick;
+that is, it is possible that a request has one domain in the TLS layer
+and another in the HTTP layer, and the CloudFlare server will transparently redirect it to proper place.
+While we verified that domain fronting would work on CloudFlare,
+we did not test deployment,
+because when we asked we were told that our planned use would be against CloudFlare's terms of service.
+CloudFlare hosts a number of HTTPS sites.
+Choosing just one of them to be the front in TLS connections could cause
+the innocent third-party domain to be censored even though it is not itself carrying any circumvention traffic.
+To avoid this problem, the front can be simply a CloudFlare IP address,
+with no SNI at all.
+The censor then faces the choice of allowing circumvention traffic,
+or else blocking a large number of popular unrelated web sites.
+
+We were not able to make the system work with Amazon CloudFront nor Akamai.
+
 \bibliographystyle{plain}  
 \bibliography{related-work}
 
