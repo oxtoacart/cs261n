@@ -156,6 +156,36 @@ Users identified reliability, speed, and ease of installation as the most import
 
 % CORDON? Say how meek would be classified in it?
 
+\section{Usage scenarios}
+
+The default usage scenario has a single paid App Engine instance, publicly known and usable by anyone,
+with software configured to use the public instance by default.
+This way has the greatest usability because there is nothing to upload and nothing to configure.
+The number of parties able to analyze users' traffic patterns is somewhat increased:
+the path from user to bridge now includes Google and the app operators, not only the ISP and intermediate routers that were there before.
+On the other hand, the bridge no longer gets to see users' IP addresses.
+In effect, Google and the app become what Tor calls a ``guard node.''
+Because Tor is encrypted and integrity-protected, neither Google nor the app operators
+are able to read or alter users' communications, but being able to measure packet timings,
+for example, is necessary for certain linking attacks.
+
+Users are also free to upload their own personal copy of the App Engine code, as is done with GoAgent.
+App Engine imposes bandwidth quotas on unpaid apps, but they are high enough to allow daily web browsing.
+In this scenario, Google still has a privileged network position,
+but the user's traffic is no longer visible to the operators of the public app instance.
+% Outgoing HTTP requests include app id? As good as an IP address.
+
+The code that runs on App Engine is very simple.
+It just statelessly copies HTTP requests and responses.
+Another usage scenario has the App Engine code ported to another language such as PHP,
+so that it can be run in ordinary web hosting environments.
+What you lose with a PHP app is Google's unblockability;
+the censor may find and individually block the domains
+This scenario is still interesting because there are so many places
+where such an app can be run, with low cost and minimal setup.
+Installing a PHP file on a web host environment is easier than setting up a Tor bridge or SOCKS proxy.
+The URLs of PHP bridges could be distributed in a way like BridgeDB.
+
 \section{Other third-party services}
 
 A censor can block meek by blocking access to Google entirely.
@@ -181,6 +211,7 @@ The censor then faces the choice of allowing circumvention traffic,
 or else blocking a large number of popular unrelated web sites.
 
 We were not able to make the system work with Amazon CloudFront nor Akamai.
+% Dreamhost? Other HTTPS webhosts with PHP bridge?
 
 %%%%%%%
 
