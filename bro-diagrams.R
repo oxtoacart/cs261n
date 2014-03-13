@@ -8,6 +8,9 @@ broClasses <- c("numeric", "factor", "factor",    "factor",    "factor",    "fac
 nongoog <- (read.table('non-goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
 goog <- (read.table('goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
 
+meek <- (read.table('non-goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
+meek <- meek[meek$id.resp_p==443,]
+
 y <- nongoog$duration
 png("diagrams/flowduration.png")
 qplot(y, geom="histogram", main="Flow duration", binwidth=2) + xlab("duration")
@@ -26,4 +29,14 @@ dev.off()
 y <- (goog$resp_ip_bytes) / (goog$orig_ip_bytes)
 png("diagrams/ratio-google.png")
 qplot(y, geom="histogram", main="Downstream/Upstream Ratio (Google only)", binwidth=2) + xlab("duration")
+dev.off()
+
+y <- meek$duration
+png("diagrams/flowduration-meek.png")
+qplot(y, geom="histogram", main="Flow duration (meek)", binwidth=2) + xlab("duration")
+dev.off()
+
+y <- (meek$resp_ip_bytes) / (meek$orig_ip_bytes)
+png("diagrams/ratio-meek.png")
+qplot(y, geom="histogram", main="Downstream/Upstream Ratio (meek)", binwidth=2) + xlab("ratio")
 dev.off()
