@@ -28,7 +28,7 @@ dev.off()
 
 y <- (goog$resp_ip_bytes) / (goog$orig_ip_bytes)
 png("diagrams/ratio-google.png")
-qplot(y, geom="histogram", main="Downstream/Upstream Ratio (Google only)", binwidth=2) + xlab("duration")
+qplot(y, geom="histogram", main="Downstream/Upstream Ratio (Google only)", binwidth=2) + xlab("ratio")
 dev.off()
 
 y <- meek$duration
