@@ -8,7 +8,7 @@ broClasses <- c("numeric", "factor", "factor",    "factor",    "factor",    "fac
 nongoog <- (read.table('non-goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
 goog <- (read.table('goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
 
-meek <- (read.table('non-goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
+meek <- (read.table('meek.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
 meek <- meek[meek$id.resp_p==443,]
 
 y <- nongoog$duration
