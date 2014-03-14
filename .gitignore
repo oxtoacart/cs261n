@@ -2,6 +2,10 @@
 /table.dat
 /goog.log
 /non-goog.log
+/meek.dat
+/meek.log
+/dhcp.log
+/dns.log
 /packet_filter.log
 /weird.log
 
