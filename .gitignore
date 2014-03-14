@@ -1,5 +1,9 @@
 /traces/*.gz
 table.dat
+/goog.log
+/non-goog.log
+/packet_filter.log
+/weird.log
 
 # R stuff
 /.RData
