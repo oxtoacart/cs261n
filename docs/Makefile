@@ -1,4 +1,4 @@
-all: related-work.pdf paper.pdf
+all: paper.pdf
 
 %.pdf: %.tex %.bib
 	pdflatex $*
@@ -7,6 +7,6 @@ all: related-work.pdf paper.pdf
 	pdflatex $*
 
 clean:
-	rm -f related-work.pdf paper.pdf *.aux *.bbl *.log *.blg
+	rm -f paper.pdf *.aux *.bbl *.log *.blg
 
 .PHONY: all clean
