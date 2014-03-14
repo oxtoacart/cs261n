@@ -1,5 +1,5 @@
 /traces/*.gz
-table.dat
+/table.dat
 /goog.log
 /non-goog.log
 /packet_filter.log
