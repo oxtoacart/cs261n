@@ -121,6 +121,9 @@ Flash proxy's approach to endpoint blocking is in a sense
 the opposite of ours: where flash proxy uses cheap, disposable, individually blockable proxies,
 we use just one high-value proxy, which shares its fate with network
 infrastructure that is expensive to block.
+A quirk of the browser proxy model is that the proxy connects to the client rather than the other way around.
+The client must be able to receive a TCP connection; in particular it
+may not be behind network address translation~(NAT), which limits flash proxy's usefulness.
 Flash proxy itself does nothing to defend against content blocking.
 Connections between censored clients and browser-based proxies use
 WebSocket, a meta-protocol running on TCP,
@@ -136,17 +139,23 @@ the censor could decide simply to block all WebSocket.
 % Psiphon
 
 A technique known as OSS~\cite{oss} (for
-``online scanning service'') resembles ours in certain ways. OSS bounces data
+``online scanning service'') bounces data
 through third-party web services that are capable of making HTTP requests.
-Even though such services can fetch a web page, they do not in general
-preserve the contents of the page when it is returned to the requestor.
-(A translation service, for example,
-returns the page after translating it to another language.)
-For this reason, OSS does not rely on being able to send downstream data in HTTP response bodies,
-but rather requires the server to make a symmetric reflected HTTP request back to the client.
-The main ways in which this work differs is that we are effectively using an OSS that we fully control:
-we can ensure that reflected HTTP traffic is unmodified;
-and we make the OSS hard to block by hosting it on an important network resource.
+For example, a censored client may ask a translation service to
+translate a web page at \url{http://proxy.example.com/...}, where ``\url{...}''
+stands for the data payload that the client wishes to send---data are embedded in the URL.
+Simply by making the HTTP request, the service sends the client's message.
+The client cannot rely on being able to receive the response to its message in an HTTP response,
+because online scanning services do not in general
+return unmodified the contents of the page they are ordered to retrieve.
+The translation service, for example, returns the page in another language.
+For this reason, the server sends a response message by making
+another reflected HTTP request back to the client, through the same OSS or a different one.
+The need for the client to receive a connection means that OSS has the same problem with NAT that flash proxy does.
+The NAT aspect is the most important way in which our work improves on OSS.
+App Engine is effectively an unblockable OSS that we fully control.
+We can ensure that reflected HTTP bodies are unmodified, and therefore use them to carry traffic
+without having to connect to the client.
 
 Decoy routing is
 a recently proposed anti-blocking approach. Telex~\cite{telex}
