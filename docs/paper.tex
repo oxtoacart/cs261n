@@ -5,8 +5,23 @@
 
 \begin{document}
 
+\section{Introduction}
+
 % VPN arms race We seek to build a system that remains difficult to block even
 % after it has many users.
+
+\ldots
+
+The fact that we tunnel inside HTTPS greatly eases the steganography problem.
+It's not necessary to generate plausible HTTP, only plausible TLS.
+TLS payloads are encrypted, and to a first approximation all encrypted payloads look alike.
+We need only make sure that the TLS handshake and other meta-attributes of the connection are not uniquely fingerprintable.
+Section~\ref{sec:browserextension} describes the use of a web browser extension as a instrument for making HTTPS requests,
+so things like the TLS handshake, DNS lookup, and TCP connection reuse match those of a browser as closely as possible.
+Of course, there are more subtle considerations that go into
+making a circumvention HTTPS stream look like an allowed HTTPS stream,
+things like packet size and timing, and duration of TCP connections.
+These additional considerations are the subject of Section~\ref{sec:trafficstatistics}.
 
 \section{Related work}
 
@@ -184,6 +199,15 @@ above that of other special-purpose tools like Tor~(2.9\%) and Psiphon~(2.5\%).
 Users identified reliability, speed, and ease of installation as the most important features of a circumvention tool.
 
 % CORDON? Say how meek would be classified in it?
+
+\section{Making the TLS handshake indistinguishable}
+\label{sec:browserextension}
+
+% Examples of how handshakes differ; e.g., OpenSSL versus NSS,
+% and non-browser NSS versus browser NSS.
+
+\section{Making traffic characteristics indistinguishable}
+\label{sec:trafficstatistics}
 
 \section{Usage scenarios}
 
