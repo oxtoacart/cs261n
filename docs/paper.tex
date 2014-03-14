@@ -72,19 +72,33 @@ deliberately drop or inject ACKs in order to disrupt the covert channel, without
 much collateral damage.
 
 
-The other grand challenge of proxy-based circumvention is proxy address unblockability,
-for which there have been a few approaches proposed.
+The other grand challenge of proxy-based circumvention is endpoint blocking,
+against which there have been a few approaches proposed.
 Tor has long faced the problem of its entry relays being blocked. The list of
 relays is public, so it easy to block all of them by IP address. Tor
 bridges~\cite{tor-blocking} are relays that are not universally known, intended
 to serve as entry points for censored users. A database of bridges (BridgeDB) seeks to
 provide a few secret bridges to anyone who asks, while at the same time making it
-difficult to learn the entire list. BridgeDB is capable of distributing
-the addresses of obfsproxy and ScrambleSuit bridges, and the combination
-of selective bridge distribution and traffic obfuscation has had some success as a comprehensive circumvention solution.
-It remains the case that there are simply not enough bridges to keep them all secret for long against a resourceful adversary.
+difficult to learn the entire list.
+The database is accessible over HTTPS and email.
+The HTTPS interface requires solving a captcha,
+and the email interface responds only to addresses from certain providers, like Gmail,
+that have defenses against bulk account creation.
+BridgeDB has the feature that repeated queries from the same address
+(IP subnet or email address) will receive the same small set of bridges.
+Its resistance to enumeration therefore depends both on
+having a large number of potential bridges,
+and on the censor not being able to control large numbers of IP and email addresses.
+BridgeDB is capable of distributing
+the addresses of obfsproxy and ScrambleSuit bridges.
+The combination
+of careful bridge address disbursement and obfuscated protocols
+gives Tor's system a realistic claim to addressing both challenges of proxy-based circumvention.
+Address distribution appears to be the weaker side of the defense,
+as evidenced by real-world censors' apparent preference for
+blocking bridge addresses over real-time deobfuscation~\cite{foci12-winter}.
 
-Flash proxy~\cite{flashproxy} attempts to address the problem  by
+Flash proxy~\cite{flashproxy} attempts to address endpoint blocking by
 conscripting web users as temporary proxies. Proxies last only as long as a web
 user stays on a page, so the pool of proxies is constantly changing and
 difficult to block.
