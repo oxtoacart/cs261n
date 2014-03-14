@@ -16,11 +16,19 @@
 % proxies outside the censor's domain, and let the user connect to one of them
 % which can pass data on to the true destination for the user.
 
-Broadly speaking, there are two main challenges to proxy-based circumvention.
-The first is obfuscation: making circumvention traffic difficult to distinguish
-from traffic the censor wishes to allow. The second is proxy address
-unblockability: making it difficult for the censor simply to block proxies by
-address. Past works have considered one or both of these problems.
+Broadly speaking, there are two main challenges to proxy-based circumvention:
+blocking by content and blocking by endpoint.
+Blocking by content means that the censor inspect packet or flow payloads,
+looking, for example, for forbidden protocols or keywords.
+Content-based blocking is countered by obfuscation:
+making circumvention traffic difficult to distinguish
+from traffic the censor wishes to allow.
+Blocking by endpoint means that the censor forbids all communication with certain
+network addresses, whatever the content of the communication.
+The challenge of endpoint blocking is met by making it difficult for the censor to learn proxy addresses;
+by having sufficiently many proxies;
+or by colocating proxies with high-value services, to block which would incur collateral damage.
+Effective proxy-based circumvention requires that both these challenges be addressed.
 
 Traffic obfuscation has been approached in many different ways,
 which may be classified into two general techniques.
