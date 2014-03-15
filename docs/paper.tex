@@ -219,9 +219,27 @@ The discovery of Chinese active probing was the motivation for probing resistanc
 and in our work.
 
 GoAgent~\cite{goagent} is a direct inspiration for our system in its use of App
-Engine and Host header--based domain fronting. GoAgent requires users to upload
-a personal copy of the server code to App Engine, and works only with HTTP and HTTPS,
-not other TCP-based protocols.
+Engine and Host header--based domain fronting.
+As in our system, traffic is fronted by the Google frontend server
+and delivered to its destination by a specialized app running on App Engine.
+GoAgent requires users to upload a personal copy of the server code to App Engine,
+which harms usability but requires no central management
+and enables users to stay within bandwidth limits that exist for unpaid apps.
+GoAgent is an HTTP and HTTPS proxy only.
+It works by encapulating a desired HTTP request, including URL and POST body, if any,
+and uploading the request to App Engine.
+The app unpacks the encapsulated request and directly requests the desired URL using
+App Engine's URL-fetching API.
+The design is simple but has disadvantages, stemming from the web app's
+need to know what URL to request.
+In order to proxy HTTPS, the local GoAgent proxy program does a benign man-in-the-middle
+attack on the browser, which must have previously trusted the GoAgent CA certificate.
+The local proxy program decrypts the HTTPS in order to read from it the HTTP request including the URL.
+When the response comes back, the local proxy re-encrypts it under its own key.
+End-to-end security is lost; an attacker positioned at the web app
+is able to observe and modify all traffic.
+In our system, such an attacker may only deny service or perform traffic analysis on ciphertext.
+Additionally, we allow proxying of any TCP-based traffic, not only HTTP.
 According to a May 2013 survey~\cite{collateral-freedom},
 GoAgent was the circumvention tool most used in
 China, with 35\% of survey respondents having used it in the previous month.
