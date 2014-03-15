@@ -23,6 +23,15 @@ making a circumvention HTTPS stream look like an allowed HTTPS stream,
 things like packet size and timing, and duration of TCP connections.
 These additional considerations are the subject of Section~\ref{sec:trafficstatistics}.
 
+Most of the discussion in this paper will use the specific example of the
+Google frontend server as a front for App Engine.
+App Engine is the system on which we have based our deployment,
+and it suffices to illustrate the concept of domain fronting.
+There are other systems, discussed in Section~\ref{sec:otherservices}
+that can be substituted for App Engine, with few or no modifications.
+When an example talks about ``App Engine,'' the reader may instead think
+of other systems such as the CloudFlare content delivery network.
+
 \section{Related work}
 
 % In response to Internet censorship, many research papers and pragmatic systems
@@ -249,6 +258,7 @@ Installing a PHP file on a web host environment is easier than setting up a Tor 
 The URLs of PHP bridges could be distributed in a way like BridgeDB.
 
 \section{Other third-party services}
+\label{sec:otherservices}
 
 A censor can block meek by blocking access to Google entirely.
 To take such a step is extreme, because of its high collateral damage,
