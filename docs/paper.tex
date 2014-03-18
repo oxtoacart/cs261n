@@ -40,6 +40,13 @@ of other systems such as the CloudFlare content delivery network.
 % proxies outside the censor's domain, and let the user connect to one of them
 % which can pass data on to the true destination for the user.
 
+% I'm thinking of recasting this as three challenges:
+%  1. Content blocking.
+%  2. Endpoint blocking.
+%  3. Active scanning.
+% We have something to say for all three and related work falls into one or
+% more of those categories.
+
 Broadly speaking, there are two main challenges to proxy-based circumvention:
 blocking by content and blocking by endpoint.
 Blocking by content means that the censor inspect packet or flow payloads,
