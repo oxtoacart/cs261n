@@ -1,26 +1,19 @@
-iptables -P OUTPUT DROP
-iptables -I OUTPUT 1 -m owner --uid-owner debian-tor -j ACCEPT
-iptables -I OUTPUT 1 -m state --state RELATED,ESTABLISHED -j ACCEPT
-iptables -I OUTPUT 1 -o lo -j ACCEPT
-ip6tables -P OUTPUT DROP
-ip6tables -I OUTPUT 1 -m owner --uid-owner debian-tor -j ACCEPT
-ip6tables -I OUTPUT 1 -m state --state RELATED,ESTABLISHED -j ACCEPT
-ip6tables -I OUTPUT 1 -o lo -j ACCEPT
-apt-get install iptables-persistent
+sudo groupadd meek
 
-Set Firefox SOCKS proxy to 127.0.0.1:9050
-Set network.proxy.socks_remote_dns=true in about:config.
+sudo iptables -P OUTPUT DROP
+sudo iptables -F OUTPUT
+sudo iptables -A OUTPUT -o lo -j ACCEPT
+sudo iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A OUTPUT -m owner --gid-owner meek -j ACCEPT
+sudo ip6tables -P OUTPUT DROP
+sudo ip6tables -F OUTPUT
+sudo ip6tables -A OUTPUT -o lo -j ACCEPT
+sudo ip6tables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo ip6tables -A OUTPUT -m owner --gid-owner meek -j ACCEPT
+sudo apt-get install iptables-persistent
+(Or "sudo dpkg-reconfigure iptables-persistent".)
 
-Applications→System Tools→Preferences→System Settings→Network→Network Proxy
-Socks Host 127.0.0.1:9050
+In start-tor-browser:
+sudo -g meek ./Browser/firefox -no-remote -profile Data/Browser/profile.default
 
-In /etc/tor/torrc:
-UseBridges 1
-Bridge meek 0.0.2.0:1
-ClientTransportPlugin meek exec /usr/local/bin/meek-client --url=https://meek-reflect.appspot.com/ --front=www.google.com --log=/tmp/meek-client.log
-
-/etc/init.d/tor restart
-
-Reboot.
-
-kvm -m 2G -k en-us -hda debian-7.4.0-amd64-i386-netinst.hda -net nic -net dump,file=meek.pcap,len=65536 -net user
+kvm -m 2G -k en-us -hda debian-7.4.0-amd64-i386-netinst-meek.qcow2 -net nic -net dump,file=meek.pcap,len=65536 -net user
