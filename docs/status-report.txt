@@ -1,11 +1,18 @@
 CS261N Project Status Report
+HTTP-based circumvention transport
 
 (1. Sketch the project)
+The goal of this project is to implement and evaluate a new blocking-resistant censorship circumvention protocol. A censor may inspect, modify, drop, and spoof any traffic it sees. However, the censor is sensitive to the need to minimize collateral damage as these false positives incur some kind of cost. Thus, we are going to engineer a communications channel that is not blacklisted, and is difficult to characterize and blacklist even after the censor knows about it. 
+
+Our proposed protocol uses widely used HTTPS infrastructure, assumed to be too valuable for the censor to block. The protocol carries data in HTTP requests and responses. The client sends traffic through a custom web app on Google App Engine. It works in places where Google search (www.google.com) is unblocked, even though App Engine itself (appspot.com) may be blocked. The client program builds a special HTTPS request and sends it to the Google frontend server--the server that dispatches requests to different Google services.
+
+At the highest level, the protocol's outward appearance is unblockable: it is HTTPS to a site that is not blocked. We assume that everything is tunneled through encrypted and authenticated HTTPS, so that we don't have to precisely match details such as HTTP header ordering. We propose to evaluate the protocol's blockability at a lower level, and secure it against the attacks we foresee. Some specific traffic features we propose to study are: 1) TLS header characteristics, 2) packet sizes and timing, 3) upstream/downstream ratio, 4) payload sizes, 5) polling interval, and 6) behavior on random drops.
 
 (2. What completed)
 - Implementation
     - Working Prototype
     - Browser Extensions (Firefox and Chrome)
+    - Browser Bundles
 - Evaluation
     - TLS Fingerprint
     - Traffic Analysis
