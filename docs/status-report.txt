@@ -1,0 +1,27 @@
+CS261N Project Status Report
+
+(1. Sketch the project)
+
+(2. What completed)
+- Implementation
+    - Working Prototype
+    - Browser Extensions (Firefox and Chrome)
+- Evaluation
+    - TLS Fingerprint
+    - Traffic Analysis
+        - SYN interval (normal)
+        - Flow Duration (normal / meek)
+        - Upstream/Downstream Ratio (normal / meek)
+        - Packet Length (normal)
+
+(3. What remains)
+- Flow duration seems to be an issue.
+- More attack scenarios:
+    - Site fingerprint 
+        The attacker may be able to fingerprint https://www.google.com/ according to some patterns (first few packet sizes for example). If the traffic that goes to Google does not exhibit these patterns, the censor will block the traffic.
+
+(4. Open issues)
+- Do we need to shape the traffic?
+
+(5. Preference for presentation slot)
+- The later the better?
