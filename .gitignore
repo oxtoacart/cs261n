@@ -1,4 +1,5 @@
 /traces/*.gz
+/traces/*.pcap
 /table.dat
 /goog.log
 /non-goog.log
