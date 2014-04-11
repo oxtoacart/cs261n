@@ -30,5 +30,5 @@ At the highest level, the protocol's outward appearance is unblockable: it is HT
 (4. Open issues)
 - Do we need to shape the traffic?
 
-(5. Preference for presentation slot)
+(5. Preference for presentation slot: May 1, 6, 8)
 - The later the better?
