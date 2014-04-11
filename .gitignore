@@ -9,6 +9,8 @@
 /packet_filter.log
 /weird.log
 
+/diagrams/*.png
+
 # R stuff
 /.RData
 /.Rhistory
