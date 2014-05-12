@@ -10,40 +10,40 @@ goog <- (read.table('goog.log', col.names=broNames, colClasses=broClasses, na.st
 tbb <- (read.table('tbb.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
 
 y <- nongoog$duration
-png("diagrams/flowduration.png")
+postscript("diagrams/flowduration.eps")
 qplot(y, geom="histogram", main="Flow duration", binwidth=2) + xlab("duration")
 dev.off()
 
 y <- (nongoog$resp_ip_bytes) / (nongoog$orig_ip_bytes)
-png("diagrams/ratio.png")
+postscript("diagrams/ratio.eps")
 qplot(y, geom="histogram", main="Downstream/Upstream Ratio", binwidth=2) + xlab("ratio")
 dev.off()
 
 y <- goog$duration
-png("diagrams/flowduration-google.png")
+postscript("diagrams/flowduration-google.eps")
 qplot(y, geom="histogram", main="Flow duration (Google only)", binwidth=2) + xlab("duration")
 dev.off()
 
-png("diagrams/flowduration-google-cdf.png")
+postscript("diagrams/flowduration-google-cdf.eps")
 qplot(y, ecdf(y)(y), geom="step", ylim=c(0,1), main="Flow duration CDF (Google)") + xlab("length") + ylab("probability")
 dev.off()
 
 y <- tbb$duration
-png("diagrams/flowduration-tbb.png")
+postscript("diagrams/flowduration-tbb.eps")
 qplot(y, geom="histogram", main="Flow duration (TBB)", binwidth=2) + xlab("duration")
 dev.off()
 
-png("diagrams/flowduration-tbb-cdf.png")
+postscript("diagrams/flowduration-tbb-cdf.eps")
 qplot(y, ecdf(y)(y), geom="step", ylim=c(0,1), main="Flow duration CDF (Alexa 500 with TBB)") + xlab("length") + ylab("probability")
 dev.off()
 
 y <- (goog$resp_ip_bytes) / (goog$orig_ip_bytes)
-png("diagrams/ratio-google.png")
+postscript("diagrams/ratio-google.eps")
 qplot(y, geom="histogram", main="Downstream/Upstream Ratio (Google only)", binwidth=2) + xlab("ratio")
 dev.off()
 
 y <- table(goog$id.orig_h)
-png("diagrams/connections-google.png")
+postscript("diagrams/connections-google.eps")
 hist(y,breaks=1000,main="Connections per user in 10 mins", xlab="Connections")
 dev.off()
 
