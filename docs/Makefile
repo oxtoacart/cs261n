@@ -1,4 +1,4 @@
-all: paper.pdf
+all: meek.pdf
 
 %.pdf: %.tex %.bib
 	pdflatex $*
@@ -7,6 +7,6 @@ all: paper.pdf
 	pdflatex $*
 
 clean:
-	rm -f paper.pdf *.aux *.bbl *.log *.blg
+	rm -f meek.pdf *.aux *.bbl *.log *.blg
 
 .PHONY: all clean
