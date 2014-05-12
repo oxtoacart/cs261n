@@ -97,9 +97,10 @@ anything forbidden by the censor; that is, fail to match a blacklist. The second
 to resemble a protocol that is explicitly allowed by the censor; that is, match a whitelist.
 Falling into the first category are ``look-like-nothing'' transports whose
 payloads are indistinguishable from a uniformly random byte stream.
-The classic example of a look-like-nothing
-protocol is obfsproxy~\cite{obfsproxy}, long the go-to obfuscated
-transport used by Tor. ScrambleSuit~\cite{scramblesuit} is like obfsproxy in the
+Classic example of look-like-nothing
+protocols are obfs2~\cite{obfs2} and its successor obfs3~\cite{obfs3},
+which have been Tor's go-to pluggable transports since early 2012~\cite{obfsproxy-arms-race}.
+ScrambleSuit~\cite{scramblesuit} is like obfs3 in the
 content of its payloads, but it takes additional steps to obscure its traffic signature
 (packet lengths and timing), and is designed to resist active scanning for proxies
 (the proxy server remains silent until the client proves knowledge of a shared
