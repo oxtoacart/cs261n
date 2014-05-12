@@ -30,12 +30,16 @@ def genrows(reader):
         row["syn"] = r_boolean(p[TCP].flags & FLAG_SYN)
         yield row
 
-writer = csv.DictWriter(sys.stdout, ("t", "src", "dst", "dir", "syn", "iplen", "datalen", "google"), dialect="excel-tab")
+writer = csv.DictWriter(sys.stdout, ("t", "src", "dst", "dir", "syn", "iplen", "datalen", "type"), dialect="excel-tab")
 writer.writeheader()
 
 for row in genrows(PcapReader("traces/lbl.https.non-goog.dpriv")):
-    row["google"] = r_boolean(False)
+    row["type"] = "non-google"
     writer.writerow(row)
 for row in genrows(PcapReader("traces/lbl.https.goog.dpriv")):
-    row["google"] = r_boolean(True)
+    row["type"] = "google"
     writer.writerow(row)
+for row in genrows(PcapReader("traces/meek_tbb_extension_tcp.pcap")):
+    row["type"] = "tbb"
+    writer.writerow(row)
+
