@@ -1,0 +1,10 @@
+We'll present the design and implementation of meek, a new censorship-resistant protocol. meek tunnels traffic as HTTPS requests through third-party web services such as Google App Engine. meek aims to be resistant to both IP blocking and DPI. IP blocking is defeated by routing through a high-value third-party service like Google. DPI is defeated by careful encoding of HTTPS traffic so that it appears to come from a browser and not a circumvention tool. We'll describe how a censor can fingerprint TLS, and how we use a web browser extension to camouflage our HTTPS requests.
+
+We have implemented all the parts of the system. Our presentation will include an end-to-end demo of the working system.
+
+Future work will deal with more subtle traffic characteristics such as packet timing and size distributions, to make them more similar to normal web browsing.
+
+More information and source code: https://trac.torproject.org/projects/tor/wiki/doc/meek
+
+Chang Lan
+David Fifield

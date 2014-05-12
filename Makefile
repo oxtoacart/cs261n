@@ -7,7 +7,10 @@ all: diagrams/datalen.png diagrams/datalen-in.png diagrams/datalen-out.png \
 	diagrams/flowduration.png diagrams/flowduration-google.png \
 	diagrams/ratio.png diagrams/ratio-google.png \
 	diagrams/connections-google.png
-	
+
+diagrams:
+	mkdir -p $@
+
 table.dat: gentable traces/lbl.https.non-goog.dpriv traces/lbl.https.goog.dpriv
 	./gentable > "$@"
 
@@ -29,12 +32,13 @@ tbb.log: traces/meek_tbb_extension_tcp.pcap
 diagrams/datalen.png diagrams/datalen-in.png diagrams/datalen-out.png \
 diagrams/datalen-google.png diagrams/datalen-google-in.png diagrams/datalen-google-out.png \
 diagrams/syninterval-out.png diagrams/syninterval-google-out.png \
-diagrams/syninterval-out-log.png diagrams/syninterval-google-out-log.png: diagrams.R table.dat
+diagrams/syninterval-out-log.png diagrams/syninterval-google-out-log.png: diagrams.R table.dat diagrams
 	Rscript diagrams.R
 
 diagrams/flowduration.png diagrams/flowduration-google.png diagrams/flowduration-tbb.png \
 diagrams/ratio.png diagrams/ratio-google.png \
 diagrams/connections-google.png: bro-diagrams.R non-goog.log goog.log tbb.log
+diagrams/connections-google.png: bro-diagrams.R non-goog.log goog.log diagrams
 	Rscript bro-diagrams.R
 
 .PHONY: all

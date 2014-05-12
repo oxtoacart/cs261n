@@ -180,24 +180,26 @@ App Engine is effectively an unblockable OSS that we fully control.
 We can ensure that reflected HTTP bodies are unmodified, and therefore use them to carry traffic
 without having to connect to the client.
 
-Decoy routing is
-a recently proposed anti-blocking approach. Telex~\cite{telex}
-asks friendly ISPs to deploy special software on routers between censored users and
-popular, uncensored Internet destinations.
-Circumvention traffic is marked with a special ``tag'' that is distinguishable from a random string only
-by Telex routers (not by the censor).
-On receiving such a tagged communication, the Telex router shunts it away from its apparent destination
+Decoy routing~\cite{decoyrouting} is a technique that puts
+proxies in the middle of network paths, rather than at the endpoints.
+Realizations of the decoy routing idea include Telex~\cite{telex}
+and Cirripede~\cite{cirripede}.
+Decoy routing asks friendly ISPs to deploy special software on routers that lie
+between censored users and uncensored Internet destinations.
+Circumvention traffic is ``tagged'' in a way that is detectable only
+by decoy routers, and not by the censor.
+On receiving a tagged communication, the decoy router shunts it away from its apparent destination
 and toward the censored destination requested by the client.
-Telex is conceptually similar to our work.
-Both systems use a piece of network infrastructure as a decoy to redirect certain flows
-(for Telex it is an ISP router; for us it is the Google frontend server),
-and both tag flows in a way that is visible only to the decoy router
-(for Telex a tag is a hash embedded in the TLS client randomness;
-for us it is the HTTP Host header, hidden within an HTTPS stream).
-An important difference is that Telex requires some degree of buy-in from network operators
-whose incentives may not be aligned with circumventors'.
-We require no active participation on the part of the frontend operator,
-only a lack of active opposition.
+Our work is conceptually similar to decoy routing,
+though the action happens at the application layer rather than the network layer.
+Both systems use a piece of network infrastructure as a decoy to redirect certain flows:
+in decoy routing it is an ISP router; for us it is the front domain.
+Both tag flows in a way that is visible only to the decoy router:
+in decoy routing a tag may be, for example, a hash embedded in the TLS client randomness;
+for us it is the HTTP Host header, encrypted within an HTTPS stream.
+Decoy routing generally requires the cooperation of large, centrally located
+router operators,
+whereas we only need to buy web application hosting.
 
 CensorSpoofer~\cite{censorspoofer}
 decouples the upstream and downstream channels.
@@ -209,14 +211,14 @@ so that they appear to come from the dummy host.
 From the censor's point of view, the client is carrying on a conversation only with the dummy host.
 If the dummy is blocked, another can be used in its place,
 as the CensorSpoofer proxy's true IP address remains unknown.
-% Cirripede
 
+\cite{ccs2012-decoys}
 % Routing around decoys
 A recent study~\cite{nodirectionhome} on AS
 topology suggests that defeating decoy routing is likely to be expensive for the
 censors, if the decoy routers are strategically deployed. Despite that decoy
-routing is a sound technical approach, it is still questionable whether ISPs are
-willing to act against state-level censors. However, the takeaway is that the
+routing is a sound technical approach, it is not clear whether ISPs are
+willing to act against censors. However, the takeaway is that the
 censors are unwilling to completely block day-to-day Internet access, which we
 can take advantage of.
 
