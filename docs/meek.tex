@@ -57,6 +57,10 @@ that can be substituted for App Engine, with few or no modifications.
 When an example talks about ``App Engine,'' the reader may instead think
 of other systems such as the CloudFlare content delivery network.
 
+The confidentiality provided by HTTPS
+
+Alternate domain fronting: use just an IP (no DNS and no SNI).
+
 \section{Background and related work}
 
 % In response to Internet censorship, many research papers and pragmatic systems
@@ -290,8 +294,16 @@ Users identified reliability, speed, and ease of installation as the most import
 
 % CORDON? Say how meek would be classified in it?
 
+\section{Threat model}
+
+Censor allows www.google.com (or an IP); forbids appspot.com.
+
+\section{Architecture}
+
 \section{Making the TLS handshake indistinguishable}
 \label{sec:browserextension}
+
+Two big things: list of ciphersuites and extensions.
 
 % Examples of how handshakes differ; e.g., OpenSSL versus NSS,
 % and non-browser NSS versus browser NSS.
