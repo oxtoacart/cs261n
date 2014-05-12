@@ -10,8 +10,24 @@
 
 \begin{abstract}
 We describe meek, a blocking-resistant Internet communication system for censorship circumvention.
-A key technique we use is ``domain fronting''---communicating with
-a forbidden domain name while appearing to communicate with one that is allowed.
+meek uses HTTP as a mechanism for transporting data, but it is not a steganographic HTTP transport;
+rather, it relies on HTTPS to hide the contents of communications from a censor.
+Communications are proxied through a web service that may itself be blocked by the censor:
+``domain fronting''---in which the domain name used in the (censor-visible)
+DNS request and TLS server name extension doesn't match the name in the (censor-invisible)
+HTTP host header---enables communication that is apparently with an allowed host
+but actually with a forbidden host.
+
+Though HTTPS frustrates blocking by hiding the underlying communication,
+differences in TLS implementations give rise to distinguishing features
+that may be used to block circumvention traffic.
+We describe how we use a web browser as a tool for making HTTPS requests,
+so that the TLS signature of circumvention traffic resembles that of ordinary web browsing.
+We present other, more subtle traffic characteristics that may enable blocking,
+and identify potential countermeasures to such blocking.
+
+We describe our experience implementing meek as a pluggable transport for Tor,
+and the results of an initial experimental deployment.
 \end{abstract}
 
 \section{Introduction}
