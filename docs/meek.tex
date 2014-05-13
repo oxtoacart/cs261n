@@ -886,12 +886,21 @@ which could be distributed using a system like BridgeDB.
 
 \section{Future work}
 
-% Pipelining of requests.
-% Put a diagram here showing serialized requests.
-% Simple reliability layer, SEQ/ACK.
+In future work we would like to implement pipelining of requests,
+so that more than one HTTP request can be outstanding at a time.
+This would have better performance compared to the current system,
+which serializes requests and responses in order to keep the
+underlying TCP stream in order.
+A system of sequence numbers and acknowledgments as used in OSS~\cite{oss}
+could make this possible.
 % Would be useful for Iran-like session cutoff, independent of meek.
 
 % Performance measurements
+We would like to do more quantitative performance measurements,
+in order to measure the overhead in bandwidth and latency that meek has over plain Tor.
+We have done informal tests, such as browsing YouTube,
+but have not yet put numbers to our measurements.
+
 % Load balancing
 
 \section{Acknowledgements}
