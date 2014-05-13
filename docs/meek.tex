@@ -839,7 +839,7 @@ The number of parties able to analyze users' traffic patterns is somewhat increa
 the path from user to Tor bridge now includes App Engine and the web app operators,
 in addition to the ISP and intermediate routers that were there before.
 On the other hand, the Tor bridge no longer gets to see users' IP addresses:
-all it sees are many connections from the App Engine.
+all it sees are many connections from App Engine.
 In effect, App Engine and the web app become what Tor calls a ``guard node,''
 a privileged relay that takes the first hop in the chain of relays.
 Because Tor is encrypted and integrity-protected, neither App Engine nor the app operators
@@ -880,7 +880,7 @@ In this scenario, domain fronting is not used;
 instead unblockability depends on there being many (individually blockable) PHP reflectors.
 In other words, it is roughly the same situation as exists today with Tor bridges,
 except that it can be much easier for a volunteer to upload a PHP file to a web host
-than to set up Tor bridge or other proxy.
+than to set up Tor bridge.
 Such PHP bridges could potentially automatically report their own URLs,
 which could be distributed using a system like BridgeDB.
 
