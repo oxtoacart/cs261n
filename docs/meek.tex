@@ -1,4 +1,5 @@
 \documentclass{article}  
+\usepackage{graphicx}
 \usepackage{url}
 
 \title{Blocking-resistant communication through high-value web services}
@@ -373,6 +374,21 @@ We were not able to make the system work with Amazon CloudFront nor Akamai.
 
 % Google can deanonymize you, because they are the first hop,
 % and also often the last hop because of their popularity.
+
+\section{Deployment}
+
+\begin{figure}
+\includegraphics[width=\linewidth]{clients-meek}
+\caption{Number of concurrent users using the meek transport,
+as reported by the Tor Metrics Portal.
+Missing parts of the graph are caused by missing data at the metrics portal.
+}
+\label{fig:clients}
+\end{figure}
+
+Figure~\ref{fig:clients} shows the number of concurrent users of meek between January and May~2014,
+as reported by the Tor Metrics Portal~\cite{metrics-meek}.
+The number of concurrent users is estimated by counting directory requests made over the transport~\cite{counting-daily-bridge-users}.
 
 \section{Future work}
 
