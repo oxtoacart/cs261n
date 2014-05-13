@@ -323,6 +323,7 @@ collateral damage caused by false positives:
 mistakenly blocking or degrading non-circumvention traffic causes the censor
 to incur some penalty, just as mistakenly allowing circumvention traffic does.
 The censor must allow TLS connections; meek does not try to look like plaintext.
+% but the censor may look at TLS characteristics and block suspicious connections.
 
 The user's computer, the third-party infrastructure (e.g., Google), and the Tor bridge
 are all uncontrolled and uncompromised by the censor.
@@ -334,11 +335,11 @@ The components of the system are shown in Figure~\ref{fig:architecture}.
 The three parts that are new in our system are:
 \begin{enumerate}
 \item The client program \meekclient.
-Using the pluggable transports protocol, tor treats \meekclient\ as a SOCKS proxy.
-When \meekclient\ receives data from tor, it bundles it up in an HTTP POST
+Using the pluggable transports protocol, Tor treats \meekclient\ as a SOCKS proxy.
+When \meekclient\ receives data from Tor, it bundles it up in an HTTP POST
 request and sends it to the web app,
 using HTTPS to hide the contents and the domain fronting trick to hide the true destination.
-Downstream data are returned in HTTP responses, which \meekclient\ decodes and sends back to tor.
+Downstream data are returned in HTTP responses, which \meekclient\ decodes and sends back to Tor.
 \item The ``reflector'' web app, running on App Engine.
 Its domain name \mbox{meek-reflect.appspot.com} is protected by domain fronting.
 It is called a reflector because it doesn't do anything intelligent:
@@ -346,7 +347,7 @@ it merely copies the HTTP requests it receives and forwards them
 to \meekserver\ running on the Tor bridge.
 \item The server program \meekserver, which acts as an HTTP server.
 It receives reflected requests from the web app, decodes their bodies,
-and forwards the contents to an instance of tor running on the same host.
+and forwards the contents to an instance of Tor running on the same host.
 If there is anything pending to be sent back to the client,
 \meekserver\ sends it along with its HTTP response.
 \meekserver\ also takes care of stringing together multiple HTTP requests
@@ -376,9 +377,9 @@ Rather, each instance of \meekclient\ generates at startup a random 32-byte
 session ID, which is sent along with its requests in a special
 X-Session-ID HTTP header.
 \meekserver, when it sees a particular session ID for the first time,
-opens up a new connection to the local tor process,
+opens up a new connection to the local Tor process,
 and stores the session ID in a cache. Subsequent requests with the
-same session ID will reuse the same tor connection.
+same session ID will reuse the same Tor connection.
 Entries are removed from the cache after a period of inactivity.
 
 HTTP is fundamentally a pull-based protocol.
@@ -629,14 +630,6 @@ study we are only interested in Google traffic, because the censor will be mostl
 suspected meek traffic with normal Google traffic. This part of the trace is 312 MB in size. 
 
 
-% 1. TCP payload length
-% 2. Number of concurrent connections
-% 3. Connection Lifetime
-
-% Conclusion:
-% 1. long-lived connections with bulk data transfer may be suspicious
-% 2. Distribution of packet sizes 
-
 \begin{figure}
 \centering
 \begin{subfigure}[b]{0.5\textwidth}
@@ -658,10 +651,12 @@ suspected meek traffic with normal Google traffic. This part of the trace is 312
 
 \paragraph{TCP payload length}
 Figure \ref{fig:len} shows the payload size distribution of normal Google traffic and meek traffic. Both
-figures exhibit a significant amount of packets with no payload. Most likely these packets are TCP SYN and ACK
-packets. Figure \ref{fig:len:lbl} is the distribution of normal traffic, which indicates a large portion
-of small-sized packets. While in the distribution of meek traffic shown in Figure \ref{fig:len:meek}, most packets
-are large packets ranging from 1400B to 1500B. 
+figures exhibit a significant amount of packets with no payload. These packets are mostly TCP SYN and ACK
+packets. Figure \ref{fig:len:lbl} shows the distribution of normal traffic, which indicates a large portion
+of small-sized packets. However, in the meek traffic shown in Figure \ref{fig:len:meek}, most packets
+are large packets ranging from 1400 bytes to 1500 bytes. This result is unexpected, because the underlying packets 
+in the TLS session are sent from Tor. By default, each Tor cell is 512 bytes, but meek changes the packet size 
+distribution. Therefore, meek provides traffic shaping without additional efforts.
 
 Recall that we use browsers to handle HTTPS connections for meek in order to hide TLS handshake characteristics.
 Browsers also apply techniques like HTTP pipelining to improve performance. Since meek is always communicating with
@@ -672,8 +667,10 @@ Google, click a result, and then close the tab that displays search results. The
 connection immediately after the user leaves the Google web page. Next time the user browses Google search, the browser 
 opens a new connection. In this case, small requests do not have such opportunity for batching.
 
-These browser techniques improve performance, but also lead to unexpected risks. The censor may be aware of the 
-deviation from the distribution of normal traffic. Additionally, the persistent connection itself can be a problem.
+These browser techniques improve performance, but may also lead to unexpected consequences. 
+Although meek alters the packet size distribution of underlying Tor traffic, 
+the censor may be aware of the distribution of meek itself. 
+Additionally, the persistent connection itself can be a problem.
 We thus investigated other related characteristics.
 
 \begin{figure}
@@ -738,14 +735,16 @@ longer than 600 seconds.
 The distribution of meek traffic, in contrast, is totally different. First, there are much fewer connections, which is 
 consistent with the discussions above. Second, the durations are much longer if we notice the x-axis in Figure \ref{fig:duration:meek}. If there is not a case in which normal users also have such long connections when browsing Google, the 
 censor can potentially block any long connections between users and Google. Even if this is the case, the
-censor has to wait until a time threshold is reached. The user may already obtained the forbidden data she wants, or 
+censor has to wait until a time threshold is reached. The user might have already obtained the forbidden data she wants, or 
 meek could simply restart a connection.
 
-\paragraph{Conclusion} So far we have found two potential weaknesses: long-lived connections with bulk data transfer, 
-and deviated distribution of packet sizes. To fundamentally fix these weaknesses we need to transform to the traffic into the normal-looking traffic. The problem is inherently difficult, because we need to know \emph{what} is normal traffic, i.e. what
-is the model of normal traffic, which is an open problem. However, the arm-race game is symmetric; since finding a right
-model is a difficult task for us, it is also difficult for the censor. Therefore, the censor can only find ad-hoc 
-characteristics to block forbidden traffic, which are relatively easy to defend against. 
+\paragraph{Conclusion} So far we do not find any obvious traffic characteristics that can be useful for
+distinguishing the meek traffic. But admittedly there two potential weaknesses: long-lived connections 
+with bulk data transfer, and deviated distribution of packet sizes. To fundamentally fix these weaknesses 
+we need to transform to the traffic into the normal-looking traffic. The problem is inherently difficult, because we need to know \emph{what} is normal traffic, i.e. what is the model of normal traffic, which is an open problem. However, 
+the arm-race game is symmetric; since finding a right model is a difficult task for us, it is also difficult for 
+the censor. Therefore, the censor can only find ad-hoc features to block forbidden traffic, which are relatively 
+easy to defend against. 
 
 \section{Usage scenarios}
 
