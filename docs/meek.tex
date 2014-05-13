@@ -601,25 +601,27 @@ because an extension cannot open a listening socket and an app cannot make HTTP 
 \section{Camouflage of traffic characteristics}
 \label{sec:trafficstatistics}
 
-The censor cannot sniff the content of communications or infer the existence of meek traffic 
+The censor cannot sniff the content of communications or infer the usage of meek 
 from packet \emph{data}, 
 since the communication is encrypted inside the TLS session, and we have devoted large efforts 
 in hiding TLS handshake fingerprints. However, it is still possible that the censor can detect 
-the existence of meek traffic according to the \emph{meta-data}, i.e. traffic characteristics. 
-We studied a collection of traffic characteristics and evaluated their possibilities of becoming
-the censor's interest. Specifically, we considered three characteristics: 1) payload length of
-TCP packets, 2) number of concurrent HTTPS connections, 3) HTTPS connection lifetime. To collect 
-the traffic trace of meek, we browsed the Alexa top 500 websites sequentially using the Tor Browser Bundle
-and dumped the traffic trace from 
-the network interface. We ensured only the browser can successfully access the network by setting
+the existence of meek according to the \emph{meta-data}, i.e. traffic characteristics. 
+In this section we study a collection of traffic characteristics and evaluate their possibilities of becoming
+the censor's interest. Specifically, we consider three characteristics: 1) payload length of
+TCP packets, 2) number of concurrent HTTPS connections, 3) HTTPS connection lifetime. 
+
+To collect the traffic trace of meek, we browses the Alexa top 500 websites sequentially using 
+the Tor Browser Bundle and dump the traffic trace from the network interface. We ensured only
+the browser can successfully access the network by setting
 up the \texttt{iptables} firewall so that packets from other processes will be dropped. We also 
-obtained a 10-minute sample of normal HTTPS traffic trace from LBL. The trace is 983 MB in total. We also
-specifically extracted the traffic between LBL and Google. Since the trace only has packet headers, we 
-cannot extract the domain information. However, the \texttt{TXT} DNS records of the domain 
-\texttt{\_netblocks.google.com} shows the IP address blocks that belongs to Google. Therefore, we 
-determine whether a flow is from or to Google by examining the address in the IP header. For this
-study we are only interested in Google traffic, because the censor will be mostly likely to compare
-suspected meek traffic with normal Google traffic. This part of the trace is 312 MB in size. 
+obtain a 10-minute sample of normal HTTPS traffic trace from LBL. The trace is 983 MB in total. 
+We also specifically extracted the traffic between LBL and Google from the trace. Since the trace 
+only has packet headers, we cannot extract the domain information. However, the \texttt{TXT} DNS
+records of the domain \texttt{\_netblocks.google.com} shows the IP address blocks that belongs to
+Google. Therefore, we determine whether a flow is from or to Google by examining the address in the 
+IP header. We only interested in the Google traffic only, because the censor who wants to defeat meek
+will be mostly likely to compare suspicious traffic with normal Google traffic. The size of the 
+Google trace is 312 MB. 
 
 
 \begin{figure}
@@ -650,7 +652,8 @@ are large packets ranging from 1400 bytes to 1500 bytes. This result is unexpect
 in the TLS session are sent from Tor. By default, each Tor cell is 512 bytes, but meek changes the packet size 
 distribution. Therefore, meek provides traffic shaping without additional efforts.
 
-Recall that we use browsers to handle HTTPS connections for meek in order to hide TLS handshake characteristics.
+To explain the phenomenon, recall that we use browsers to handle HTTPS connections for meek in order
+to hide TLS handshake characteristics.
 Browsers also apply techniques like HTTP pipelining to improve performance. Since meek is always communicating with
 the same Google frontend server, the browser will keep the persistent TLS connection. In addition, small requests 
 can be batched into a large chunk before being sent. This explains why large packets are mostly seen from the meek trace.
@@ -659,10 +662,10 @@ Google, click a result, and then close the tab that displays search results. The
 connection immediately after the user leaves the Google web page. Next time the user browses Google search, the browser 
 opens a new connection. In this case, small requests do not have such opportunity for batching.
 
-These browser techniques improve performance, but may also lead to unexpected consequences. 
+These browser techniques improve performance, but also pose unexpected consequences. 
 Although meek alters the packet size distribution of underlying Tor traffic, 
 the censor may be aware of the distribution of meek itself. 
-Additionally, the persistent connection itself can be a problem.
+Additionally, the persistent connection itself can be an issue.
 We thus investigated other related characteristics.
 
 \begin{figure}
