@@ -56,18 +56,32 @@ making a circumvention HTTPS stream look like an allowed HTTPS stream,
 things like packet size and timing, and duration of TCP connections.
 These additional considerations are the subject of Section~\ref{sec:trafficstatistics}.
 
-Most of the discussion in this paper will use the specific example of the
-Google frontend server as a front for App Engine.
-App Engine is the system on which we have based our deployment,
-and it suffices to illustrate the concept of domain fronting.
-There are other systems, discussed in Section~\ref{sec:otherservices}
-that can be substituted for App Engine, with few or no modifications.
-When an example talks about ``App Engine,'' the reader may instead think
-of other systems such as the CloudFlare content delivery network.
+``Domain fronting'' is the term we use for one of the key techniques used by meek.
+Domain fronting is the use of different domain names at different layers of the network stack.
+In the DNS query and TLS server name indication (SNI)~\cite[Section~3]{rfc6066},
+which are visible to the censor, one domain name (the ``front domain'') appears;
+while in the HTTP Host header~\cite[Section~14.23]{rfc2616},
+which is hidden from censor by HTTPS encryption,
+a different name (the actual destination) appears.
+Domain fronting works in systems that use the Host header in order to
+multiplex many domain names behind one HTTPS frontend;
+among these systems are Google's infrastructure and the
+CloudFlare content delivery network.
+Domain fronting can also work using only an IP address in place of
+a front domain. In this case there is no DNS query and no SNI in the TLS layer,
+but the actual destination still appears in the Host header.
+Domain fronting has been used successfully for years by GoAgent~\cite{goagent}
+(which uses a bare IP address without SNI)
+and by one of the rendezvous methods of flash proxy~\cite{flashproxy}.
+In the examples in this paper, the front domain is www.google.com
+and the actual hidden destination domain is meek-reflect.appspot.com,
+which is our custom web app that aids in circumvention.
 
-The confidentiality provided by HTTPS
-
-Alternate domain fronting: use just an IP (no DNS and no SNI).
+For concreteness, and because it is what we have deployed so far,
+the examples in this paper will use Google and App Engine as the specific
+third-party web service used for circumvention.
+Other systems that support domain fronting may be substituted for Google,
+and other alternative deployments are discussed in Section~\ref{sec:otherdeployment}.
 
 \section{Background and related work}
 
@@ -775,6 +789,7 @@ We were not able to make the system work with Amazon CloudFront nor Akamai.
 % and also often the last hop because of their popularity.
 
 \section{Deployment}
+\label{sec:deployment}
 
 We implemented meek as a Tor pluggable transport~\cite{pt}
 and built experimental releases of the Tor Browser Bundle featuring meek.
@@ -821,6 +836,7 @@ Each of the browser extensions
 is about 300 lines of JavaScript.
 
 \subsection{Other deployment scenarios}
+\label{sec:otherdeployment}
 
 The deployment we envision and have started to implement
 uses a single paid App Engine instance, which is publicly known and usable by anyone.
