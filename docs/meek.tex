@@ -545,6 +545,16 @@ We were not able to make the system work with Amazon CloudFront nor Akamai.
 
 \section{Deployment}
 
+We implemented meek as a Tor pluggable transport~\cite{pt}
+and built experimental releases of the Tor Browser Bundle featuring meek.
+The browser bundle includes Tor and a version of Firefox
+called Tor Browser that is patched to defend against application-layer identity leaks.
+Users need to download and run the bundle and select meek from the list of transports,
+and then a browser window appears,
+configured to use meek for circumvention and Tor for anonymity.
+We announced our prototype bundles on Tor development mailing lists,
+and from there they were picked up by Tor Weekly News on the Tor blog.
+
 \begin{figure}
 \includegraphics[width=\linewidth]{clients-meek}
 \caption{Number of concurrent users using the meek transport,
