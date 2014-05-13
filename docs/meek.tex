@@ -301,7 +301,28 @@ Users identified reliability, speed, and ease of installation as the most import
 
 \section{Threat model}
 
-Censor allows www.google.com (or an IP); forbids appspot.com.
+The censor is able to inspect all traffic that passes through
+the censorship boundary and block or allow it at will.
+The censor is able to actively scan for proxies, and issue followup
+connections to hosts that clients connect to, in order to determine
+whether they are proxies.
+The censor may block the web host on which the reflector web app runs,
+but it must allow access to some domain that can front for it.
+In our deployment using App Engine, the censor may block appspot.com,
+but must allow www.google.com (or its IP address, or some other domain
+that goes through the frontend server).
+
+The censor must operate at line rate; that is,
+it must not delay traffic unduly while deciding whether to allow it.
+This consideration is one facet of the censor's sensistivity to
+collateral damage caused by false positives:
+mistakenly blocking or degrading non-circumvention traffic causes the censor
+to incur some penalty, just as mistakenly allowing circumvention traffic does.
+The censor must allow TLS connections; meek does not try to look like plaintext.
+
+The user's computer, the third-party infrastructure (e.g., Google), and the Tor bridge
+are all uncontrolled and uncompromised by the censor.
+The user has a way to get a copy of the necessary client programs.
 
 \section{Architecture}
 
