@@ -83,7 +83,7 @@ and the actual hidden destination domain is meek-reflect.appspot.com,
 which is our custom web app that aids in circumvention.
 
 meek may be regarded as a steganographic transport only in that it must blend in with other HTTPS traffic.
-Tunnelling inside HTTPS greatly eases the steganography problem:
+Tunneling inside HTTPS greatly eases the steganography problem:
 It's not necessary to generate plausible HTTP, only plausible TLS,
 because TLS payloads are encrypted, and to a first approximation all encrypted payloads look alike.
 We need only make sure that the TLS handshake and other meta-attributes of the connection are not uniquely fingerprintable.
@@ -303,7 +303,7 @@ GoAgent requires users to upload a personal copy of the server code to App Engin
 which harms usability but requires no central management
 and enables users to stay within bandwidth limits that exist for unpaid apps.
 GoAgent is an HTTP and HTTPS proxy only.
-It works by encapulating a desired HTTP request, including URL and POST body, if any,
+It works by encapsulating a desired HTTP request, including URL and POST body, if any,
 and uploading the request to App Engine.
 The app unpacks the encapsulated request and directly requests the desired URL using
 App Engine's URL-fetching API.
@@ -341,7 +341,7 @@ that goes through the frontend server).
 
 The censor must operate at line rate; that is,
 it must not delay traffic unduly while deciding whether to allow it.
-This consideration is one facet of the censor's sensistivity to
+This consideration is one facet of the censor's sensitivity to
 collateral damage caused by false positives:
 mistakenly blocking or degrading non-circumvention traffic causes the censor
 to incur some penalty, just as mistakenly allowing circumvention traffic does.
@@ -426,7 +426,7 @@ Although it is possible to use the system with proxies other than Tor,
 using Tor has some attractive features.
 The pluggable transports infrastructure makes it relatively easy to prototype
 a circumvention technique and connect it to a global proxy network.
-We can treat confidentiality and integrity of tunnelled communication
+We can treat confidentiality and integrity of tunneled communication
 as a problem solved by Tor, which we don't need to solve separately.
 Tor's extra proxy hops mean that the HTTP reflector (App Engine)
 and the entry bridge do not have to be trusted.
@@ -903,7 +903,7 @@ but have not yet put numbers to our measurements.
 
 % Load balancing
 
-\section{Acknowledgements}
+\section{Acknowledgments}
 
 We thank Vern Paxson, Nick Weaver, and Doug Tygar for inspiring conversation on this topic.
 Special thanks go to the members of the tor-qa and tor-dev mailing lists
