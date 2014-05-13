@@ -658,10 +658,10 @@ Google trace is 312 MB.
 \end{figure}
 
 \paragraph{TCP payload length}
-Figure \ref{fig:len} shows the payload size distribution of normal Google traffic and meek traffic. Both
+Figure \ref{fig:len} shows the payload size distribution of normal traffic and meek's traffic. Both
 figures exhibit a significant amount of packets with no payload. These packets are mostly TCP SYN and ACK
 packets. Figure \ref{fig:len:lbl} shows the distribution of normal traffic, which indicates a large portion
-of small-sized packets. However, in the meek traffic shown in Figure \ref{fig:len:meek}, most packets
+of small-sized packets. However, in the meek's traffic shown in Figure \ref{fig:len:meek}, most packets
 are large packets ranging from 1400 bytes to 1500 bytes. This result is unexpected, because the underlying packets 
 in the TLS session are sent from Tor. By default, each Tor cell is 512 bytes, but meek changes the packet size 
 distribution. Therefore, meek provides traffic shaping without additional efforts.
@@ -670,7 +670,8 @@ To explain the phenomenon, recall that we use browsers to handle HTTPS connectio
 to hide TLS handshake characteristics.
 Browsers also apply techniques like HTTP pipelining to improve performance. Since meek is always communicating with
 the same Google frontend server, the browser will keep the persistent TLS connection. In addition, small requests 
-can be batched into a large chunk before being sent. This explains why large packets are mostly seen from the meek trace.
+can be batched into a large chunk before being sent. This explains why large packets are mostly seen from the trace that
+records meek's traffic.
 In contract, normal users may not have persistent connections to Google. For example, a user may search a keyword on
 Google, click a result, and then close the tab that displays search results. The browser may close the 
 connection immediately after the user leaves the Google web page. Next time the user browses Google search, the browser 
@@ -741,14 +742,14 @@ on 600 seconds does not reflect that these connections' actual duration is 600 s
 is the lower bound of their actual duration. Thus, we can conclude that only about 10\% connections last 
 longer than 600 seconds.
 
-The distribution of meek traffic, in contrast, is totally different. First, there are much fewer connections, which is 
+The distribution of meek's traffic, in contrast, is totally different. First, there are much fewer connections, which is 
 consistent with the discussions above. Second, the durations are much longer if we notice the x-axis in Figure \ref{fig:duration:meek}. If there is not a case in which normal users also have such long connections when browsing Google, the 
 censor can potentially block any long connections between users and Google. Even if this is the case, the
 censor has to wait until a time threshold is reached. The user might have already obtained the forbidden data she wants, or 
 meek could simply restart a connection.
 
 \paragraph{Conclusion} So far we do not find any obvious traffic characteristics that can be useful for
-distinguishing the meek traffic. But admittedly there two potential weaknesses: long-lived connections 
+distinguishing meek's traffic. But admittedly there two potential weaknesses: long-lived connections 
 with bulk data transfer, and deviated distribution of packet sizes. To fundamentally fix these weaknesses 
 we need to transform to the traffic into the normal-looking traffic. The problem is inherently difficult, because we need to know \emph{what} is normal traffic, i.e. what is the model of normal traffic, which is an open problem. However, 
 the arm-race game is symmetric; since finding a right model is a difficult task for us, it is also difficult for 
