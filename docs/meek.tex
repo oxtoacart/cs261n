@@ -559,6 +559,18 @@ as reported by the Tor Metrics Portal~\cite{metrics-meek}.
 The number of concurrent users is estimated by counting directory requests made over the transport~\cite{counting-daily-bridge-users}.
 The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by meek.
 
+meek has a home page at
+\url{https://trac.torproject.org/projects/tor/wiki/doc/meek}.
+Our source code is in the Git repository at
+\url{https://git.torproject.org/pluggable-transports/meek.git}.
+As of version 0.5 (May~7, 2014), the source code consists of
+about 800 lines of Go for the client programs,
+400 lines for the server, and
+100 lines for the intermediary web app.
+Each of the browser extensions
+(one for Firefox, one for Chrome)
+is about 300 lines of JavaScript.
+
 \section{Future work}
 
 % Pipelining of requests.
