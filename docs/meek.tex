@@ -330,7 +330,29 @@ The user has a way to get a copy of the necessary client programs.
 
 \section{Architecture}
 
-\cite{pt}
+The components of the system are shown in Figure~\ref{fig:architecture}.
+The three parts that are new in our system are:
+\begin{enumerate}
+\item The client program \meekclient.
+Using the pluggable transports protocol, tor treats \meekclient\ as a SOCKS proxy.
+When \meekclient\ receives data from tor, it bundles it up in an HTTP POST
+request and sends it to the web app,
+using HTTPS to hide the contents and the domain fronting trick to hide the true destination.
+Downstream data are returned in HTTP responses, which \meekclient\ decodes and sends back to tor.
+\item The ``reflector'' web app, running on App Engine.
+Its domain name \mbox{meek-reflect.appspot.com} is protected by domain fronting.
+It is called a reflector because it doesn't do anything intelligent:
+it merely copies the HTTP requests it receives and forwards them
+to \meekserver\ running on the Tor bridge.
+\item The server program \meekserver, which acts as an HTTP server.
+It receives reflected requests from the web app, decodes their bodies,
+and forwards the contents to an instance of tor running on the same host.
+If there is anything pending to be sent back to the client,
+\meekserver\ sends it along with its HTTP response.
+\meekserver\ also takes care of stringing together multiple HTTP requests
+into one logical stream and multiplexing multiple concurrent connections,
+both using the technique of session IDs described in this section.
+\end{enumerate}
 
 \begin{figure}
 \includegraphics[width=\linewidth]{architecture}
@@ -342,6 +364,47 @@ The ``Google infrastructure'' block may be replaced by other infrastructure that
 }
 \label{fig:architecture}
 \end{figure}
+
+The main technical challenge in making this system work
+is in encoding a TCP stream as a sequence of HTTP requests and responses.
+\meekserver\ handles many clients at once, and their data streams
+are split across multiple HTTP transactions.
+In TCP, different streams are distinguished by their
+(source~IP, source port, dest~IP, dest~port) tuple,
+but we cannot do that because streams are split across multiple TCP sessions.
+Rather, each instance of \meekclient\ generates at startup a random 32-byte
+session ID, which is sent along with its requests in a special
+X-Session-ID HTTP header.
+\meekserver, when it sees a particular session ID for the first time,
+opens up a new connection to the local tor process,
+and stores the session ID in a cache. Subsequent requests with the
+same session ID will reuse the same tor connection.
+Entries are removed from the cache after a period of inactivity.
+
+HTTP is fundamentally a pull-based protocol.
+There is no way for the server to send data to the client without
+the client first making a request.
+The same applies to meek: when \meekserver\ has data to send back to
+a client with a particular session ID, it cannot do so until it
+receives a request from that client.
+For this reason, \meekclient\ polls the server,
+sending an empty request if necessary, every so often.
+The polling interval starts short (100~ms) and grows exponentially
+up to a maximum of 5~s.
+Alternative techniques for push-like behavior,
+such as HTTP long polling,
+don't work well with App Engine,
+because App Engine requires requests to finish within 60 seconds.
+
+We implemented meek as a pluggable transport~\cite{pt} for Tor.
+Although it is possible to use the system with proxies other than Tor,
+using Tor has some attractive features.
+The pluggable transports infrastructure makes it relatively easy to prototype
+a circumvention technique and connect it to a global proxy network.
+We can treat confidentiality and integrity of tunnelled communication
+as a problem solved by Tor, which we don't need to solve separately.
+Tor's extra proxy hops mean that the HTTP reflector (App Engine)
+and the entry bridge do not have to be trusted.
 
 \section{Making the TLS handshake indistinguishable}
 \label{sec:browserextension}
