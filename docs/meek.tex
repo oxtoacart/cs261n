@@ -43,16 +43,23 @@ and the results of an initial experimental deployment.
 % VPN arms race We seek to build a system that remains difficult to block even
 % after it has many users.
 
-The fact that we tunnel inside HTTPS greatly eases the steganography problem.
-It's not necessary to generate plausible HTTP, only plausible TLS.
-TLS payloads are encrypted, and to a first approximation all encrypted payloads look alike.
-We need only make sure that the TLS handshake and other meta-attributes of the connection are not uniquely fingerprintable.
-Section~\ref{sec:browserextension} describes the use of a web browser extension as a instrument for making HTTPS requests,
-so things like the TLS handshake, DNS lookup, and TCP connection reuse match those of a browser as closely as possible.
-Of course, there are more subtle considerations that go into
-making a circumvention HTTPS stream look like an allowed HTTPS stream,
-things like packet size and timing, and duration of TCP connections.
-These additional considerations are the subject of Section~\ref{sec:trafficstatistics}.
+Censorship is a daily reality for many Internet users.
+Workplaces, schools, and governments use technical and social means
+to prevent access to certain information by the network users under their control.
+In response, those users use technical and social means
+to gain access to the forbidden information.
+What has emerged is an ongoing conflict between censor and censored,
+with advances on both sides, more subtle evasion being countered by more powerful detection.
+
+In this paper we describe the design and deployment of meek,
+a censorship-resistant communication system that aims at defeating
+known technical means of censorship.
+meek tunnels traffic through HTTP, but does not attempt to look like plaintext HTTP;
+it uses HTTPS to hide the contents of communications
+while relaying them through a third-party web services that it itself hard to block.
+meek is implemented as a Tor pluggable transport~\cite{pt}.
+We have done an initial deployment of the system and it is in use
+by a small number of users.
 
 ``Domain fronting'' is the term we use for one of the key techniques used by meek.
 Domain fronting is the use of different domain names at different layers of the network stack.
@@ -74,6 +81,18 @@ and by one of the rendezvous methods of flash proxy~\cite{flashproxy}.
 In the examples in this paper, the front domain is www.google.com
 and the actual hidden destination domain is meek-reflect.appspot.com,
 which is our custom web app that aids in circumvention.
+
+meek may be regarded as a steganographic transport only in that it must blend in with other HTTPS traffic.
+Tunnelling inside HTTPS greatly eases the steganography problem:
+It's not necessary to generate plausible HTTP, only plausible TLS,
+because TLS payloads are encrypted, and to a first approximation all encrypted payloads look alike.
+We need only make sure that the TLS handshake and other meta-attributes of the connection are not uniquely fingerprintable.
+Section~\ref{sec:browserextension} describes the use of a web browser extension as a instrument for making HTTPS requests,
+so things like the TLS handshake, DNS lookup, and TCP connection reuse match those of a browser as closely as possible.
+Of course, there are more subtle considerations that go into
+making a circumvention HTTPS stream look like an allowed HTTPS stream,
+things like packet size and timing, and duration of TCP connections.
+These additional considerations are the subject of Section~\ref{sec:trafficstatistics}.
 
 For concreteness, and because it is what we have deployed so far,
 the examples in this paper will use Google and App Engine as the specific
