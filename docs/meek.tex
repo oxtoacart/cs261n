@@ -43,8 +43,6 @@ and the results of an initial experimental deployment.
 % VPN arms race We seek to build a system that remains difficult to block even
 % after it has many users.
 
-\ldots
-
 The fact that we tunnel inside HTTPS greatly eases the steganography problem.
 It's not necessary to generate plausible HTTP, only plausible TLS.
 TLS payloads are encrypted, and to a first approximation all encrypted payloads look alike.
@@ -129,7 +127,7 @@ protocols are obfs2~\cite{obfs2} and its successor obfs3~\cite{obfs3},
 which have been Tor's go-to pluggable transports since early 2012~\cite{obfsproxy-arms-race}.
 ScrambleSuit~\cite{scramblesuit} is like obfs3 in the
 content of its payloads, but it takes additional steps to obscure its traffic signature
-(packet lengths and timing), and is designed to resist active scanning for proxies
+(packet lengths and timing), and is designed to resist active scanning
 (the proxy server remains silent until the client proves knowledge of a shared
 secret).
 
@@ -266,7 +264,7 @@ From the censor's point of view, the client is carrying on a conversation only w
 If the dummy is blocked, another can be used in its place,
 as the CensorSpoofer proxy's true IP address remains unknown.
 
-\cite{ccs2012-decoys}
+% \cite{ccs2012-decoys}
 % Routing around decoys
 A recent study~\cite{nodirectionhome} on AS
 topology suggests that defeating decoy routing is likely to be expensive for the
@@ -276,7 +274,7 @@ willing to act against censors. However, the takeaway is that the
 censors are unwilling to completely block day-to-day Internet access, which we
 can take advantage of.
 
-CloudTransport~\cite{cloudtransport}
+% CloudTransport~\cite{cloudtransport}
 
 GoAgent~\cite{goagent} is a direct inspiration for our system in its use of App
 Engine and Host header--based domain fronting.
@@ -783,7 +781,7 @@ or else blocking a large number of popular unrelated web sites.
 We were not able to make the system work with Amazon CloudFront nor Akamai.
 % Dreamhost? Other HTTPS webhosts with PHP bridge?
 
-\section{Security}
+% \section{Security}
 
 % Google can deanonymize you, because they are the first hop,
 % and also often the last hop because of their popularity.
