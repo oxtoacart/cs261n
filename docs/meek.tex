@@ -343,7 +343,7 @@ The censor cannot sniff the content of communications or infer the existence of 
 from packet \emph{data}, 
 since the communication is encrypted inside the TLS session, and we have devoted large efforts 
 in hiding TLS handshake fingerprints. However, it is still possible that the censor can detect 
-the existence of meek traffic according to the \emph{metadata}, i.e. traffic characteristics. 
+the existence of meek traffic according to the \emph{meta-data}, i.e. traffic characteristics. 
 We studied a collection of traffic characteristics and evaluated their possibilities of becoming
 the censor's interest. Specifically, we considered three characteristics: 1) payload length of
 TCP packets, 2) number of concurrent HTTPS connections, 3) HTTPS connection lifetime. To collect 
@@ -396,14 +396,14 @@ are large packets ranging from 1400B to 1500B.
 
 Recall that we use browsers to handle HTTPS connections for meek in order to hide TLS handshake characteristics.
 Browsers also apply techniques like HTTP pipelining to improve performance. Since meek is always communicating with
-the same Google frontend server, the browser will keep the persistant TLS connection. In addition, small requests 
+the same Google frontend server, the browser will keep the persistent TLS connection. In addition, small requests 
 can be batched into a large chunk before being sent. This explains why large packets are mostly seen from the meek trace.
 In contract, normal users may not have persistent connections to Google. For example, a user may search a keyword on
 Google, click a result, and then close the tab that displays search results. The browser may close the 
 connection immediately after the user leaves the Google web page. Next time the user browses Google search, the browser 
 opens a new connection. In this case, small requests do not have such opportunity for batching.
 
-These browser techniques improve performance, but also lead to unexpected results. The censor may be aware of the 
+These browser techniques improve performance, but also lead to unexpected risks. The censor may be aware of the 
 deviation from the distribution of normal traffic. Additionally, the persistent connection itself can be a problem.
 We thus investigated other related characteristics.
 
@@ -419,35 +419,64 @@ We thus investigated other related characteristics.
 \centering
 \includegraphics[width=0.8\textwidth]{figs/conns.eps}
 \caption{Concurrent HTTPS connections over time. We measure the trace for the Tor Browser Bundle and Firefox/Chrome extensions.}
-\label{fig:len:meek}
+\label{fig:conconns}
 \end{figure}
 
 \paragraph{Concurrent connections}
+Figure \ref{fig:connections} shows how many HTTPS connections to Google did a user make 
+during the 10-minute measurement window.
+There are 34,732 connections in total from 2,745 unique IPs. We observe that the majority of users have less than 
+50 connections to the Google frontend server, and most of the numbers concentrate on 1 ~ 10. This is not unexpected
+because a typical pattern of using Google is using the Google search as a stepping stone for other websites.
 
-
+We measure the number of concurrent HTTPS connections during the automated browsing of Alexa
+top 500 sites using three platforms: Tor Browser Bundle, Safari + Firefox extension, and Safari + Chrome extension.
+Figure \ref{fig:conconns} shows the number over time. We can see that most of the time
+the browser has one HTTPS connection to Google. Sometimes the browser may have more than one connection
+due to background activities such as statistics reporting. In all cases the number of connections is always 
+less than 5. We can conclude that the number of concurrent connections does not show distinct characteristics, as 
+a small number of connections can be considered as a normal behavior.
 
 \begin{figure}
 \centering
 \begin{subfigure}[b]{0.5\textwidth}
 \includegraphics[height=\textwidth, angle=270]{figs/flowduration-google-cdf.eps}
 \caption{Normal Google Traffic}
-\label{fig:len:lbl}
+\label{fig:duration:lbl}
 \end{subfigure}%
 %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
 %(or a blank line to force the subfigure onto a new line)
 \begin{subfigure}[b]{0.5\textwidth}
 \includegraphics[height=\textwidth, angle=270]{figs/flowduration-tbb-cdf.eps}
-\caption{Traffic Using meek}
-\label{fig:len:meek}
+\caption{Traffic Using meek (Notice the x-axis)}
+\label{fig:duration:meek}
 \end{subfigure}
 
 \caption{Connection lifetime distribution}
-\label{fig:len}
+\label{fig:duration}
 \end{figure}
 
 \paragraph{Connection lifetime}
+We consider the connection lifetime as a potential weakness. Figure \ref{fig:duration:lbl} shows the 
+connection lifetime distribution of normal traffic. Interestingly we can see the concentration on 
+several discrete values: 60s, 120s, 180s, 240s. We hypothesize that it is due to the HTTP Keep-Alive 
+timeout of different browsers and web services. Another important observation is the concentration on 
+durations that exceed 600 seconds. Note that our trace only contains 10 minutes' data, therefore the concentration 
+on 600 seconds does not reflect that these connections' actual duration is 600 seconds. Rather, 600 seconds
+is the lower bound of their actual duration. Thus, we can conclude that only about 10\% connections last 
+longer than 600 seconds.
 
-\paragraph{Conclusion}
+The distribution of meek traffic, in contrast, is totally different. First, there are much fewer connections, which is 
+consistent with the discussions above. Second, the durations are much longer if we notice the x-axis in Figure \ref{fig:duration:meek}. If there is not a case in which normal users also have such long connections when browsing Google, the 
+censor can potentially block any long connections between users and Google. Even if this is the case, the
+censor has to wait until a time threshold is reached. The user may already obtained the forbidden data she wants, or 
+meek could simply restart a connection.
+
+\paragraph{Conclusion} So far we have found two potential weaknesses: long-lived connections with bulk data transfer, 
+and deviated distribution of packet sizes. To fundamentally fix these weaknesses we need to transform to the traffic into the normal-looking traffic. The problem is inherently difficult, because we need to know \emph{what} is normal traffic, i.e. what
+is the model of normal traffic, which is an open problem. However, the arm-race game is symmetric; since finding a right
+model is a difficult task for us, it is also difficult for the censor. Therefore, the censor can only find ad-hoc 
+characteristics to block forbidden traffic, which are relatively easy to defend against. 
 
 \section{Usage scenarios}
 
