@@ -658,10 +658,10 @@ Google trace is 312 MB.
 \end{figure}
 
 \paragraph{TCP payload length}
-Figure \ref{fig:len} shows the payload size distribution of normal traffic and meek's traffic. Both
+Figure ~\ref{fig:len} shows the payload size distribution of normal traffic and meek's traffic. Both
 figures exhibit a significant amount of packets with no payload. These packets are mostly TCP SYN and ACK
-packets. Figure \ref{fig:len:lbl} shows the distribution of normal traffic, which indicates a large portion
-of small-sized packets. However, in the meek's traffic shown in Figure \ref{fig:len:meek}, most packets
+packets. Figure ~\ref{fig:len:lbl} shows the distribution of normal traffic, which indicates a large portion
+of small-sized packets. However, in the meek's traffic shown in Figure ~\ref{fig:len:meek}, most packets
 are large packets ranging from 1400 bytes to 1500 bytes. This result is unexpected, because the underlying packets 
 in the TLS session are sent from Tor. By default, each Tor cell is 512 bytes, but meek changes the packet size 
 distribution. Therefore, meek provides traffic shaping without additional efforts.
@@ -699,7 +699,7 @@ We thus investigated other related characteristics.
 \end{figure}
 
 \paragraph{Concurrent connections}
-Figure \ref{fig:connections} shows how many HTTPS connections to Google did a user make 
+Figure ~\ref{fig:connections} shows how many HTTPS connections to Google did a user make 
 during the 10-minute measurement window.
 There are 34,732 connections in total from 2,745 unique IPs. We observe that the majority of users have less than 
 50 connections to the Google frontend server, and most of the numbers concentrate on 1 ~ 10. This is not unexpected
@@ -707,7 +707,7 @@ because a typical pattern of using Google is using the Google search as a steppi
 
 We measure the number of concurrent HTTPS connections during the automated browsing of Alexa
 top 500 sites using three platforms: Tor Browser Bundle, Safari + Firefox extension, and Safari + Chrome extension.
-Figure \ref{fig:conconns} shows the number over time. We can see that most of the time
+Figure ~\ref{fig:conconns} shows the number over time. We can see that most of the time
 the browser has one HTTPS connection to Google. Sometimes the browser may have more than one connection
 due to background activities such as statistics reporting. In all cases the number of connections is always 
 less than 5. We can conclude that the number of concurrent connections does not show distinct characteristics, as 
@@ -733,7 +733,7 @@ a small number of connections can be considered as a normal behavior.
 \end{figure}
 
 \paragraph{Connection lifetime}
-We consider the connection lifetime as a potential weakness. Figure \ref{fig:duration:lbl} shows the 
+We consider the connection lifetime as a potential weakness. Figure ~\ref{fig:duration:lbl} shows the 
 connection lifetime distribution of normal traffic. Interestingly we can see the concentration on 
 several discrete values: 60s, 120s, 180s, 240s. We hypothesize that it is due to the HTTP Keep-Alive 
 timeout of different browsers and web services. Another important observation is the concentration on 
@@ -743,7 +743,7 @@ is the lower bound of their actual duration. Thus, we can conclude that only abo
 longer than 600 seconds.
 
 The distribution of meek's traffic, in contrast, is totally different. First, there are much fewer connections, which is 
-consistent with the discussions above. Second, the durations are much longer if we notice the x-axis in Figure \ref{fig:duration:meek}. If there is not a case in which normal users also have such long connections when browsing Google, the 
+consistent with the discussions above. Second, the durations are much longer if we notice the x-axis in Figure ~\ref{fig:duration:meek}. If there is not a case in which normal users also have such long connections when browsing Google, the 
 censor can potentially block any long connections between users and Google. Even if this is the case, the
 censor has to wait until a time threshold is reached. The user might have already obtained the forbidden data she wants, or 
 meek could simply restart a connection.
@@ -873,6 +873,7 @@ which could be distributed using a system like BridgeDB.
 % Would be useful for Iran-like session cutoff, independent of meek.
 
 % Performance measurements
+% Load balancing
 
 \section{Acknowledgements}
 
