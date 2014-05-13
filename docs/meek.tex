@@ -739,36 +739,6 @@ is the model of normal traffic, which is an open problem. However, the arm-race 
 model is a difficult task for us, it is also difficult for the censor. Therefore, the censor can only find ad-hoc 
 characteristics to block forbidden traffic, which are relatively easy to defend against. 
 
-\section{Usage scenarios}
-
-The default usage scenario has a single paid App Engine instance, publicly known and usable by anyone,
-with software configured to use the public instance by default.
-This way has the greatest usability because there is nothing to upload and nothing to configure.
-The number of parties able to analyze users' traffic patterns is somewhat increased:
-the path from user to bridge now includes Google and the app operators, not only the ISP and intermediate routers that were there before.
-On the other hand, the bridge no longer gets to see users' IP addresses.
-In effect, Google and the app become what Tor calls a ``guard node.''
-Because Tor is encrypted and integrity-protected, neither Google nor the app operators
-are able to read or alter users' communications, but being able to measure packet timings,
-for example, is necessary for certain linking attacks.
-
-Users are also free to upload their own personal copy of the App Engine code, as is done with GoAgent.
-App Engine imposes bandwidth quotas on unpaid apps, but they are high enough to allow daily web browsing.
-In this scenario, Google still has a privileged network position,
-but the user's traffic is no longer visible to the operators of the public app instance.
-% Outgoing HTTP requests include app id? As good as an IP address.
-
-The code that runs on App Engine is very simple.
-It just statelessly copies HTTP requests and responses.
-Another usage scenario has the App Engine code ported to another language such as PHP,
-so that it can be run in ordinary web hosting environments.
-What you lose with a PHP app is Google's unblockability;
-the censor may find and individually block the domains
-This scenario is still interesting because there are so many places
-where such an app can be run, with low cost and minimal setup.
-Installing a PHP file on a web host environment is easier than setting up a Tor bridge or SOCKS proxy.
-The URLs of PHP bridges could be distributed in a way like BridgeDB.
-
 \section{Other third-party services}
 \label{sec:otherservices}
 
@@ -847,6 +817,42 @@ about 800 lines of Go for the client programs,
 Each of the browser extensions
 (one for Firefox, one for Chrome)
 is about 300 lines of JavaScript.
+
+\subsection{Other deployment scenarios}
+
+The deployment we envision and have started to implement
+uses a single paid App Engine instance, which is publicly known and usable by anyone.
+Client software is configured to use this public instance by default.
+A preconfigured public instance has great usability advantages
+because there is nothing for the user to upload and nothing to configure.
+The number of parties able to analyze users' traffic patterns is somewhat increased:
+the path from user to Tor bridge now includes App Engine and the web app operators,
+in addition to the ISP and intermediate routers that were there before.
+On the other hand, the Tor bridge no longer gets to see users' IP addresses:
+all it sees are many connections from the App Engine.
+In effect, App Engine and the web app become what Tor calls a ``guard node,''
+a privileged relay that takes the first hop in the chain of relays.
+Because Tor is encrypted and integrity-protected, neither App Engine nor the app operators
+are able to read or alter users' communications, but being on path enables them
+to do things like measure packet timing patterns.
+
+Users are also free to upload their own personal copy of the App Engine code, as is done with GoAgent.
+App Engine imposes bandwidth quotas on unpaid apps, but they are high enough to allow daily web browsing.
+In this scenario, Google still has a privileged network position,
+but the user's traffic patterns are no longer visible to the operators of a public app instance.
+% Outgoing HTTP requests include app id? As good as an IP address.
+
+The code that runs on App Engine is very simple.
+It just statelessly copies HTTP requests and responses.
+Another possible deployment scenario uses a PHP implementation of the reflector,
+deployed on an ordinary web hosting service other than App Engine.
+In this scenario, domain fronting is not used;
+instead unblockability depends on there being many (individually blockable) PHP reflectors.
+In other words, it is roughly the same situation as exists today with Tor bridges,
+except that it can be much easier for a volunteer to upload a PHP file to a web host
+than to set up Tor bridge or other proxy.
+Such PHP bridges could potentially automatically report their own URLs,
+which could be distributed using a system like BridgeDB.
 
 \section{Future work}
 
