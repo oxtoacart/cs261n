@@ -346,10 +346,153 @@ The ``Google infrastructure'' block may be replaced by other infrastructure that
 \section{Making the TLS handshake indistinguishable}
 \label{sec:browserextension}
 
-Two big things: list of ciphersuites and extensions.
+The practice of routing traffic through a web service with domain fronting
+defeats both endpoint-based blocking and active scanning.
+The endpoint (which appears to be the front domain; e.g. www.google.com)
+cannot be blocked because to block it would cause collateral damage.
+Active scanning is defeated because if the censor accesses the same
+endpoint as the client, all they see is a web page served by the front domain.
+Even though the censor knows some traffic is being fronted,
+by looking only at IP addresses and domain names, it cannot determine which.
 
-% Examples of how handshakes differ; e.g., OpenSSL versus NSS,
-% and non-browser NSS versus browser NSS.
+However, a savvy censor may also use content-based blocking
+(deep packet inspection) as a basis for blocking.
+Anything that reliably distinguishes meek's traffic from that of normal allowed traffic
+(presumably web browsing) must be eliminated.
+In this section we demonstrate how the client part of the TLS handshake can be used
+to fingerprint different TLS implementations,
+and how we use a web browser to camouflage meek's TLS.
+
+There are many parts of the TLS handshake, but the two that
+most distinguish the client are the list of ciphersuites and the
+list of TLS extensions in the Client Hello.
+Figure~\ref{fig:ciphersuites} shows how the list of ciphersuites
+differs in different client implementations.
+Figure~\ref{fig:ciphersuites:meek-client} is how our first prototype of \meekclient\ appeared on the wire,
+using the built-in crypto/tls library of the Go programming language.
+The list of ciphersuites is unlike that of a web browser,
+and could be used as a fingerprint for blocking.
+Tor itself was blocked by China in 2011 in exactly this way~\cite{bug4744}.
+Similarly the list of TLS extensions (not shown)
+differed between \meekclient\ and popular browsers.
+
+\begin{figure}
+
+\begin{subfigure}[t]{0.30\textwidth}
+\begin{minipage}[t][17ex][t]{0.30\textwidth}
+\tiny
+\begin{verbatim}
+TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+TLS_ECDHE_RSA_WITH_RC4_128_SHA
+TLS_ECDHE_ECDSA_WITH_RC4_128_SHA
+TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+TLS_RSA_WITH_RC4_128_SHA
+TLS_RSA_WITH_AES_128_CBC_SHA
+TLS_RSA_WITH_AES_256_CBC_SHA
+TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA
+TLS_RSA_WITH_3DES_EDE_CBC_SHA
+\end{verbatim}
+\end{minipage}
+\caption{meek-client}
+\label{fig:ciphersuites:meek-client}
+\end{subfigure}
+%
+\begin{subfigure}[t]{0.30\textwidth}
+\begin{minipage}[t][48ex][t]{0.30\textwidth}
+\tiny
+\begin{verbatim}
+TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA
+TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA
+TLS_ECDHE_ECDSA_WITH_RC4_128_SHA
+TLS_ECDHE_RSA_WITH_RC4_128_SHA
+TLS_DHE_RSA_WITH_AES_128_CBC_SHA
+TLS_DHE_DSS_WITH_AES_128_CBC_SHA
+TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA
+TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA
+TLS_DHE_RSA_WITH_AES_256_CBC_SHA
+TLS_DHE_DSS_WITH_AES_256_CBC_SHA
+TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA
+TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA
+TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA
+TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA
+TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA
+TLS_ECDH_RSA_WITH_AES_128_CBC_SHA
+TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA
+TLS_ECDH_RSA_WITH_AES_256_CBC_SHA
+TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA
+TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA
+TLS_ECDH_ECDSA_WITH_RC4_128_SHA
+TLS_ECDH_RSA_WITH_RC4_128_SHA
+TLS_RSA_WITH_AES_128_CBC_SHA
+TLS_RSA_WITH_CAMELLIA_128_CBC_SHA
+TLS_RSA_WITH_AES_256_CBC_SHA
+TLS_RSA_WITH_CAMELLIA_256_CBC_SHA
+TLS_RSA_WITH_SEED_CBC_SHA
+SSL_RSA_FIPS_WITH_3DES_EDE_CBC_SHA
+TLS_RSA_WITH_3DES_EDE_CBC_SHA
+TLS_RSA_WITH_RC4_128_SHA
+TLS_RSA_WITH_RC4_128_MD5
+\end{verbatim}
+\end{minipage}
+\caption{Firefox 24}
+\label{fig:ciphersuites:firefox}
+\end{subfigure}
+%
+\begin{subfigure}[t]{0.30\textwidth}
+\begin{minipage}[t][27ex][t]{0.30\textwidth}
+\tiny
+\begin{verbatim}
+TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+TLS_RSA_WITH_AES_128_GCM_SHA256
+TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+TLS_DHE_RSA_WITH_AES_256_CBC_SHA
+TLS_RSA_WITH_AES_256_CBC_SHA
+TLS_ECDHE_ECDSA_WITH_RC4_128_SHA
+TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+TLS_ECDHE_RSA_WITH_RC4_128_SHA
+TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+TLS_DHE_RSA_WITH_AES_128_CBC_SHA
+TLS_DHE_DSS_WITH_AES_128_CBC_SHA
+TLS_RSA_WITH_RC4_128_SHA
+TLS_RSA_WITH_RC4_128_MD5
+TLS_RSA_WITH_AES_128_CBC_SHA
+TLS_RSA_WITH_3DES_EDE_CBC_SHA
+\end{verbatim}
+\end{minipage}
+\caption{Chrome 33}
+\label{fig:ciphersuites:chrome}
+\end{subfigure}
+
+\caption{Differences in ciphersuites offered by
+our \meekclient\ program when it accesses the network directly,
+and by two web browsers.
+The distinctive ciphersuites offered by \meekclient\ can be used as part of a blocking fingerprint.
+As a remedy we have \meekclient\ proxy its TLS through a web browser extension.
+}
+\label{fig:ciphersuites}
+\end{figure}
+
+In response to the threat of TLS fingerprinting,
+we modified \meekclient\ to proxy its HTTP requests through a local web browser extension.
+\meekclient\ tells the extension what URLs to fetch, and the extension fetches them.
+The TLS fingerprint looks like that of a browser, because it is that of a browser.
+We implemented two versions of the extension, one for Firefox and one for Chrome.
+They work similarly: they open a TCP port on localhost,
+await instructions from \meekclient\ on what HTTP requests to make,
+issue the requests, and return the responses.
 
 \begin{figure}
 \includegraphics{browser-architecture}
@@ -363,14 +506,9 @@ This figure is a detailed view of the ``User's PC'' component of Figure~\ref{fig
 \label{fig:browser-architecture}
 \end{figure}
 
-We implemented two versions of a browser extension, one for Firefox and one for Chrome.
-They both work similarly: they open a TCP port on localhost,
-await instructions from \meekclient\ on what HTTP requests to make,
-issue the requests, and return the responses.
-
 Figure~\ref{fig:browser-architecture} shows the interaction of components
 on the user's computer.
-Rather than starting \meekclient\ directly, the tor
+Rather than starting \meekclient\ as a pluggable transport directly, the tor
 process starts a helper process that starts both \meekclient\
 and a headless browser instance.
 The headless browser runs our extension in a separate
@@ -378,6 +516,9 @@ process and separate browser profile from the browser the
 user interacts with; the two browser instances share no state.
 \meekclient\ is configured to issue its requests through the browser extension;
 in this configuration, the headless browser is the only thing that ever touches the network.
+When run with a browser extension, meek has the same TLS signature
+as Firefox (Figure~\ref{fig:ciphersuites:firefox}) or
+Chrome (Figure~\ref{fig:ciphersuites:chrome}).
 
 The use of a browser extension offers benefits beyond its TLS signature.
 We inherit other characteristics of the browser:
@@ -386,9 +527,20 @@ its connection reuse,
 and HTTP keepalive behavior.
 The Firefox extension has special usability advantages because the Tor Browser Bundle
 uses a modified Firefox.
-We can include a small extension in the browser bundle and reuse the existing
-Firefox executable without increasing the download size of the bundle much,
+We can include a small extension in the browser bundle, reusing the existing
+Firefox executable, without increasing the download size of the bundle much,
 and without requiring users to separately configure a browser to run the extension.
+
+The development of the browser extensions posed some unexpected challenges.
+Tor Browser disables TLS session tickets because they can be used as linking identifiers,
+but the lack of session tickets shows up as a missing TLS extension,
+so we had to reenable them in the headless browser.
+(Doing so doesn't harm Tor Browser's anonymity:
+if session tickets are used, they are used only on the circumvention layer
+between the user and the frontend server. Tor Browser's own TLS is tunneled
+within the circumvention layer, and session tickets are still disabled at that level.)
+The Chrome extension needed to be split into two pieces, an extension and an app,
+because an extension cannot open a listening socket and an app cannot make HTTP requests.
 
 \section{Making traffic characteristics indistinguishable}
 \label{sec:trafficstatistics}
