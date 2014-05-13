@@ -5,6 +5,10 @@
 \usepackage{subcaption}
 \usepackage{hyperref}
 
+% Avoid line breaks in program names.
+\def\meekclient{\mbox{meek-client}}
+\def\meekserver{\mbox{meek-server}}
+
 \title{Blocking-resistant communication through high-value web services}
 \author{David Fifield, Chang Lan}
 
@@ -358,6 +362,33 @@ This figure is a detailed view of the ``User's PC'' component of Figure~\ref{fig
 }
 \label{fig:browser-architecture}
 \end{figure}
+
+We implemented two versions of a browser extension, one for Firefox and one for Chrome.
+They both work similarly: they open a TCP port on localhost,
+await instructions from \meekclient\ on what HTTP requests to make,
+issue the requests, and return the responses.
+
+Figure~\ref{fig:browser-architecture} shows the interaction of components
+on the user's computer.
+Rather than starting \meekclient\ directly, the tor
+process starts a helper process that starts both \meekclient\
+and a headless browser instance.
+The headless browser runs our extension in a separate
+process and separate browser profile from the browser the
+user interacts with; the two browser instances share no state.
+\meekclient\ is configured to issue its requests through the browser extension;
+in this configuration, the headless browser is the only thing that ever touches the network.
+
+The use of a browser extension offers benefits beyond its TLS signature.
+We inherit other characteristics of the browser:
+how often it resolves DNS names,
+its connection reuse,
+and HTTP keepalive behavior.
+The Firefox extension has special usability advantages because the Tor Browser Bundle
+uses a modified Firefox.
+We can include a small extension in the browser bundle and reuse the existing
+Firefox executable without increasing the download size of the bundle much,
+and without requiring users to separately configure a browser to run the extension.
 
 \section{Making traffic characteristics indistinguishable}
 \label{sec:trafficstatistics}
