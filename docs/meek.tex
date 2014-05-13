@@ -305,6 +305,17 @@ Censor allows www.google.com (or an IP); forbids appspot.com.
 
 \section{Architecture}
 
+\begin{figure}
+\includegraphics[width=\linewidth]{architecture}
+\caption{
+System architecture.
+The Google frontend server is the server that dispatches requests to different services depending on the Host header.
+Components that are new in our system are outlined in blue.
+The ``Google infrastructure'' block may be replaced by other infrastructure that supports domain fronting.
+}
+\label{fig:architecture}
+\end{figure}
+
 \section{Making the TLS handshake indistinguishable}
 \label{sec:browserextension}
 
@@ -312,6 +323,18 @@ Two big things: list of ciphersuites and extensions.
 
 % Examples of how handshakes differ; e.g., OpenSSL versus NSS,
 % and non-browser NSS versus browser NSS.
+
+\begin{figure}
+\includegraphics{browser-architecture}
+\caption{
+Client architecture including a browser extension for TLS camouflage.
+Dashed lines show the process hierarchy.
+Solid lines show the flow of outgoing communication.
+The headless instance of the browser runs in the background and is invisible to the user.
+This figure is a detailed view of the ``User's PC'' component of Figure~\ref{fig:architecture}.
+}
+\label{fig:browser-architecture}
+\end{figure}
 
 \section{Making traffic characteristics indistinguishable}
 \label{sec:trafficstatistics}
@@ -495,8 +518,8 @@ We were not able to make the system work with Amazon CloudFront nor Akamai.
 \includegraphics[width=\linewidth]{clients-meek}
 \caption{Number of concurrent users using the meek transport,
 as reported by the Tor Metrics Portal.
-Missing parts of the graph are caused by missing data at the metrics portal.
-}
+The gap between April~14 and April~22 is when the Tor bridge authority
+was down because of the Heartbleed OpenSSL vulnerability~\cite{heartbleed}, and wasn't collecting statistics.}
 \label{fig:clients}
 \end{figure}
 
