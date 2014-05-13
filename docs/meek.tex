@@ -303,6 +303,17 @@ Censor allows www.google.com (or an IP); forbids appspot.com.
 
 \section{Architecture}
 
+\begin{figure}
+\includegraphics[width=\linewidth]{architecture}
+\caption{
+System architecture.
+The Google frontend server is the server that dispatches requests to different services depending on the Host header.
+Components that are new in our system are outlined in blue.
+The ``Google infrastructure'' block may be replaced by other infrastructure that supports domain fronting.
+}
+\label{fig:architecture}
+\end{figure}
+
 \section{Making the TLS handshake indistinguishable}
 \label{sec:browserextension}
 
