@@ -77,30 +77,31 @@ Alternate domain fronting: use just an IP (no DNS and no SNI).
 % proxies outside the censor's domain, and let the user connect to one of them
 % which can pass data on to the true destination for the user.
 
-% I'm thinking of recasting this as three challenges:
-%  1. Content blocking.
-%  2. Endpoint blocking.
-%  3. Active scanning.
-% We have something to say for all three and related work falls into one or
-% more of those categories.
-%
-% "Cover your ACKs" talks about "unobservability" and "unblockability," maybe
-% isomorphic to our "blocking by content" and "blocking by endpoint."
-
 Broadly speaking, there are two main challenges to proxy-based circumvention:
 blocking by content and blocking by endpoint.
-Blocking by content means that the censor inspect packet or flow payloads,
+A content-blocking censor inspects packets and payloads,
 looking, for example, for forbidden protocols or keywords.
 Content-based blocking is countered by obfuscation:
 making circumvention traffic difficult to distinguish
 from traffic the censor wishes to allow.
-Blocking by endpoint means that the censor forbids all communication with certain
-network addresses, whatever the content of the communication.
+Blocking by endpoint is based on \emph{whom you are speaking to},
+and blocking by content is based on \emph{what you are saying}.
+A skilled censor will do both, and effective circumvention requires meeting both challenges.
+An endpoint-blocking censor forbids all communication with certain
+addresses, for example IP addresses and domain names, whatever the contents may be.
 The challenge of endpoint blocking is met by making it difficult for the censor to learn proxy addresses;
-by making it difficult to scan for proxies;
-by having sufficiently many proxies;
-or by colocating proxies with high-value services, to block which would incur collateral damage.
-Effective proxy-based circumvention requires that both these challenges be addressed.
+by having overwhelmingly many proxies;
+or by colocating proxies with high-value services so that both must be blocked or both allowed.
+
+To the above challenges we may add the related challenge of active scanning for proxies.
+Though a circumvention protocol may be difficult to identify on the wire,
+it may nevertheless be easy to scan for servers that speak the protocol,
+and thereafter block the server by its address.
+Winter and Lindskog~\cite{foci12-winter} confirmed an earlier discovery of
+Wilde~\cite{wilde} that China's Great Firewall identifies Tor bridges
+by actively scanning destination addresses to see if they speak the Tor protocol.
+The discovery of active probing was the motivation for probing resistance in ScrambleSuit~\cite{scramblesuit}
+and in this work.
 
 Traffic obfuscation has been approached in many different ways,
 which may be classified into two general techniques.
@@ -262,15 +263,6 @@ censors are unwilling to completely block day-to-day Internet access, which we
 can take advantage of.
 
 CloudTransport~\cite{cloudtransport}
-
-Winter and Lindskog~\cite{foci12-winter} investigated how China's Great Firewall blocks Tor.
-They confirmed an earlier discovery of Wilde~\cite{wilde} that the firewall identifies Tor relays using more than passive monitoring:
-it actively probes destination addresses to see if they speak the Tor protocol, and if so,
-blocks them for the future.
-(At the time, the firewall identified potential Tor connections for future probing by looking for a distinctive
-list of TLS ciphersuites---a failure of obfuscation.) %\cite{bug4744}
-The discovery of Chinese active probing was the motivation for probing resistance in ScrambleSuit
-and in our work.
 
 GoAgent~\cite{goagent} is a direct inspiration for our system in its use of App
 Engine and Host header--based domain fronting.
