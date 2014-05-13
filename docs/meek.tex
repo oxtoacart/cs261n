@@ -322,6 +322,17 @@ Two big things: list of ciphersuites and extensions.
 % Examples of how handshakes differ; e.g., OpenSSL versus NSS,
 % and non-browser NSS versus browser NSS.
 
+\begin{figure}
+\includegraphics{browser-architecture}
+\caption{
+Client architecture including a browser extension for TLS camouflage.
+Dashed lines show the process hierarchy.
+Solid lines show the flow of outgoing communication.
+This figure is a detailed view of the ``User's PC'' component of Figure~\ref{fig:architecture}.
+}
+\label{fig:architecture}
+\end{figure}
+
 \section{Making traffic characteristics indistinguishable}
 \label{sec:trafficstatistics}
 
