@@ -1,38 +1,70 @@
 @inproceedings{foci12-winter,
-  title = {How the {Great Firewall of China} is blocking {Tor}}, 
-  author = {Philipp Winter and Stefan Lindskog}, 
+  title = {How the {Great Firewall of China} is blocking {Tor}},
+  author = {Philipp Winter and Stefan Lindskog},
   booktitle = {Proceedings of the USENIX Workshop on Free and Open Communications on the
-        Internet (FOCI)}, 
-  year = {2012}, 
-  month = {August}, 
-  location = {Bellevue, WA, USA},
+        Internet (FOCI)},
+  year = {2012},
+  month = {August},
+  www_tags = {selected},
+  www_pdf_url = {https://www.usenix.org/system/files/conference/foci12/foci12-final2.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{https://www.usenix.org/system/files/conference/foci12/foci12-final2.pdf}},
 }
 
 @inproceedings{flashproxy,
-  title = {Evading Censorship with Browser-Based Proxies}, 
+  title = {Evading Censorship with Browser-Based Proxies},
   author = {David Fifield and Nate Hardison and Jonathan Ellithorpe and Emily Stark and
-        Roger Dingledine and Phil Porras and Dan Boneh}, 
-  booktitle = {Proceedings of the 12th Privacy Enhancing Technologies Symposium (PETS)}, 
-  year = {2012}, 
+        Roger Dingledine and Phil Porras and Dan Boneh},
+  booktitle = {Proceedings of the 12th Privacy Enhancing Technologies Symposium (PETS)},
+  year = {2012},
   month = {July},
-  location = {Vigo, Spain},  
+  publisher = {Springer},
+  www_tags = {selected},
+  www_pdf_url = {https://crypto.stanford.edu/flashproxy/flashproxy.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{https://crypto.stanford.edu/flashproxy/flashproxy.pdf}},
 }
 
 @inproceedings{cloudtransport,
-  title={{CloudTransport}: Using Cloud Storage for Censorship-Resistant Networking},
-  author={Chad Brubaker and Amir Houmansadr and Vitaly Shmatikov},
-  booktitle={Proceedings of the 14th Privacy Enhancing Technologies Symposium (PETS)},
-  year=2014,
-  month=jul,
-  url={\url{http://www.cs.utexas.edu/users/amir/papers/CloudTransport.pdf}},
+  title = {{CloudTransport}: Using Cloud Storage for Censorship-Resistant Networking},
+  author = {Chad Brubaker and Amir Houmansadr and Vitaly Shmatikov},
+  booktitle = {Proceedings of the 14th Privacy Enhancing Technologies Symposium (PETS)},
+  year = 2014,
+  month = jul,
+  www_pdf_url = {http://www.cs.utexas.edu/users/amir/papers/CloudTransport.pdf},
+  note = {\url{http://www.cs.utexas.edu/users/amir/papers/CloudTransport.pdf}},
 }
 
 @misc{obfsproxy,
   author = {George Kadianakis and Nick Mathewson},
-  title = {Obfsproxy Architecture},
+  title = {{obfsproxy}},
   howpublished = {\url{https://www.torproject.org/projects/obfsproxy}},
   year = {2011},
   month = {December},
+}
+
+@misc{obfs2,
+  author = {George Kadianakis and Nick Mathewson},
+  title = {{obfs2} (The Twobfuscator)},
+  howpublished = {\url{https://gitweb.torproject.org/pluggable-transports/obfsproxy.git/blob/HEAD:/doc/obfs2/obfs2-protocol-spec.txt}},
+  year = {2011},
+  month = jan,
+}
+
+@misc{obfs3,
+  author = {George Kadianakis and Nick Mathewson},
+  title = {{obfs3} (The Threebfuscator)},
+  howpublished = {\url{https://gitweb.torproject.org/pluggable-transports/obfsproxy.git/blob/HEAD:/doc/obfs3/obfs3-protocol-spec.txt}},
+  year = {2013},
+  month = jan,
+}
+
+@misc{obfsproxy-arms-race,
+  author = {Roger Dingledine},
+  title = {Obfsproxy: the next step in the censorship arms race},
+  howpublished = {\url{https://blog.torproject.org/blog/obfsproxy-next-step-censorship-arms-race}},
+  year = {2012},
+  month = feb,
 }
 
 @misc{obfs-flash,
@@ -63,96 +95,137 @@
 }
 
 @inproceedings{scramblesuit,
-  title = {{ScrambleSuit}: A Polymorphic Network Protocol to Circumvent Censorship}, 
-  author = {Philipp Winter and Tobias Pulls and Juergen Fuss}, 
-  booktitle = {Proceedings of the Workshop on Privacy in the Electronic Society (WPES)}, 
-  year = {2013}, 
-  month = {November}, 
-  location = {Berlin, Germany}, 
-}
-
-@inproceedings{oss,
-  title = {{OSS}: Using Online Scanning Services for Censorship Circumvention}, 
-  author = {David Fifield and Gabi Nakibly and Dan Boneh}, 
-  booktitle = {Proceedings of the 13th Privacy Enhancing Technologies Symposium (PETS)}, 
-  year = {2013}, 
-  month = {July}, 
-  location = {Bloomington, IN, USA},
-}
-
-@inproceedings{stegotorus, 
-  author = {Zachary Weinberg and Jeffrey Wang and Vinod Yegneswaran and Linda Briesemeister and Steven Cheung and Frank Wang and Dan Boneh}, 
-  title = {{StegoTorus}: a camouflage proxy for the {Tor} anonymity system}, 
-  booktitle = {Proceedings of the 19th ACM Conference on Computer and Communications Security (CCS)}, 
-  location = {Raleigh, NC, USA},
-  year = {2012},
-  month = {October},
-}
-
-@inproceedings{skypemorph,
-  author = {Hooman Mohajeri Moghaddam and Baiyu Li and Mohammad Derakhshani and Ian Goldberg},
-  title = {{SkypeMorph}: Protocol Obfuscation for {Tor} Bridges},
-  booktitle = {Proceedings of the 19th ACM Conference on Computer and Communications Security (CCS)},
-  year = {2012},
-  location = {Raleigh, NC, USA},
-  month = {October},
-}
-
-@inproceedings{parrot,
-  title = {The Parrot Is Dead: Observing Unobservable Network Communications},
-  author = {Amir Houmansadr and Chad Brubaker and Vitaly Shmatikov},
-  booktitle = {Proceedings of the 34th IEEE Symposium on Security and Privacy (Oakland)},
-  year = {2013},
-  month = {May},
-  location = {San Francisco, CA, USA},
-}
-
-@inproceedings{acks,
-  author = {John Geddes and Max Schuchard and Nicholas Hopper},
-  title = {Cover Your {ACK}s: Pitfalls of Covert Channel Censorship Circumvention},
-  booktitle = {Proceedings of the 20th ACM Conference on Computer and Communications Security (CCS)},
+  title = {{ScrambleSuit}: A Polymorphic Network Protocol to Circumvent Censorship},
+  author = {Philipp Winter and Tobias Pulls and Juergen Fuss},
+  booktitle = {Proceedings of the Workshop on Privacy in the Electronic Society (WPES)},
   year = {2013},
   month = {November},
   location = {Berlin, Germany},
- } 
+  publisher = {ACM},
+  www_tags = {selected},
+  www_pdf_url = {http://www.cs.kau.se/philwint/pdf/wpes2013.pdf},
+  www_section = {Traffic analysis},
+  note = {\url{http://www.cs.kau.se/philwint/pdf/wpes2013.pdf}},
+}
+
+@inproceedings{oss,
+  title = {{OSS}: Using Online Scanning Services for Censorship Circumvention},
+  author = {David Fifield and Gabi Nakibly and Dan Boneh},
+  booktitle = {Proceedings of the 13th Privacy Enhancing Technologies Symposium (PETS)},
+  year = {2013},
+  month = {July},
+  www_pdf_url = {https://www.bamsoftware.com/papers/oss.pdf},
+  www_tags = {selected},
+  www_section = {Communications Censorship},
+  note = {\url{https://www.bamsoftware.com/papers/oss.pdf}},
+}
+
+@inproceedings{stegotorus,
+  title = {{StegoTorus}: A Camouflage Proxy for the {Tor} Anonymity System},
+  author = {Zachary Weinberg and Jeffrey Wang and Vinod Yegneswaran and Linda Briesemeister
+        and Steven Cheung and Frank Wang and Dan Boneh},
+  booktitle = {Proceedings of the 19th ACM conference on Computer and Communications
+        Security (CCS)},
+  year = {2012},
+  month = {October},
+  www_tags = {selected},
+  www_pdf_url = {http://www.owlfolio.org/media/2010/05/stegotorus.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{http://www.owlfolio.org/media/2010/05/stegotorus.pdf}},
+}
+
+@inproceedings{skypemorph,
+  title = {{SkypeMorph}: Protocol Obfuscation for {T}or Bridges},
+  author = {Hooman Mohajeri Moghaddam and Baiyu Li and Mohammad Derakhshani and Ian
+        Goldberg},
+  booktitle = {Proceedings of the 19th ACM conference on Computer and Communications
+        Security (CCS)},
+  year = {2012},
+  month = {October},
+  www_tags = {selected},
+  www_pdf_url = {https://cs.uwaterloo.ca/~iang/pubs/skypemorph-ccs.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{https://cs.uwaterloo.ca/~iang/pubs/skypemorph-ccs.pdf}},
+}
+
+@inproceedings{parrot,
+  title = {The Parrot is Dead: Observing Unobservable Network Communications},
+  author = {Amir Houmansadr and Chad Brubaker and Vitaly Shmatikov},
+  booktitle = {Proceedings of the 2013 IEEE Symposium on Security and Privacy},
+  year = {2013},
+  month = {May},
+  www_pdf_url = {http://www.cs.utexas.edu/~amir/papers/parrot.pdf},
+  www_tags = {selected},
+  www_section = {Communications Censorship},
+  note = {\url{http://www.cs.utexas.edu/~amir/papers/parrot.pdf}},
+}
+
+@inproceedings{acks,
+  title = {Cover Your {ACKs}: Pitfalls of Covert Channel Censorship Circumvention},
+  author = {John Geddes and Maxfield Schuchard and Nicholas Hopper},
+  booktitle = {Proceedings of the 20th ACM conference on Computer and Communications
+        Security (CCS)},
+  year = {2013},
+  month = {November},
+  www_tags = {selected},
+  www_pdf_url = {http://www-users.cs.umn.edu/~hopper/ccs13-cya.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{http://www-users.cs.umn.edu/~hopper/ccs13-cya.pdf}},
+}
 
 @inproceedings{freewave,
+  title = {{I Want my Voice to be Heard: IP over Voice-over-IP for Unobservable Censorship
+        Circumvention}},
   author = {Amir Houmansadr and Thomas Riedl and Nikita Borisov and Andrew Singer},
-  title = {I Want My Voice to Be Heard: {IP} over Voice-over-{IP} for Unobservable Censorship Circumvention},
-  booktitle = {Proceedings of the 20th Annual Network and Distributed System Security Symposium (NDSS)},
+  booktitle = {Proceedings of the 20th Network and Distributed System Security Symposium (NDSS)},
   year = {2013},
   month = {February},
-  location = {San Diego, CA, USA},
+  publisher = {Internet Society},
+  www_tags = {selected},
+  www_pdf_url = {http://www.cs.utexas.edu/~amir/papers/FreeWave.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{http://www.cs.utexas.edu/~amir/papers/FreeWave.pdf}},
 }
 
 @inproceedings{telex,
-  title = {Telex: Anticensorship in the Network Infrastructure}, 
-  author = {Eric Wustrow and Scott Wolchok and Ian Goldberg and J. Alex Halderman}, 
-  booktitle = {Proceedings of the 20th USENIX Security Symposium}, 
-  year = {2011}, 
-  month = {August}, 
-  location = {San Francisco, CA, USA},
+  title = {Telex: Anticensorship in the Network Infrastructure},
+  author = {Eric Wustrow and Scott Wolchok and Ian Goldberg and J. Alex Halderman},
+  booktitle = {Proceedings of the 20th USENIX Security Symposium},
+  year = {2011},
+  month = {August},
+  www_important = {1},
+  www_tags = {selected},
+  www_pdf_url = {http://www.usenix.org/events/sec/tech/full_papers/Wustrow.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{http://www.usenix.org/events/sec/tech/full_papers/Wustrow.pdf}},
 }
 
 @inproceedings{censorspoofer,
   title = {{CensorSpoofer}: Asymmetric Communication using {IP} Spoofing for
-        Censorship-Resistant Web Browsing}, 
+        Censorship-Resistant Web Browsing},
   author = {Qiyan Wang and Xun Gong and Giang T. K. Nguyen and Amir Houmansadr and Nikita
-        Borisov}, 
+        Borisov},
   booktitle = {Proceedings of the 19th ACM conference on Computer and Communications
-        Security (CCS)}, 
-  year = {2012}, 
-  month = {October}, 
-  location = {Raleigh, NC, USA},
+        Security (CCS)},
+  year = {2012},
+  month = {October},
+  www_tags = {selected},
+  www_pdf_url = {https://netfiles.uiuc.edu/qwang26/www/publications/censorspoofer.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{https://netfiles.uiuc.edu/qwang26/www/publications/censorspoofer.pdf}},
 }
 
 @inproceedings{nodirectionhome,
-  author = {Amir Houmansadr and Edmund L. Wong and Vitaly Shmatikov},
-  booktitle = {Proceedings of the 21th Annual Network and Distributed System Security Symposium (NDSS)},
   title = {No Direction Home: The True Cost of Routing Around Decoys},
+  author = {Amir Houmansadr and Edmund L. Wong and Vitaly Shmatikov},
+  booktitle = {Proceedings of the 21st Network and Distributed Security Symposium (NDSS)},
   year = {2014},
   month = {February},
-  location = {San Diego, CA, USA},
+  publisher = {Internet Society},
+  www_tags = {selected},
+  www_pdf_url = {http://www.internetsociety.org/sites/default/files/01_2_1.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{http://www.internetsociety.org/sites/default/files/01_2_1.pdf}},
 }
 
 @techreport{collateral-freedom,
@@ -181,42 +254,72 @@
 }
 
 @inproceedings{fte,
-  title = {Protocol Misidentification Made Easy with Format-Transforming Encryption}, 
-  author = {Kevin P. Dyer and Scott E. Coull and Thomas Ristenpart and Thomas Shrimpton}, 
+  title = {Protocol Misidentification Made Easy with Format-Transforming Encryption},
+  author = {Kevin P. Dyer and Scott E. Coull and Thomas Ristenpart and Thomas Shrimpton},
   booktitle = {Proceedings of the 20th ACM conference on Computer and Communications
-        Security (CCS)}, 
-  year = {2013}, 
-  month = {November}, 
-  location = {Berlin, Germany}, 
+        Security (CCS)},
+  year = {2013},
+  month = {November},
+  www_tags = {selected},
+  www_pdf_url = {https://kpdyer.com/publications/ccs2013-fte.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{https://kpdyer.com/publications/ccs2013-fte.pdf}},
 }
 
 @inproceedings{ccs2012-decoys,
-  title = {Routing Around Decoys}, 
-  author = {Max Schuchard and John Geddes and Christopher Thompson and Nicholas Hopper}, 
+  title = {Routing Around Decoys},
+  author = {Max Schuchard and John Geddes and Christopher Thompson and Nicholas Hopper},
   booktitle = {Proceedings of the 19th ACM conference on Computer and Communications
-        Security (CCS 2012)}, 
-  year = {2012}, 
-  month = {October}, 
-  location = {Raleigh, NC, USA},
+        Security (CCS)},
+  year = {2012},
+  month = {October},
+  www_tags = {selected},
+  www_pdf_url = {http://www-users.cs.umn.edu/~hopper/decoy-ccs12.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{http://www-users.cs.umn.edu/~hopper/decoy-ccs12.pdf}},
 }
 
 @inproceedings{cirripede,
-  address = {Chicago, IL, USA},
-  author = {Houmansadr, Amir and Nguyen, Giang T. K. and Caesar, Matthew and Borisov, Nikita},
-  booktitle = {Computer and Communications Security},
-  pages = {187--200},
-  publisher = {ACM},
-  title = {{Cirripede: Circumvention Infrastructure using Router Redirection with Plausible Deniability}},
+  title = {Cirripede: Circumvention Infrastructure using Router Redirection with Plausible
+        Deniability},
+  author = {Amir Houmansadr and Giang T. K. Nguyen and Matthew Caesar and Nikita Borisov},
+  booktitle = {Proceedings of the 18th ACM conference on Computer and Communications
+        Security (CCS)},
   year = {2011},
-  www_pdf_url = {http://hatswitch.org/~nikita/papers/cirripede-ccs11.pdf}
+  month = {October},
+  www_tags = {selected},
+  www_pdf_url = {http://hatswitch.org/~nikita/papers/cirripede-ccs11.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{http://hatswitch.org/~nikita/papers/cirripede-ccs11.pdf}},
 }
 
 @inproceedings{decoyrouting,
-  address = {San Francisco, CA, USA},
-  author = {Karlin, Josh and Ellard, Daniel and Jackson, Alden W. and Jones, Christine E. and Lauer, Greg and Mankins, David P. and Strayer, W. Timothy},
-  booktitle = {Free and Open Communications on the Internet},
-  publisher = {USENIX Association},
-  title = {{Decoy Routing: Toward Unblockable Internet Communication}},
+  title = {Decoy Routing: Toward Unblockable Internet Communication},
+  author = {Josh Karlin and Daniel Ellard and Alden W. Jackson and Christine E. Jones and
+        Greg Lauer and David P. Mankins and W. Timothy Strayer},
+  booktitle = {Proceedings of the USENIX Workshop on Free and Open Communications on the
+        Internet (FOCI)},
   year = {2011},
-  www_pdf_url = {http://static.usenix.org/event/foci11/tech/final_files/Karlin.pdf}
+  month = {August},
+  www_tags = {selected},
+  www_pdf_url = {http://www.usenix.org/events/foci11/tech/final_files/Karlin.pdf},
+  www_section = {Communications Censorship},
+  note = {\url{http://www.usenix.org/events/foci11/tech/final_files/Karlin.pdf}},
+}
+
+@misc{metrics-meek,
+  title = {Bridge users using transport meek},
+  author = {Tor Project},
+  howpublished = {\url{https://metrics.torproject.org/users.html?graph=userstats-bridge-transport\&transport=meek#userstats-bridge-transport}},
+  year = {2014},
+  month = may,
+}
+
+@techreport{counting-daily-bridge-users,
+  title = {Counting daily bridge users},
+  author = {Karsten Loesing},
+  number = {2012-10-001},
+  year = 2012,
+  month = oct,
+  note = {\url{https://research.torproject.org/techreports/counting-daily-bridge-users-2012-10-24.pdf}},
 }

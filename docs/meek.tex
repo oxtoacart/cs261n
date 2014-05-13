@@ -1,5 +1,7 @@
 \documentclass{article}  
+\usepackage{graphicx}
 \usepackage{url}
+\usepackage{hyperref}
 
 \title{Blocking-resistant communication through high-value web services}
 \author{David Fifield, Chang Lan}
@@ -10,8 +12,24 @@
 
 \begin{abstract}
 We describe meek, a blocking-resistant Internet communication system for censorship circumvention.
-A key technique we use is ``domain fronting''---communicating with
-a forbidden domain name while appearing to communicate with one that is allowed.
+meek uses HTTP as a mechanism for transporting data, but it is not a steganographic HTTP transport;
+rather, it relies on HTTPS to hide the contents of communications from a censor.
+Communications are proxied through a web service that may itself be blocked by the censor:
+``domain fronting''---in which the domain name used in the (censor-visible)
+DNS request and TLS server name extension doesn't match the name in the (censor-invisible)
+HTTP host header---enables communication that is apparently with an allowed host
+but actually with a forbidden host.
+
+Though HTTPS frustrates blocking by hiding the underlying communication,
+differences in TLS implementations give rise to distinguishing features
+that may be used to block circumvention traffic.
+We describe how we use a web browser as a tool for making HTTPS requests,
+so that the TLS signature of circumvention traffic resembles that of ordinary web browsing.
+We present other, more subtle traffic characteristics that may enable blocking,
+and identify potential countermeasures to such blocking.
+
+We describe our experience implementing meek as a pluggable transport for Tor,
+and the results of an initial experimental deployment.
 \end{abstract}
 
 \section{Introduction}
@@ -40,6 +58,10 @@ There are other systems, discussed in Section~\ref{sec:otherservices}
 that can be substituted for App Engine, with few or no modifications.
 When an example talks about ``App Engine,'' the reader may instead think
 of other systems such as the CloudFlare content delivery network.
+
+The confidentiality provided by HTTPS
+
+Alternate domain fronting: use just an IP (no DNS and no SNI).
 
 \section{Background and related work}
 
@@ -81,9 +103,10 @@ anything forbidden by the censor; that is, fail to match a blacklist. The second
 to resemble a protocol that is explicitly allowed by the censor; that is, match a whitelist.
 Falling into the first category are ``look-like-nothing'' transports whose
 payloads are indistinguishable from a uniformly random byte stream.
-The classic example of a look-like-nothing
-protocol is obfsproxy~\cite{obfsproxy}, long the go-to obfuscated
-transport used by Tor. ScrambleSuit~\cite{scramblesuit} is like obfsproxy in the
+Classic example of look-like-nothing
+protocols are obfs2~\cite{obfs2} and its successor obfs3~\cite{obfs3},
+which have been Tor's go-to pluggable transports since early 2012~\cite{obfsproxy-arms-race}.
+ScrambleSuit~\cite{scramblesuit} is like obfs3 in the
 content of its payloads, but it takes additional steps to obscure its traffic signature
 (packet lengths and timing), and is designed to resist active scanning for proxies
 (the proxy server remains silent until the client proves knowledge of a shared
@@ -174,7 +197,8 @@ A technique known as OSS~\cite{oss} (for
 ``online scanning service'') bounces data
 through third-party web services that are capable of making HTTP requests.
 For example, a censored client may ask a translation service to
-translate a web page at \url{http://proxy.example.com/...}, where ``\url{...}''
+translate a web page at \begin{NoHyper}\url{http://proxy.example.com/...}\end{NoHyper},
+where ``\begin{NoHyper}\url{...}\end{NoHyper}''
 stands for the data payload that the client wishes to send---data are embedded in the URL.
 Simply by making the HTTP request, the service sends the client's message.
 The client cannot rely on being able to receive the response to its message in an HTTP response,
@@ -273,8 +297,16 @@ Users identified reliability, speed, and ease of installation as the most import
 
 % CORDON? Say how meek would be classified in it?
 
+\section{Threat model}
+
+Censor allows www.google.com (or an IP); forbids appspot.com.
+
+\section{Architecture}
+
 \section{Making the TLS handshake indistinguishable}
 \label{sec:browserextension}
+
+Two big things: list of ciphersuites and extensions.
 
 % Examples of how handshakes differ; e.g., OpenSSL versus NSS,
 % and non-browser NSS versus browser NSS.
@@ -352,6 +384,22 @@ We were not able to make the system work with Amazon CloudFront nor Akamai.
 
 % Google can deanonymize you, because they are the first hop,
 % and also often the last hop because of their popularity.
+
+\section{Deployment}
+
+\begin{figure}
+\includegraphics[width=\linewidth]{clients-meek}
+\caption{Number of concurrent users using the meek transport,
+as reported by the Tor Metrics Portal.
+Missing parts of the graph are caused by missing data at the metrics portal.
+}
+\label{fig:clients}
+\end{figure}
+
+Figure~\ref{fig:clients} shows the number of concurrent users of meek between January and May~2014,
+as reported by the Tor Metrics Portal~\cite{metrics-meek}.
+The number of concurrent users is estimated by counting directory requests made over the transport~\cite{counting-daily-bridge-users}.
+The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by meek.
 
 \section{Future work}
 
