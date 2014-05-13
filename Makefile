@@ -2,11 +2,11 @@ BRO = bro
 
 all: diagrams/datalen.png diagrams/datalen-in.png diagrams/datalen-out.png \
 	diagrams/datalen-google.png diagrams/datalen-google-in.png diagrams/datalen-google-out.png \
-	diagrams/syninterval-out.png diagrams/syninterval-google-out.png \
-	diagrams/syninterval-out-log.png diagrams/syninterval-google-out-log.png \
-	diagrams/flowduration.png diagrams/flowduration-google.png \
-	diagrams/ratio.png diagrams/ratio-google.png \
-	diagrams/connections-google.png
+	diagrams/syninterval-out.eps diagrams/syninterval-google-out.eps \
+	diagrams/syninterval-out-log.eps diagrams/syninterval-google-out-log.eps \
+	diagrams/flowduration.eps diagrams/flowduration-google.eps \
+	diagrams/ratio.eps diagrams/ratio-google.eps \
+	diagrams/connections-google.eps
 
 diagrams:
 	mkdir -p $@
@@ -31,14 +31,14 @@ tbb.log: traces/meek_tbb_extension_tcp.pcap
 
 diagrams/datalen.png diagrams/datalen-in.png diagrams/datalen-out.png \
 diagrams/datalen-google.png diagrams/datalen-google-in.png diagrams/datalen-google-out.png \
-diagrams/syninterval-out.png diagrams/syninterval-google-out.png \
-diagrams/syninterval-out-log.png diagrams/syninterval-google-out-log.png: diagrams.R table.dat diagrams
+diagrams/syninterval-out.eps diagrams/syninterval-google-out.eps \
+diagrams/syninterval-out-log.eps diagrams/syninterval-google-out-log.eps: diagrams.R table.dat diagrams
 	Rscript diagrams.R
 
-diagrams/flowduration.png diagrams/flowduration-google.png diagrams/flowduration-tbb.png \
-diagrams/ratio.png diagrams/ratio-google.png \
-diagrams/connections-google.png: bro-diagrams.R non-goog.log goog.log tbb.log
-diagrams/connections-google.png: bro-diagrams.R non-goog.log goog.log diagrams
+diagrams/flowduration.eps diagrams/flowduration-google.eps diagrams/flowduration-tbb.eps \
+diagrams/ratio.eps diagrams/ratio-google.eps \
+diagrams/connections-google.eps: bro-diagrams.R non-goog.log goog.log tbb.log
+diagrams/connections-google.eps: bro-diagrams.R non-goog.log goog.log diagrams
 	Rscript bro-diagrams.R
 
 .PHONY: all
