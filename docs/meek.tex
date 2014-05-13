@@ -1,6 +1,8 @@
 \documentclass{article}  
 \usepackage{graphicx}
 \usepackage{url}
+\usepackage{caption}
+\usepackage{subcaption}
 \usepackage{hyperref}
 
 \title{Blocking-resistant communication through high-value web services}
@@ -314,6 +316,27 @@ Two big things: list of ciphersuites and extensions.
 \section{Making traffic characteristics indistinguishable}
 \label{sec:trafficstatistics}
 
+The censor cannot sniff the content of communications or infer the existence of meek traffic 
+from packet \emph{data}, 
+since the communication is encrypted inside the TLS session, and we have devoted large efforts 
+in hiding TLS handshake fingerprints. However, it is still possible that the censor can detect 
+the existence of meek traffic according to the \emph{metadata}, i.e. traffic characteristics. 
+We studied a collection of traffic characteristics and evaluated their possibilities of becoming
+the censor's interest. Specifically, we considered three characteristics: 1) payload length of
+TCP packets, 2) number of concurrent HTTPS connections, 3) HTTPS connection lifetime. To collect 
+the traffic trace of meek, we browsed the Alexa top 500 websites sequentially using the Tor Browser Bundle
+and dumped the traffic trace from 
+the network interface. We ensured only the browser can successfully access the network by setting
+up the \texttt{iptables} firewall so that packets from other processes will be dropped. We also 
+obtained a 10-minute sample of normal HTTPS traffic trace from LBL. The trace is 983 MB in total. We also
+specifically extracted the traffic between LBL and Google. Since the trace only has packet headers, we 
+cannot extract the domain information. However, the \texttt{TXT} DNS records of the domain 
+\texttt{\_netblocks.google.com} shows the IP address blocks that belongs to Google. Therefore, we 
+determine whether a flow is from or to Google by examining the address in the IP header. For this
+study we are only interested in Google traffic, because the censor will be mostly likely to compare
+suspected meek traffic with normal Google traffic. This part of the trace is 312 MB in size. 
+
+
 % 1. TCP payload length
 % 2. Number of concurrent connections
 % 3. Connection Lifetime
@@ -321,6 +344,87 @@ Two big things: list of ciphersuites and extensions.
 % Conclusion:
 % 1. long-lived connections with bulk data transfer may be suspicious
 % 2. Distribution of packet sizes 
+
+\begin{figure}
+\centering
+\begin{subfigure}[b]{0.5\textwidth}
+\includegraphics[width=\textwidth]{figs/datalen-google-cdf.png}
+\caption{Normal Google Traffic}
+\label{fig:len:lbl}
+\end{subfigure}%
+%add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
+%(or a blank line to force the subfigure onto a new line)
+\begin{subfigure}[b]{0.5\textwidth}
+\includegraphics[width=\textwidth]{figs/datalen-tbb-cdf.png}
+\caption{Traffic Using meek}
+\label{fig:len:meek}
+\end{subfigure}
+
+\caption{TCP packet payload size distribution}
+\label{fig:len}
+\end{figure}
+
+\paragraph{TCP payload length}
+Figure \ref{fig:len} shows the payload size distribution of normal Google traffic and meek traffic. Both
+figures exhibit a significant amount of packets with no payload. Most likely these packets are TCP SYN and ACK
+packets. Figure \ref{fig:len:lbl} is the distribution of normal traffic, which indicates a large portion
+of small-sized packets. While in the distribution of meek traffic shown in Figure \ref{fig:len:meek}, most packets
+are large packets ranging from 1400B to 1500B. 
+
+Recall that we use browsers to handle HTTPS connections for meek in order to hide TLS handshake characteristics.
+Browsers also apply techniques like HTTP pipelining to improve performance. Since meek is always communicating with
+the same Google frontend server, the browser will keep the persistant TLS connection. In addition, small requests 
+can be batched into a large chunk before being sent. This explains why large packets are mostly seen from the meek trace.
+In contract, normal users may not have persistent connections to Google. For example, a user may search a keyword on
+Google, click a result, and then close the tab that displays search results. The browser may close the 
+connection immediately after the user leaves the Google web page. Next time the user browses Google search, the browser 
+opens a new connection. In this case, small requests do not have such opportunity for batching.
+
+These browser techniques improve performance, but also lead to unexpected results. The censor may be aware of the 
+deviation from the distribution of normal traffic. Additionally, the persistent connection itself can be a problem.
+We thus investigated other related characteristics.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth, angle=270]{figs/connections-google.eps}
+\caption{Histogram of each user's connections in the 10-minute window}
+\label{fig:connections}
+\end{figure}
+%add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
+%(or a blank line to force the subfigure onto a new line)
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figs/conns.eps}
+\caption{Concurrent HTTPS connections over time. We measure the trace for the Tor Browser Bundle and Firefox/Chrome extensions.}
+\label{fig:len:meek}
+\end{figure}
+
+\paragraph{Concurrent connections}
+
+
+
+\begin{figure}
+\centering
+\begin{subfigure}[b]{0.5\textwidth}
+\includegraphics[height=\textwidth, angle=270]{figs/flowduration-google-cdf.eps}
+\caption{Normal Google Traffic}
+\label{fig:len:lbl}
+\end{subfigure}%
+%add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
+%(or a blank line to force the subfigure onto a new line)
+\begin{subfigure}[b]{0.5\textwidth}
+\includegraphics[height=\textwidth, angle=270]{figs/flowduration-tbb-cdf.eps}
+\caption{Traffic Using meek}
+\label{fig:len:meek}
+\end{subfigure}
+
+\caption{Connection lifetime distribution}
+\label{fig:len}
+\end{figure}
+
+\paragraph{Connection lifetime}
+
+\paragraph{Conclusion}
 
 \section{Usage scenarios}
 

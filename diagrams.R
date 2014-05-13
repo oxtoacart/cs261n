@@ -26,7 +26,7 @@ qplot(x[x$type=="google",]$datalen, main="TCP payload length (Google only)", bin
 dev.off()
 
 png("diagrams/datalen-google-cdf.png")
-qplot(x[x$type=="google",]$datalen, ecdf(x[x$type=="google",]$datalen)(x[x$type=="google",]$datalen), geom="step", ylim=c(0,1), main="TCP payload length CDF (Google only)") + xlab("length") + ylab("probability") 
+qplot(x[x$type=="google",]$datalen, ecdf(x[x$type=="google",]$datalen)(x[x$type=="google",]$datalen), geom="step", ylim=c(0,1), main="TCP payload length CDF (Google only)") + xlab("Length (Bytes)") + ylab("Probability") 
 dev.off()
 
 png("diagrams/datalen-google-in.png")
@@ -38,11 +38,11 @@ qplot(x[x$type=="google" & x$dir=="OUT",]$datalen, main="TCP payload length (out
 dev.off()
 
 png("diagrams/datalen-tbb.png")
-qplot(x[x$type=="tbb",]$datalen, main="TCP payload length (TBB meek)", binwidth=2) + xlab("length") 
+qplot(x[x$type=="tbb",]$datalen, main="TCP payload length (TBB meek)", binwidth=2) + xlab("Length") 
 dev.off()
 
 png("diagrams/datalen-tbb-cdf.png")
-qplot(x[x$type=="tbb",]$datalen, ecdf(x[x$type=="tbb",]$datalen)(x[x$type=="tbb",]$datalen), geom="step", ylim=c(0,1), main="TCP payload length CDF (Alexa 500 with TBB)") + xlab("length") + ylab("probability") 
+qplot(x[x$type=="tbb",]$datalen, ecdf(x[x$type=="tbb",]$datalen)(x[x$type=="tbb",]$datalen), geom="step", ylim=c(0,1), main="TCP payload length CDF (Alexa 500 with TBB)") + xlab("Length (Bytes)") + ylab("Probability") 
 dev.off()
 
 syn.out <- x[x$syn & x$dir=="OUT",]

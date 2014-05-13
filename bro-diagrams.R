@@ -30,7 +30,7 @@ qplot(y, geom="histogram", main="Flow duration (Google only)", binwidth=2) + xla
 dev.off()
 
 postscript("diagrams/flowduration-google-cdf.eps")
-qplot(y, ecdf(y)(y), geom="step", ylim=c(0,1), main="Flow duration CDF (Google)") + xlab("length (sec)") + ylab("probability")
+qplot(y, ecdf(y)(y), geom="step", ylim=c(0,1), main="Flow duration CDF (Google)") + xlab("Length (Seconds)") + ylab("Probability")
 #+ theme(text = element_text(size = rel(5)))
 dev.off()
 
@@ -41,7 +41,7 @@ qplot(y, geom="histogram", main="Flow duration (TBB)", binwidth=2) + xlab("durat
 dev.off()
 
 postscript("diagrams/flowduration-tbb-cdf.eps")
-qplot(y, ecdf(y)(y), geom="step", ylim=c(0,1), main="Flow duration CDF (Alexa 500 with TBB)") + xlab("length (sec)") + ylab("probability")  
+qplot(y, ecdf(y)(y), geom="step", ylim=c(0,1), main="Flow duration CDF (Alexa 500 with TBB)") + xlab("Length (Seconds)") + ylab("Probability")  
 #+ theme(axis.title = element_text(size = rel(2)), axis.text = element_text(size = rel(2)), plot.title = element_text(size = rel(2)), axis.ticks.margin = unit(10, "lines"))
 dev.off()
 
