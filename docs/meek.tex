@@ -565,7 +565,7 @@ issue the requests, and return the responses.
 
 \begin{figure}
 \centering
-\includegraphics{browser-architecture}
+\includegraphics[height=1.5in]{browser-architecture}
 \caption{
 Client architecture including a browser extension for TLS camouflage.
 Dashed lines show the process hierarchy.
@@ -756,34 +756,6 @@ the arm-race game is symmetric; since finding a right model is a difficult task 
 the censor. Therefore, the censor can only find ad-hoc features to block forbidden traffic, which are relatively 
 easy to defend against. 
 
-\section{Other third-party services}
-\label{sec:otherservices}
-
-A censor can block meek by blocking access to Google entirely.
-To take such a step is extreme, because of its high collateral damage,
-but it is not outside the realm of possibility.
-% Cite when Google and Gmail were completely blocked temporarily.
-We investigated how easily our system can be adapted to hard-to-block systems other than Google,
-and found that CloudFlare, a content delivery network, in principle supports domain fronting.
-
-CloudFlare provides the frontend of $X$ web sites, $Y$ of them supporting HTTPS~\cite{something}.
-CloudFlare supports the domain fronting trick;
-that is, it is possible that a request has one domain in the TLS layer
-and another in the HTTP layer, and the CloudFlare server will transparently redirect it to proper place.
-While we verified that domain fronting would work on CloudFlare,
-we did not test deployment,
-because when we asked we were told that our planned use would be against CloudFlare's terms of service.
-CloudFlare hosts a number of HTTPS sites.
-Choosing just one of them to be the front in TLS connections could cause
-the innocent third-party domain to be censored even though it is not itself carrying any circumvention traffic.
-To avoid this problem, the front can be simply a CloudFlare IP address,
-with no SNI at all.
-The censor then faces the choice of allowing circumvention traffic,
-or else blocking a large number of popular unrelated web sites.
-
-We were not able to make the system work with Amazon CloudFront nor Akamai.
-% Dreamhost? Other HTTPS webhosts with PHP bridge?
-
 % \section{Security}
 
 % Google can deanonymize you, because they are the first hop,
@@ -860,6 +832,26 @@ App Engine imposes bandwidth quotas on unpaid apps, but they are high enough to 
 In this scenario, Google still has a privileged network position,
 but the user's traffic patterns are no longer visible to the operators of a public app instance.
 % Outgoing HTTP requests include app id? As good as an IP address.
+
+A censor can block meek by blocking access to Google entirely,
+but other systems can take the place of Google.
+An attractive alternative is CloudFlare, a large content delivery network,
+which supports domain fronting, dispatching requests based on the Host header
+rather than IP or SNI.
+We did not test deployment on CloudFlare,
+because their terms of service are not clear on whether this kind of use is allowed,
+and we got an ambiguous answer when we asked for clarification.
+A particular concern when using CloudFlare or other content delivery networks is the choice of front domain.
+If one domain is being used particularly as a front for circumvention traffic,
+it may find itself blocked by the censor, even though it is not itself
+involved in any circumvention.
+One good solution to this problem may be not to use a domain name at all,
+but only the IP address of one of CloudFlare's servers.
+The censor will then face the choice of allowing circumvention traffic,
+or else blocking a large number of unrelated web sites.
+
+% We were not able to make the system work with Amazon CloudFront nor Akamai.
+% Dreamhost? Other HTTPS webhosts with PHP bridge?
 
 The code that runs on App Engine is very simple.
 It just statelessly copies HTTP requests and responses.
