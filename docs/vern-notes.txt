@@ -1,0 +1,201 @@
+Points to clarify/enhance:
+
+* The abstract does not effectively convey the nature of the approach
+  It needs to spell out the tunneled and fate-sharing nature of the
+  system more clearly.  For example, "proxied through a web service that
+  may itself be blocked by the censor" sounds like it can't possibly work.
+
+* meek essentially uses something akin to double-tunneling.  You could
+  make this more clear.
+
+* In general, meek doesn't need to be tied to Tor, or in fact to any
+  sort of confidentiality/privacy-preserving backend.  I think you should
+  acknowledge this up front.  There's a quite reasonable tradeoff for users
+  to consider here: if their threat model is only regarding evading the
+  censor, then they might prefer the significantly better performance of
+  being able to directly web surf (say) rather than building Tor circuits
+  and the like.  While you might disagree with that choice, you should
+  consider the degree to which providing less-than-great security sometimes
+  hugely enables deployment of a system (such as SSH's leap-of-faith "PKI"
+  approach).
+
+* Related to this, you should assess how much performance overhead your
+  approach imposes.
+
+* Figure 1 should come much earlier, basically in the Introduction.
+  Otherwise, it's hard to follow just where the paper is going.  In
+  particular, the current narrative structure in the intro doesn't work
+  well.  Even though I came in already knowing how the scheme works,
+  I found the discussion confusing.
+
+* In the Intro, when mentioning Section 6, foreshadow the general
+  strategy you'll take for addressing the additional considerations.
+
+* "indistinguishable from a uniformly random byte stream" - note,
+  that means it actually *does* look like something (i.e., like a
+  random byte stream), so this only achieves the goal if observing
+  such byte streams is not peculiar in network traffic.
+
+* The discussion of CensorSpoofer on page 5 seems out of place, and in
+  particular the paragraph after it appears to naturally follow the
+  one just before it.
+
+* Tell us what issues arise in using CensorSpoofer.
+
+* The discussion of GoAgent is hard to follow.  It would help
+  significantly to have an illustrative diagram.  (Perhaps you
+  can use your architecture diagram plus some enhancements.)
+
+* In the beginning of section 5, it would be reasonable to state that
+  blocking Google would cause *major* collateral damage.  (It's not uncommon
+  for blocking to potentially cause *some* collateral damage, but usually
+  not to a degree that worries the censor.)
+
+* "There are many parts of the TLS handshake, but the two that most
+  distinguish ..." - if there are many parts then it behooves you to
+  analyze *all* of them lest one of the less obvious ones also leaks
+  information.
+
+* Briefly explain what TLS session tickets are.
+
+* Figure 4 would work better as  histogram.  In addition, you could
+  plot both distributions on the same plot to enable more direct
+  comparison.  (Explain TBB = Tor Browser Bundle.)
+
+* Tell us what LBL is.
+
+* The mention of Google's TXT DNS records is baffling because it's
+  so terse.
+
+* Consider assessing in the LBL trace each user's aggregate traffic
+  to Google (# connections, # bytes).  The worry would be that that
+  sort of summary statistic may make meek stand out.
+
+* OTOH, you should also frame that meek doesn't have to conform with an
+  *average* traffic profile, just with one that isn't *too* unusual.  The
+  censor will incur serious collateral damage even if they block just
+  the upper 1% of strong-traffic-to-Google.
+
+* Related to this, you shouldn't just look at the distributions but
+  also the associated *variance* across users.
+
+* "model of normal traffic, which is an open problem" - that's quite a 
+  strong statement.  Arguably a *complete* model is an open problem,
+  but that's not what's needed here.  If you had more/longer traces,
+  wouldn't that enable you to address this fairly well?
+
+* I particularly like the observation that if this modeling is hard for
+  you-the-meek-designer then it's also hard for the censor.
+
+* What's meant by Tor Browser being "patched to defend against
+  application-layer identity leaks"?
+
+* It's Highly Cool that you already have some real users!  (And at
+  a whopping cost of one-hundred-and-eleven US cents. :-)
+
+* Tell us more about what's unclear in CloudFlare's ToS.
+
+* "... or else blocking a large number of unrelated web sites".  It's
+  valuable here to reflect on Pakistan's blocking of YouTube, which
+  was meant to just prevent access to one video, but they lacked the
+  technical means to do that, so they blocked the whole thing - clearly
+  with collateral damage.  So it's not unprecedented.
+
+* The discussion about PHP implementations etc. at the end of section 7
+  is opaque.  (Seems PHP here is a red herring and you really just mean
+  lots-of-App-Engine-services.)
+
+
+Presentation:
+
+* You make heavy use of passive voice.  You could make the writing much
+  more lively by switching some of it to active voice.  This definitely
+  slowed down my reading of parts of the writeup
+
+* System names are generally capitalized, i.e., "Meek" not "meek".
+  This particularly matters given that "meek" is an English word and thus
+  when the eye scans it mid-sentence without capitalization, it can at
+  first get absorbed as an adjective rather than the name of your system.
+  If it really matters to you that it remain lowercase, then set it in
+  a different font (such as via \textsf{}); though keep in mind that
+  not capitalizing it will strike some readers as an author-centric
+  flourish (i.e., you're not helping them out by following the usual
+  convention of capitalizing).
+
+* You used a 10pt font even though I asked for 11pt at
+  http://www.icir.org/vern/cs261n/writing.html .  Note that for conference
+  submission, if you don't follow the formatting requirements (particularly
+  for an issue like this), your paper will likely be rejected unread.
+  (It also makes me suspect you didn't take note of the other writing
+  considerations on that page.)
+
+* Likewise, you didn't submit your document source as asked.  Glitches
+  like these put the reviewer in a grumpy mood :-(.
+
+* What's up with citations like "[7, Section 3]"?  The point referred
+  to here (in the Intro) is on page 6, not page 7.  And in any case,
+  that's not the usual convention for section cross-references.
+
+* Cross-reference glitch in the Intro: "Section 14.23"
+
+* Is it really "flash proxy" and not "Flash proxy"?  (More lowercasing?)
+  I found that visually distracting; it's reminiscent of "flash crowd".
+  If that's the reference, rather than use of Flash, then explain that
+  to the reader.
+
+* Avoid use of "things", it's quite vague.
+
+* Avoid use of contractions like "it's" or "doesn't".
+
+* "Classic example ... early 2012" - something 2 years old is not "classic"!
+
+* Capitalize "CAPTCHA".
+
+* Some of your paragraphs are quite long.  This gets tiring for the reader.
+
+* The HTTPS info in Figure 1 is too small to make out readily.
+
+* "HTTP long polling" is not clear.
+
+* Figure 2 should be bigger.  You could move it to an Appendix to
+  facilitate this.
+
+* The dashed lines in Figure 3 look solid in black-and-white.
+
+* "We only interested in the Google traffic only" reads awkwardly.
+
+* "This result [different packet size distributions] is unexpected ... but
+  meek changes the packet size distribution".  The reader is confused at
+  this point (why is it unexpected if you know that meek changes the
+  distribution?).  You need to structure this more clearly to then lead
+  into the next paragraph.
+
+* Typo, contract -> contrast
+
+* "how many HTTPS connections to Google did a user make" reads awkwardly.
+
+* "most of the numbers concentrate on 1  10" - hyphen missing
+
+* "typical pattern of using Google is ..." - add citation, or frame that
+  *presumably* this is the case
+
+* You should try Figure 5 log-scaled (X axis only) to see if it's
+  more illuminating.  As it is, all of the action is in the leftmost
+  part of the plot.
+
+* Figure 6 is baffling in black-and-white.  Also, it says "Concurrent
+  HTTPS connections over time" but doesn't state at what granularity.
+  Per user?  For your sequential visiting of the Alexa sites?
+
+* Figure 7 should be bigger (for the report); should merge the two halves;
+  and should employ log-scaling so the two halves will both reasonably fit.
+
+* The lines in Figure 8 are not particularly meaningful.  Stick with
+  points/barplots.
+
+* Avoid orphan subsections like 7.1 (i.e., there's no subsequent 7.2
+  subsection).
+
+* The bibliography is quite nicely put together.  The URLs are very
+  handy, though for conference submission you would often omit them
+  (or turn them into shortened URLs) to save space.
