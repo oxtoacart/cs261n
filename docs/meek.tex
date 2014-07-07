@@ -252,25 +252,31 @@ We can ensure that reflected HTTP bodies are unmodified, and therefore use them 
 without having to connect to the client.
 
 Decoy routing~\cite{decoyrouting} is a technique that puts
-proxies in the middle of network paths, rather than at the endpoints.
-Realizations of the decoy routing idea include Telex~\cite{telex}
+proxies in the middle of network paths, rather than at the ends.
+Realizations of decoy routing include Telex~\cite{telex}
 and Cirripede~\cite{cirripede}.
-Decoy routing asks friendly ISPs to deploy special software on routers that lie
-between censored users and uncensored Internet destinations.
+In decoy routing, friendly ISPs deploy special \emph{decoy} routers that lie
+on network paths between censored users and uncensored Internet destinations.
 Circumvention traffic is ``tagged'' in a way that is detectable only
 by decoy routers, and not by the censor.
-On receiving a tagged communication, the decoy router shunts it away from its apparent destination
-and toward the censored destination requested by the client.
-Our work is conceptually similar to decoy routing,
-though the action happens at the application layer rather than the network layer.
-Both systems use a piece of network infrastructure as a decoy to redirect certain flows:
-in decoy routing it is an ISP router; for us it is the front domain.
-Both tag flows in a way that is visible only to the decoy router:
-in decoy routing a tag may be, for example, a hash embedded in the TLS client randomness;
-for us it is the HTTP Host header, encrypted within an HTTPS stream.
-Decoy routing generally requires the cooperation of large, centrally located
-router operators,
-whereas we only need to buy web application hosting.
+On receiving a tagged communication, the decoy shunts it away from its apparent, \emph{overt destination}
+and toward a censored, \emph{covert destination}.
+Domain fronting is similar to decoy routing;
+think of domain fronting as decoy routing at the application layer.
+In place of a decoy router, domain fronting has a CDN edge server;
+in place of the overt destination is the front domain.
+Both systems tag flows in a way that is invisible to the censor:
+decoy routing uses, for example, a hash embedded in a client nonce,
+while domain fronting uses the HTTP Host header, encrypted within HTTPS.
+
+Schuhard et~al.~\cite{ccs2012-decoys}
+introduce the idea of a \emph{routing adversary} against decoy routing,
+and show that the connectivity of the Internet enables
+censors to force network users onto paths that do not include decoys.
+Simulations by Houmansadr et~al.~\cite{nodirectionhome}
+show that even though such alternate paths exist,
+they are many times more costly to the censor,
+especially when decoys are placed strategically.
 
 CensorSpoofer~\cite{censorspoofer}
 decouples the upstream and downstream channels.
@@ -282,16 +288,6 @@ so that they appear to come from the dummy host.
 From the censor's point of view, the client is carrying on a conversation only with the dummy host.
 If the dummy is blocked, another can be used in its place,
 as the CensorSpoofer proxy's true IP address remains unknown.
-
-% \cite{ccs2012-decoys}
-% Routing around decoys
-A recent study~\cite{nodirectionhome} on AS
-topology suggests that defeating decoy routing is likely to be expensive for the
-censors, if the decoy routers are strategically deployed. Despite that decoy
-routing is a sound technical approach, it is not clear whether ISPs are
-willing to act against censors. However, the takeaway is that the
-censors are unwilling to completely block day-to-day Internet access, which we
-can take advantage of.
 
 % CloudTransport~\cite{cloudtransport}
 
