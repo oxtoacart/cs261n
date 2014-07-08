@@ -8,6 +8,7 @@ meek.pdf: meek.tex meek.bib clients-meek.pdf
 	pdflatex $*
 	pdflatex $*
 
+# wget -q -O - https://metrics.torproject.org/stats/clients.csv | sed -n -e '1p;/meek/p' > clients-meek.csv
 clients-meek.pdf: clients-meek.R clients-meek.csv
 	Rscript clients-meek.R
 
