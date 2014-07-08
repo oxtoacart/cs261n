@@ -771,10 +771,36 @@ the arm-race game is symmetric; since finding a right model is a difficult task 
 the censor. Therefore, the censor can only find ad-hoc features to block forbidden traffic, which are relatively 
 easy to defend against. 
 
-% \section{Security}
+\section{Security}
 
-% Google can deanonymize you, because they are the first hop,
-% and also often the last hop because of their popularity.
+Domain fronting shares a weakness with decoy routing,
+which is that the overt and covert destinations lie on different
+network paths.
+The difference in paths may create side channels---latency measurements for instance---that
+enable the censor to
+distinguish fronted traffic from traffic that is truly destined
+to the front domain.
+For example, a CDN can be expected to have responses
+to some fraction of requests already in cache,
+and respond to those requests with low latency.
+Fronted traffic, on the other hand, always continues all the way
+to the origin server after reaching the CDN (as if nothing were ever cached),
+resulting in a higher latency.
+Latency measurement was applied to decoy routing by Schuhard et~al.~\cite[Section~5]{ccs2012-decoys},
+who compared empirical round-trip-time distributions using a
+Kolmogorov--Smirnov test.
+% time between ChangeCipherSpec and ApplicationData
+
+% Edge servers within the censored region.
+% Censor could block on the way to the origin server,
+% if the censor has visibility to it.
+% Maybe the CDN has its own private high-speed cables,
+% or it VPNs its own stuff or something.
+
+% Firefox plugin uses normal browser trust store.
+% Adversary controls CAs. Can MITM and read your tag and block you.
+% Maybe not willing to risk getting caught in MITM.
+% Could conceivably send cover traffic if MITM detected, but blah.
 
 \section{Deployment}
 \label{sec:deployment}
