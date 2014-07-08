@@ -1,4 +1,4 @@
-\documentclass{article}  
+\documentclass[conference]{IEEEtran}
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage{caption}
@@ -9,10 +9,15 @@
 \def\meekclient{\mbox{meek-client}}
 \def\meekserver{\mbox{meek-server}}
 
-\title{Blocking-resistant communication\\through domain fronting}
-\author{David Fifield, Chang Lan}
-
 \begin{document}
+
+\title{Blocking-resistant communication\\through domain fronting}
+
+\author{David Fifield, Chang Lan}
+\author{
+\IEEEauthorblockN{David Fifield and Chang Lan}
+\IEEEauthorblockA{University of California, Berkeley}
+}
 
 \maketitle
 
@@ -944,7 +949,7 @@ but have not yet put numbers to our measurements.
 
 % Load balancing
 
-\section{Acknowledgments}
+\section*{Acknowledgments}
 
 We thank Vern Paxson, Nick Weaver, and Doug Tygar for inspiring conversation on this topic.
 Special thanks go to the members of the tor-qa and tor-dev mailing lists
@@ -961,7 +966,7 @@ who responded to our design ideas, reviewed source code, and tested our prototyp
 % HTTPS obscures session ids, equivalent to obscuring TCP connections in other transports.
 % Increases latency a lot: \approx 100 ms increased to \approx 350 ms when I tried it in March 2014.
 
-\bibliographystyle{plain}  
+\bibliographystyle{IEEEtran}
 \bibliography{meek}
 
 \end{document}
