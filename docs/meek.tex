@@ -791,6 +791,28 @@ who compared empirical round-trip-time distributions using a
 Kolmogorov--Smirnov test.
 % time between ChangeCipherSpec and ApplicationData
 
+When domain fronting is combined with Tor,
+the CDN or web service effectively becomes
+what Tor calls a ``guard node,''
+a host with a privileged network position that can observe
+the ciphertext entering the network.
+One consequence of this fact is that Google (for example)
+knows the IP addresses of everyone using the circumvention system,
+just as if it were those users' ISP.
+Another consequence is that the CDN or web service gets
+to observe and correlate both entry and exit traffic,
+in the special case where the target of the communication
+also lies on the same CDN or web service.
+For example, a user fronting through App Engine and
+browsing YouTube reveals both their entry and exit traffic to Google,
+which may attempt through traffic analysis to determine
+which entry packets correspond to which exit packets.
+The problem is hard to counter, because the front domain needs
+to be a popular destination in order to have high collateral damage,
+but popular destinations by definition tend to be visited a lot.
+% Possible countermeasure is traffic fingerprinting resistance
+% like what mjuarez is working on, mostly orthogonal to circumvention.
+
 % Edge servers within the censored region.
 % Censor could block on the way to the origin server,
 % if the censor has visibility to it.
@@ -864,11 +886,6 @@ the path from user to Tor bridge now includes App Engine and the web app operato
 in addition to the ISP and intermediate routers that were there before.
 On the other hand, the Tor bridge no longer gets to see users' IP addresses:
 all it sees are many connections from App Engine.
-In effect, App Engine and the web app become what Tor calls a ``guard node,''
-a privileged relay that takes the first hop in the chain of relays.
-Because Tor is encrypted and integrity-protected, neither App Engine nor the app operators
-are able to read or alter users' communications, but being on path enables them
-to do things like measure packet timing patterns.
 
 Users are also free to upload their own personal copy of the App Engine code, as is done with GoAgent.
 App Engine imposes bandwidth quotas on unpaid apps, but they are high enough to allow daily web browsing.
