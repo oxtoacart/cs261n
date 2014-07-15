@@ -143,18 +143,18 @@ and other alternative deployments are discussed in Section~\ref{sec:otherdeploym
 % which can pass data on to the true destination for the user.
 
 Broadly speaking, there are two main challenges to proxy-based circumvention:
-blocking by content and blocking by endpoint.
+blocking by content and blocking by address.
+Blocking by content is based on \emph{what you are saying},
+and blocking by address is based on \emph{whom you are speaking to},
+A skilled censor will do both, and effective circumvention requires meeting both challenges.
 A content-blocking censor inspects packets and payloads,
 looking, for example, for forbidden protocols or keywords.
 Content-based blocking is countered by obfuscation:
 making circumvention traffic difficult to distinguish
 from traffic the censor wishes to allow.
-Blocking by endpoint is based on \emph{whom you are speaking to},
-and blocking by content is based on \emph{what you are saying}.
-A skilled censor will do both, and effective circumvention requires meeting both challenges.
-An endpoint-blocking censor forbids all communication with certain
+An address-blocking censor forbids all communication with certain
 addresses, for example IP addresses and domain names, whatever the contents may be.
-The challenge of endpoint blocking is met by making it difficult for the censor to learn proxy addresses;
+The challenge of address blocking is met by making it difficult for the censor to learn proxy addresses;
 by having overwhelmingly many proxies;
 or by colocating proxies with high-value services so that both must be blocked or both allowed.
 
@@ -210,7 +210,7 @@ deliberately drop or inject ACKs in order to disrupt the covert channel, without
 much collateral damage.
 
 
-The other grand challenge of proxy-based circumvention is endpoint blocking,
+The other grand challenge of proxy-based circumvention is address blocking,
 against which there have been a few approaches proposed.
 Tor has long faced the problem of its entry relays being blocked. The list of
 relays is public, so it easy to block all of them by IP address. Tor
@@ -236,11 +236,11 @@ Address distribution appears to be the weaker side of the defense,
 as evidenced by real-world censors' apparent preference for
 blocking bridge addresses over real-time deobfuscation~\cite{foci12-winter}.
 
-Flash proxy~\cite{flashproxy} attempts to address endpoint blocking by
+Flash proxy~\cite{flashproxy} resists address blocking by
 conscripting web users as temporary proxies. Proxies last only as long as a web
 user stays on a page, so the pool of proxies is constantly changing;
 even if one of them is blocked, there will soon be another to replace it.
-Flash proxy's approach to endpoint blocking is in a sense
+Flash proxy's approach to address blocking is in a sense
 the opposite of ours: where flash proxy uses cheap, disposable, individually blockable proxies,
 we use just one high-value proxy, which shares its fate with network
 infrastructure that is expensive to block.
@@ -252,7 +252,7 @@ Connections between censored clients and browser-based proxies use
 WebSocket, a meta-protocol running on TCP,
 but inside the WebSocket framing is the ordinary Tor protocol.
 There exists a prototype transport that attempts to get both
-content-based and endpoint-based blocking resistance by obfuscating traffic
+content-based and address-based blocking resistance by obfuscating traffic
 with obfsproxy before sending it through flash proxy~\cite{obfs-flash}.
 However it is limited because it is not
 possible to obfuscate the outermost WebSocket layer;
@@ -465,11 +465,11 @@ and the entry bridge do not have to be trusted.
 \label{sec:browserextension}
 
 The practice of routing traffic through a web service with domain fronting
-defeats both endpoint-based blocking and active scanning.
+defeats both address-based blocking and active scanning.
 The endpoint (which appears to be the front domain; e.g. www.google.com)
 cannot be blocked because to block it would cause collateral damage.
 Active scanning is defeated because if the censor accesses the same
-endpoint as the client, all they see is a web page served by the front domain.
+domain as does the client, all they see is a web page served by the front domain.
 Even though the censor knows some traffic is being fronted,
 by looking only at IP addresses and domain names, it cannot determine which.
 
