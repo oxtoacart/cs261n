@@ -251,12 +251,12 @@ Flash proxy itself does nothing to defend against content blocking.
 Connections between censored clients and browser-based proxies use
 WebSocket, a meta-protocol running on TCP,
 but inside the WebSocket framing is the ordinary Tor protocol.
-There exists a prototype transport that attempts to get both
-content-based and address-based blocking resistance by obfuscating traffic
-with obfsproxy before sending it through flash proxy~\cite{obfs-flash}.
-However it is limited because it is not
-possible to obfuscate the outermost WebSocket layer;
-the censor could decide simply to block all WebSocket.
+% There exists a prototype transport that attempts to get both
+% content-based and address-based blocking resistance by obfuscating traffic
+% with obfsproxy before sending it through flash proxy~\cite{obfs-flash}.
+% However it is limited because it is not
+% possible to obfuscate the outermost WebSocket layer;
+% the censor could decide simply to block all WebSocket.
 
 % Lantern
 % Psiphon
