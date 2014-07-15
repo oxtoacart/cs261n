@@ -323,7 +323,19 @@ From the censor's point of view, the client is carrying on a conversation only w
 If the dummy is blocked, another can be used in its place,
 as the CensorSpoofer proxy's true IP address remains unknown.
 
-% CloudTransport~\cite{cloudtransport}
+CloudTransport~\cite{cloudtransport} uses cloud storage, for example Amazon~S3,
+as a communication channel by encoding sends and receives as reads and writes to shared remote files.
+CloudTransport has much in common with domain fronting:
+it hides the true endpoint of a communication with HTTPS,
+and sends traffic through a domain with high collateral damage.
+In CloudTransport, the hidden destination, which is a storage bucket name rather than a domain,
+is hidden in the path rather than the Host header.
+For example, in an example S3 URL
+\begin{NoHyper}\url{https://s3.amazonaws.com/bucketname/filename}\end{NoHyper},
+the censor only gets to ``see'' the generic domain part, \begin{NoHyper}\url{s3.amazonaws.com}\end{NoHyper}.
+The path component \begin{NoHyper}\url{/bucketname/filename}\end{NoHyper},
+which would reveal that CloudTransport is being used,
+cannot be used for blocking because it is encrypted in HTTPS.
 
 GoAgent~\cite{goagent} is a direct inspiration for our system in its use of App
 Engine and Host header--based domain fronting.
