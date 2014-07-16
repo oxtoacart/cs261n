@@ -295,11 +295,12 @@ App Engine is effectively an unblockable OSS that we fully control.
 We can ensure that reflected HTTP bodies are unmodified, and therefore use them to carry traffic
 without having to connect to the client.
 
-Decoy routing~\cite{decoyrouting} is a technique that puts
+Decoy routing~\cite{decoyrouting}, also called end-to-middle proxying,
+is a technique that puts
 proxies in the middle of network paths, rather than at the ends.
-Realizations of decoy routing include Telex~\cite{telex}
-and Cirripede~\cite{cirripede}.
-In decoy routing, friendly ISPs deploy special \emph{decoy} routers that lie
+Realizations of decoy routing include Telex~\cite{telex},
+Cirripede~\cite{cirripede}, and TapDance~\cite{tapdance}.
+In decoy routing, friendly ISPs deploy special routers that lie
 on network paths between censored users and uncensored Internet destinations.
 Circumvention traffic is ``tagged'' in a way that is detectable only
 by decoy routers, and not by the censor.
