@@ -149,6 +149,7 @@ and blocking by address is based on \emph{whom you are speaking to},
 A skilled censor will do both, and effective circumvention requires meeting both challenges.
 A content-blocking censor inspects packets and payloads,
 looking, for example, for forbidden protocols or keywords.
+Content-based blocking is sometimes called deep packet inspection (DPI).
 Content-based blocking is countered by obfuscation:
 making circumvention traffic difficult to distinguish
 from traffic the censor wishes to allow.
@@ -158,13 +159,15 @@ The challenge of address blocking is met by making it difficult for the censor t
 by having overwhelmingly many proxies;
 or by colocating proxies with high-value services so that both must be blocked or both allowed.
 
-To the above challenges we may add the related challenge of active scanning for proxies.
-Though a circumvention protocol may be difficult to identify on the wire,
-it may nevertheless be easy to scan for servers that speak the protocol,
-and thereafter block the server by its address.
+To the above challenges we may add the related challenge of active probing.
+An active-probing censor tries to connect to a server using a circumvention tool
+as if it were an ordinary client.
+If the connection is successful, the server can be blacklisted.
+Active probing is a very precise means of identifying a server as belonging to a circumvention system.
 Winter and Lindskog~\cite{foci12-winter} confirmed an earlier discovery of
 Wilde~\cite{wilde} that China's Great Firewall identifies Tor bridges
-by actively scanning destination addresses to see if they speak the Tor protocol.
+by issuing followup scans to observed client connections to see
+whether a server speaks the Tor protocol.
 The discovery of active probing was the motivation for probing resistance in ScrambleSuit~\cite{scramblesuit}
 and in this work.
 
