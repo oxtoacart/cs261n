@@ -733,7 +733,7 @@ Browsers also apply techniques like HTTP pipelining to improve performance. Sinc
 the same Google frontend server, the browser will keep the persistent TLS connection. In addition, small requests 
 can be batched into a large chunk before being sent. This explains why large packets are mostly seen from the trace that
 records meek's traffic.
-In contract, normal users may not have persistent connections to Google. For example, a user may search a keyword on
+In contrast, normal users may not have persistent connections to Google. For example, a user may search a keyword on
 Google, click a result, and then close the tab that displays search results. The browser may close the 
 connection immediately after the user leaves the Google web page. Next time the user browses Google search, the browser 
 opens a new connection. In this case, small requests do not have such opportunity for batching.
