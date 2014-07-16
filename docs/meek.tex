@@ -712,7 +712,7 @@ will be mostly likely to compare suspicious traffic with normal Google traffic. 
 Google trace is 312 MB. 
 
 
-\begin{figure}
+\begin{figure*}
 \centering
 \begin{subfigure}[b]{0.5\textwidth}
 \includegraphics[width=\textwidth]{figs/datalen-google-cdf.png}
@@ -729,7 +729,7 @@ Google trace is 312 MB.
 
 \caption{TCP packet payload size distribution}
 \label{fig:len}
-\end{figure}
+\end{figure*}
 
 \paragraph{TCP payload length}
 Figure ~\ref{fig:len} shows the payload size distribution of normal traffic and meek's traffic. Both
@@ -759,7 +759,7 @@ We thus investigated other related characteristics.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\textwidth, angle=270]{figs/connections-google.eps}
+\includegraphics[height=\linewidth, angle=270]{figs/connections-google.eps}
 \caption{Histogram of each user's connections in the 10-minute window}
 \label{fig:connections}
 \end{figure}
@@ -767,7 +767,7 @@ We thus investigated other related characteristics.
 %(or a blank line to force the subfigure onto a new line)
 \begin{figure}
 \centering
-\includegraphics[width=0.8\textwidth]{figs/conns.eps}
+\includegraphics[width=\linewidth]{figs/conns.eps}
 \caption{Concurrent HTTPS connections over time. We measure the trace for the Tor Browser Bundle and Firefox/Chrome extensions.}
 \label{fig:conconns}
 \end{figure}
@@ -787,7 +787,7 @@ due to background activities such as statistics reporting. In all cases the numb
 less than 5. We can conclude that the number of concurrent connections does not show distinct characteristics, as 
 a small number of connections can be considered as a normal behavior.
 
-\begin{figure}
+\begin{figure*}
 \centering
 \begin{subfigure}[b]{0.5\textwidth}
 \includegraphics[height=\textwidth, angle=270]{figs/flowduration-google-cdf.eps}
@@ -804,7 +804,7 @@ a small number of connections can be considered as a normal behavior.
 
 \caption{Connection lifetime distribution}
 \label{fig:duration}
-\end{figure}
+\end{figure*}
 
 \paragraph{Connection lifetime}
 We consider the connection lifetime as a potential weakness. Figure ~\ref{fig:duration:lbl} shows the 
