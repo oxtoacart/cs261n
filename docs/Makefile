@@ -1,6 +1,6 @@
 all: meek.pdf
 
-meek.pdf: meek.tex meek.bib clients-meek.pdf
+meek.pdf: meek.tex meek.bib clients-meek.pdf architecture.pdf browser-architecture.pdf
 
 %.pdf: %.tex %.bib
 	pdflatex $*
