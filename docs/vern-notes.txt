@@ -1,11 +1,11 @@
 Points to clarify/enhance:
 
-* The abstract does not effectively convey the nature of the approach
+x The abstract does not effectively convey the nature of the approach
   It needs to spell out the tunneled and fate-sharing nature of the
   system more clearly.  For example, "proxied through a web service that
   may itself be blocked by the censor" sounds like it can't possibly work.
 
-* meek essentially uses something akin to double-tunneling.  You could
+x meek essentially uses something akin to double-tunneling.  You could
   make this more clear.
 
 * In general, meek doesn't need to be tied to Tor, or in fact to any
@@ -36,7 +36,7 @@ Points to clarify/enhance:
   random byte stream), so this only achieves the goal if observing
   such byte streams is not peculiar in network traffic.
 
-* The discussion of CensorSpoofer on page 5 seems out of place, and in
+x The discussion of CensorSpoofer on page 5 seems out of place, and in
   particular the paragraph after it appears to naturally follow the
   one just before it.
 
@@ -170,7 +170,7 @@ Presentation:
   distribution?).  You need to structure this more clearly to then lead
   into the next paragraph.
 
-* Typo, contract -> contrast
+x Typo, contract -> contrast
 
 * "how many HTTPS connections to Google did a user make" reads awkwardly.
 
