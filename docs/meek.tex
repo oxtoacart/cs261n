@@ -113,6 +113,20 @@ In the examples in this paper, the front domain is www.google.com
 and the actual hidden destination domain is meek-reflect.appspot.com,
 which is our custom web app that aids in circumvention.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{fronting}
+\caption{
+Domain fronting uses different domain names at different layers of communication.
+At the plaintext layers visible to the censor---the DNS request and the
+TLS Server Name Indication---appears
+the front domain \mbox{\textbf{allowed.example}}.
+At the HTTP layer, unreadable to the censor but meaningful to the CDN or web service,
+is the actual destination \mbox{\textbf{forbidden.example}}.
+}
+\label{fig:fronting}
+\end{figure}
+
 meek may be regarded as a steganographic transport only in that it must blend in with other HTTPS traffic.
 Tunneling inside HTTPS greatly eases the steganography problem:
 It's not necessary to generate plausible HTTP, only plausible TLS,
