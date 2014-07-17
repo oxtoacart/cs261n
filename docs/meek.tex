@@ -28,10 +28,9 @@ that hides the remote endpoint of a communication
 for the purpose of censorship circumvention.
 Fronting enables a communication stream that is apparently with an allowed domain,
 but actually with a forbidden domain.
-The technique uses different domain names are used in different
-parts of an HTTP request.
+The technique uses different domain names at different communication layers.
 One domain is used on the ``outside''---in the DNS request and
-TLS Server Name Indication---while another domain is used
+TLS Server Name Indication---while another is used
 on the ``inside''---the HTTP Host header, invisible to the
 censor under HTTPS encryption.
 A variety of difficult-to-block web services, such as content delivery networks
