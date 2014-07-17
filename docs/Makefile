@@ -2,7 +2,7 @@ INKSCAPE = inkscape
 
 all: meek.pdf
 
-meek.pdf: meek.tex meek.bib clients-meek.pdf architecture.pdf browser-architecture.pdf
+meek.pdf: meek.tex meek.bib clients-meek.pdf fronting.pdf architecture.pdf browser-architecture.pdf
 
 %.pdf: %.tex %.bib
 	pdflatex $*
