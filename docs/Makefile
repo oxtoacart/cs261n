@@ -1,3 +1,5 @@
+INKSCAPE = inkscape
+
 all: meek.pdf
 
 meek.pdf: meek.tex meek.bib clients-meek.pdf architecture.pdf browser-architecture.pdf
@@ -7,6 +9,9 @@ meek.pdf: meek.tex meek.bib clients-meek.pdf architecture.pdf browser-architectu
 	bibtex $*
 	pdflatex $*
 	pdflatex $*
+
+%.pdf: %.svg
+	inkscape --export-text-to-path --export-pdf=$@ $<
 
 # wget -q -O - https://metrics.torproject.org/stats/clients.csv | sed -n -e '1p;/meek/p' > clients-meek.csv
 clients-meek.pdf: clients-meek.R clients-meek.csv
