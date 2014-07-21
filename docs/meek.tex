@@ -33,31 +33,28 @@ One domain is used on the ``outside''---in the DNS request and
 TLS Server Name Indication---while another is used
 on the ``inside''---the HTTP Host header, invisible to the
 censor under HTTPS encryption.
-A variety of difficult-to-block web services, such as content delivery networks
-and Google App Engine, ignore the outside of an HTTPS request
-and dispatch it internally according to the Host header:
-their frontend servers effectively provide a front,
-behind which any domain on their network may be accessed
-without revealing the destination to the censor.
-If a censor is unable to identify which traffic is fronted,
-then blocking the traffic means blocking a content delivery network wholesale,
+We identify a number of hard-to-block web services,
+like content delivery networks and Google's infrastructure,
+that ignore the outside of an HTTPS request
+and dispatch it internally according to the Host header.
+The effect is that a user may communicate with any domain within the web service,
+while appearing to communicate with any other domain.
+If a censor is unable otherwise to distinguish fronted and non-fronted traffic,
+then blocking circumvention traffic means blocking the whole web service,
 with resulting expensive collateral damage.
-Fronting has been used successfully for a few years by a circumvention system called GoAgent;
-we provide a systematic examination of its potential and limitations,
-and the results of building an implementation.
 
-We have implemented a system called meek,
+We have implemented domain fronting in a system called meek,
 a pluggable transport for Tor.
-meek combines domain fronting with a simple encoding of a bidirectional byte stream
-as HTTPS requests and responses.
-A censored client using meek makes a series of HTTPS requests
-that appear to be destined to an allowed domain,
+meek combines fronting with a proxy server that encodes a TCP stream
+as a sequence of HTTP requests and responses.
+The meek server's external interface is that of an ordinary web server.
+Communication with it is enabled through domain fronting.
+The server receives requests, decodes them, and feeds their payloads into a Tor relay,
+and returns downstream data in the HTTP response.
+A censor watching the communication sees only a sequence of HTTPS requests to an allowed domain.
 but which actually arrive at a special web server on a Tor relay.
-The web server decodes the requests, feeds their data into the Tor network,
-and sends back any downstream data encoded as HTTPS responses.
-We describe our experience deploying meek to Tor users.
-meek, or systems inspired by it,
-have been adopted by other circumvention systems including Lantern and Psiphon.
+meek, or something based on it,
+has been adopted by other circumvention systems including Lantern and Psiphon.
 
 Hiding the endpoint and obscuring byte patterns are important parts of blocking-resistant communication,
 but there are other, more subtle considerations.
