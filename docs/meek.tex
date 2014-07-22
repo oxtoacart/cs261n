@@ -4,6 +4,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{hyperref}
+\usepackage{textcomp}
 
 % Avoid line breaks in program names.
 \def\meekclient{\mbox{meek-client}}
@@ -147,8 +148,8 @@ An HTTPS request for \urll{www.google.com} has a Host header for
 \begin{quote}
 \usefont{U}{cmtt}{m}{n}%
 \$ wget -q -O - https://www.google.com/ \char`\\\\
-\strut~~~~--header 'Host: maps.google.com' | \char`\\\\
-\strut~~~~grep -o '<title>.*</title>'\\
+\strut~~~~--header \textquotesingle{}Host: maps.google.com\textquotesingle{} | \char`\\\\
+\strut~~~~grep -o \textquotesingle{}<title>.*</title>\textquotesingle{}\\
 <title>Google Maps</title>
 \end{quote}
 
