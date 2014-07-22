@@ -403,8 +403,8 @@ A technique known as OSS~\cite{oss} (for
 ``online scanning service'') bounces data
 through third-party web services that are capable of making HTTP requests.
 For example, a censored client may ask a translation service to
-translate a web page at \begin{NoHyper}\url{http://proxy.example.com/...}\end{NoHyper},
-where ``\begin{NoHyper}\url{...}\end{NoHyper}''
+translate a web page at \urll{http://proxy.example.com/...},
+where ``\urll{...}''
 stands for the data payload that the client wishes to send---data are embedded in the URL.
 Simply by making the HTTP request, the service sends the client's message.
 The client cannot rely on being able to receive the response to its message in an HTTP response,
@@ -466,9 +466,9 @@ and sends traffic through a domain with high collateral damage.
 In CloudTransport, the hidden destination, which is a storage bucket name rather than a domain,
 is hidden in the path rather than the Host header.
 For example, in an example S3 URL
-\begin{NoHyper}\url{https://s3.amazonaws.com/bucketname/filename}\end{NoHyper},
-the censor only gets to ``see'' the generic domain part, \begin{NoHyper}\url{s3.amazonaws.com}\end{NoHyper}.
-The path component \begin{NoHyper}\url{/bucketname/filename}\end{NoHyper},
+\urll{https://s3.amazonaws.com/bucketname/filename},
+the censor only gets to ``see'' the generic domain part, \urll{s3.amazonaws.com}.
+The path component \urll{/bucketname/filename},
 which would reveal that CloudTransport is being used,
 cannot be used for blocking because it is encrypted in HTTPS.
 
