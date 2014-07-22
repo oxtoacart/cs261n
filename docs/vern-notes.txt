@@ -8,7 +8,7 @@ x The abstract does not effectively convey the nature of the approach
 x meek essentially uses something akin to double-tunneling.  You could
   make this more clear.
 
-* In general, meek doesn't need to be tied to Tor, or in fact to any
+x In general, meek doesn't need to be tied to Tor, or in fact to any
   sort of confidentiality/privacy-preserving backend.  I think you should
   acknowledge this up front.  There's a quite reasonable tradeoff for users
   to consider here: if their threat model is only regarding evading the
@@ -22,7 +22,7 @@ x meek essentially uses something akin to double-tunneling.  You could
 * Related to this, you should assess how much performance overhead your
   approach imposes.
 
-* Figure 1 should come much earlier, basically in the Introduction.
+x Figure 1 should come much earlier, basically in the Introduction.
   Otherwise, it's hard to follow just where the paper is going.  In
   particular, the current narrative structure in the intro doesn't work
   well.  Even though I came in already knowing how the scheme works,
