@@ -8,6 +8,7 @@
 % Avoid line breaks in program names.
 \def\meekclient{\mbox{meek-client}}
 \def\meekserver{\mbox{meek-server}}
+\def\urll#1{\begin{NoHyper}\url{#1}\end{NoHyper}}
 
 \begin{document}
 
@@ -59,7 +60,7 @@ has been adopted by other circumvention systems including Lantern and Psiphon.
 Hiding the endpoint and obscuring byte patterns are important parts of blocking-resistant communication,
 but there are other, more subtle considerations.
 We describe what we have done to disguise other traffic ``tells'' in meek,
-such as using a web browser to make HTTPS requests
+such as using a real web browser to make HTTPS requests
 for a believable TLS fingerprint.
 We argue that these measures increase the censor's effort
 beyond simple one-shot techniques such as IP address blocking, and into
@@ -73,42 +74,47 @@ the realm of more expensive, less reliable statistical tests.
 
 Censorship is a daily reality for many Internet users.
 Workplaces, schools, and governments use technical and social means
-to prevent access to certain information by the network users under their control.
+to prevent access to information by the network users under their control.
 In response, those users use technical and social means
 to gain access to the forbidden information.
 What has emerged is an ongoing conflict between censor and censored,
 with advances on both sides, more subtle evasion being countered by more powerful detection.
 
-In this paper we describe the design and deployment of meek,
-a censorship-resistant communication system that aims at defeating
-known technical means of censorship.
-meek tunnels traffic through HTTP, but does not attempt to look like plaintext HTTP;
-it uses HTTPS to hide the contents of communications
-while relaying them through a third-party web services that it itself hard to block.
-meek is implemented as a Tor pluggable transport~\cite{pt}.
-We have done an initial deployment of the system and it is in use
-by a small number of users.
+What we as circumventors have in our favor is the censor's
+distaste for ``collateral damage,''
+accidental overblocking committed in the course of trying to censor something else.
+One way to win against the censor is to entangle circumvention traffic
+with ordinary Internet traffic in a way that both must be blocked together
+or not at all.
+If the ordinary traffic is important enough,
+above the censor's tolerance for overblocking,
+then the circumvention traffic will get through.
 
-``Domain fronting'' is the term we use for one of the key techniques used by meek.
-Domain fronting is the use of different domain names at different layers of the network stack.
-In the DNS query and TLS server name indication (SNI)~\cite[Section~3]{rfc6066},
-which are visible to the censor, one domain name (the ``front domain'') appears;
-while in the HTTP Host header~\cite[Section~14.23]{rfc2616},
+In this paper we describe ``domain fronting,'' a general-purpose technique
+based on HTTPS that hides the true destination of a communication
+from a censor.
+Fronting works with many web services that host multiple domain names
+behind an HTTPS frontend server.
+These include such high--collateral damage infrastructure as
+big content delivery networks (CDNs)
+and Google's panoply of services---a nontrivial fraction of the web.
+Domain fronting can be used as a means of tunneling traffic
+to a general-purpose proxy,
+so it is not limited to HTTPS, nor to the domains of any specific web service.
+
+The key idea of domain fronting is using
+different domain names at different layers of communication.
+In an HTTPS request, the destination domain name appears
+in three places relevant to the discussion:
+the DNS query,
+the TLS Server Name Indication (SNI) extension~\cite[Section~3]{rfc6066},
+and the HTTP Host header~\cite[Section~14.23]{rfc2616}.
+Normally, the same domain name appears in all three places.
+In a domain-fronted request,
+the DNS query and SNI carry one name (the ``front domain''),
+while the HTTP Host header,
 which is hidden from censor by HTTPS encryption,
-a different name (the actual destination) appears.
-Domain fronting works in systems that use the Host header in order to
-multiplex many domain names behind one HTTPS frontend;
-among these systems are Google's infrastructure and the
-CloudFlare content delivery network.
-Domain fronting can also work using only an IP address in place of
-a front domain. In this case there is no DNS query and no SNI in the TLS layer,
-but the actual destination still appears in the Host header.
-Domain fronting has been used successfully for years by GoAgent~\cite{goagent}
-(which uses a bare IP address without SNI)
-and by one of the rendezvous methods of flash proxy~\cite{flashproxy}.
-In the examples in this paper, the front domain is www.google.com
-and the actual hidden destination domain is meek-reflect.appspot.com,
-which is our custom web app that aids in circumvention.
+has a different name (the actual destination).
 
 \begin{figure}[h]
 \centering
@@ -124,33 +130,141 @@ is the actual destination \mbox{\textbf{forbidden.example}}.
 \label{fig:fronting}
 \end{figure}
 
-meek may be regarded as a steganographic transport only in that it must blend in with other HTTPS traffic.
-Tunneling inside HTTPS greatly eases the steganography problem:
-It's not necessary to generate plausible HTTP, only plausible TLS,
-because TLS payloads are encrypted, and to a first approximation all encrypted payloads look alike.
-We need only make sure that the TLS handshake and other meta-attributes of the connection are not uniquely fingerprintable.
-Section~\ref{sec:browserextension} describes the use of a web browser extension as a instrument for making HTTPS requests,
-so things like the TLS handshake, DNS lookup, and TCP connection reuse match those of a browser as closely as possible.
-Of course, there are more subtle considerations that go into
-making a circumvention HTTPS stream look like an allowed HTTPS stream,
-things like packet size and timing, and duration of TCP connections.
-These additional considerations are the subject of Section~\ref{sec:trafficstatistics}.
+Neither the DNS nor the SNI can be blocked without
+collaterally blocking the front domain.
+The Host header is unknown to the censor,
+but known to the server receiving the HTTPS request,
+which uses the header to internally route the request to its destination.
+No traffic ever reaches the front domain,
+which may be oblivious to the circumvention.
 
-For concreteness, and because it is what we have deployed so far,
-the examples in this paper will use Google and App Engine as the specific
-third-party web service used for circumvention.
-Other systems that support domain fronting may be substituted for Google,
-and other alternative deployments are discussed in Section~\ref{sec:otherdeployment}.
+A Wget command shows domain fronting in action
+on Google's infrastructure.
+An HTTPS request for \urll{www.google.com} has a Host header for
+\urll{maps.google.com}, and the HTML in the response is that of Google Maps.
 
-% CDNs don't route just anywhere---you have to be a customer.
+\noindent
+\begin{quote}
+\usefont{U}{cmtt}{m}{n}%
+\$ wget -q -O - https://www.google.com/ \char`\\\\
+\strut~~~~--header 'Host: maps.google.com' | \char`\\\\
+\strut~~~~grep -o '<title>.*</title>'\\
+<title>Google Maps</title>
+\end{quote}
+
+Domain fronting works with CDNs because a CDN's frontend server
+(called an ``edge server''),
+on receiving a request for a resource not already cached,
+forwards the request to the domain in the Host header
+(the ``origin server'').
+(There are other ways for CDNs to work, but this ``origin pull''
+configuration is common.)
+% The certificate you get may be that of the front domain,
+% or may be a generic shared domain.~\cite{httpsincdn}
+The CDN's edge server won't forward requests just anywhere---it
+has to be to the domain of a customer.
+This means that in order to host a proxy,
+one has to create an account and pay for bandwidth.
+
+Fronting works with Google because Google App Engine, a web application platform,
+can host a simple ``reflector'' application that emulates
+an origin-pull CDN, simply forwarding every request to another server.
+Though App Engine's domain \urll{appspot.com}
+may be blocked because it can trivially be used to host a proxy,
+it can be fronted by essentially any Google domain, for example
+\urll{google.com}, \urll{gmail.com}, or \urll{googleapis.com}.
+App Engine charges for bandwidth,
+though it has a low-bandwidth free tier.
+% See Section~\ref{sec:deployment} for more discussion on deployment.
+
+A variation is ``domainless'' fronting,
+in which there is no DNS request and no SNI extension.
+It looks to the censor
+like the user is browsing an HTTPS site by its IP address,
+or using an old browser that doesn't support SNI.
+Domainless fronting can be useful when there is no front domain
+with sufficiently high collateral damage.
+The censor is faced with the choice of blocking an entire IP address,
+blocking requests without SNI,
+or finding some more subtle and expensive test to distinguish
+circumvention traffic.
+
+To our knowledge,
+the earliest application of domain fronting to circumvention
+was by GoAgent~\cite{goagent},
+a tool based on App Engine and
+once widely used in China.
+Fronting has been used with success since 2013~\cite{flashproxy-reg-appspot}
+for the rendezvous component of another transport called flash proxy.
+GoAgent and the flash proxy rendezvous are the most direct
+inspirations of this work.
+
+We have developed domain fronting into a system called meek,
+a full-fledged circumvention transport,
+implemented as a pluggable transport~\cite{pt} for Tor.
+meek combines fronting with an HTTP-based tunneling proxy:
+upstream data are transformed into a sequence of HTTP requests,
+which are fronted in order to reach a proxy server.
+The server decodes the requests and feeds their payloads
+into a local Tor relay.
+Downstream data received from the Tor relay
+are returned to the client as HTTP responses
+through the same fronted channel.
+meek's architecture appears in Figure~\ref{fig:architecture}.
+Section~\ref{sec:architecture} describes meek's workings in detail.
+
+\begin{figure*}
+\centering
+\includegraphics[width=\linewidth]{architecture}
+\caption{
+System architecture.
+The Google frontend server is the server that dispatches requests to different services depending on the Host header.
+Components that are new in our system are outlined in blue.
+The ``Google infrastructure'' block may be replaced by other infrastructure that supports domain fronting.
+}
+\label{fig:architecture}
+\end{figure*}
+
+meek has been built into an alpha version of Tor Browser,
+and has seen use by a small number of users.
+Our deployment uses Google App Engine,
+with the hidden actual domain \urll{meek-reflect.appspot.com}
+hidden by the front \urll{www.google.com}.
+Section~\ref{sec:deployment} discusses other systems meek can work with
+and other deployment scenarios.
+In addition to the Tor pluggable transport,
+systems based on meek are now in use by other circumvention systems
+including Psiphon~\cite{psiphon} and Lantern~\cite{lantern}.
+
+% meek is designed to have features attractive in a circumvention transport.
+% It is easy to use, not requiring the configuration of any bridge addresses.
+% In Tor Browser, users need only select ``meek''
+% from a pulldown menu in order to use it.
+% It resists blocking by address and by content,
+% Section~\ref{sec:security}
+
+Domain fronting and HTTPS take care of two big circumvention challenges,
+namely hiding the destination and obscuring the contents of the message.
+There remain other, more subtle, meta-attributes of communication
+that could serve as a basis for blocking.
+For example, the handshake is a fingerprintable part of TLS.
+Section~\ref{sec:browserextension} describes how we use a web browser extension as an instrument for making HTTPS requests,
+in order that meek's TLS and HTTPS characteristics
+match those of a browser as closely as possible.
+One of our goals for meek is to force the censor
+to employ more sophisticated, expensive, and error-prone statistical tests
+to classify traffic as allowed or prohibited,
+rather than simple domain blacklists or deep packet inspection;
+to force the frontier of censorship
+to be a frontier not of simple in-line packet filters,
+but of probabilities and false positives.
+A preliminary analysis of meek's resistance to detection
+based on traffic characteristics like packet size and timing
+appears in Section~\ref{sec:trafficstatistics}.
+The analysis is based on comparing traffic traces of meek
+with samples of HTTPS traffic at an Internet router.
 
 \section{Background and related work}
-
-% In response to Internet censorship, many research papers and pragmatic systems
-% such Freegate, Psiphon, and Lantern have explored the design space of censorship
-% circumvention. All these schemes are based on a simple idea: deploy a set of
-% proxies outside the censor's domain, and let the user connect to one of them
-% which can pass data on to the true destination for the user.
 
 Broadly speaking, there are two main challenges to proxy-based circumvention:
 blocking by content and blocking by address.
@@ -362,6 +476,7 @@ GoAgent~\cite{goagent} is a direct inspiration for our system in its use of App
 Engine and Host header--based domain fronting.
 As in our system, traffic is fronted by the Google frontend server
 and delivered to its destination by a specialized app running on App Engine.
+GoAgent uses the ``domainless'' fronting model without SNI for most target domains.
 GoAgent requires users to upload a personal copy of the server code to App Engine,
 which harms usability but requires no central management
 and enables users to stay within bandwidth limits that exist for unpaid apps.
@@ -417,7 +532,13 @@ The user's computer, the third-party infrastructure (e.g., Google), and the Tor 
 are all uncontrolled and uncompromised by the censor.
 The user has a way to get a copy of the necessary client programs.
 
+We assume that the censor cannot observe the communication
+once it reaches the third-party infrastructure; i.e.,
+that no further obfuscation is needed once fronting is accomplished.
+% What about in-country edge servers; seems to work.
+
 \section{Architecture}
+\label{sec:architecture}
 
 The components of the system are shown in Figure~\ref{fig:architecture}.
 The three parts that are new in our system are:
@@ -442,18 +563,6 @@ If there is anything pending to be sent back to the client,
 into one logical stream and multiplexing multiple concurrent connections,
 both using the technique of session IDs described in this section.
 \end{enumerate}
-
-\begin{figure*}
-\centering
-\includegraphics[width=\linewidth]{architecture}
-\caption{
-System architecture.
-The Google frontend server is the server that dispatches requests to different services depending on the Host header.
-Components that are new in our system are outlined in blue.
-The ``Google infrastructure'' block may be replaced by other infrastructure that supports domain fronting.
-}
-\label{fig:architecture}
-\end{figure*}
 
 The main technical challenge in making this system work
 is in encoding a TCP stream as a sequence of HTTP requests and responses.
@@ -841,6 +950,7 @@ the censor. Therefore, the censor can only find ad-hoc features to block forbidd
 easy to defend against. 
 
 \section{Security}
+\label{sec:security}
 
 Domain fronting shares a weakness with decoy routing,
 which is that the overt and covert destinations lie on different
@@ -1023,6 +1133,7 @@ who responded to our design ideas, reviewed source code, and tested our prototyp
 % Lunar
 % Yawning Angel
 % Rod Hynes and Michael Hull of Psiphon.
+% Ox from Lantern.
 % Johanna Amann for getting the fraction of SNI from ICSI notary:
 %   https://trac.torproject.org/projects/tor/ticket/12208#comment:5
 % Arlo Breault (flashproxy-reg-appspot)
