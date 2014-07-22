@@ -28,7 +28,7 @@ x Figure 1 should come much earlier, basically in the Introduction.
   well.  Even though I came in already knowing how the scheme works,
   I found the discussion confusing.
 
-* In the Intro, when mentioning Section 6, foreshadow the general
+x In the Intro, when mentioning Section 6, foreshadow the general
   strategy you'll take for addressing the additional considerations.
 
 * "indistinguishable from a uniformly random byte stream" - note,
