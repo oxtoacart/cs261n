@@ -270,6 +270,8 @@ appears in Section~\ref{sec:trafficstatistics}.
 The analysis is based on comparing traffic traces of meek
 with samples of HTTPS traffic at an Internet router.
 
+% We measure the performance...
+
 \section{Background and related work}
 \label{sec:related-work}
 
@@ -515,33 +517,52 @@ Lantern~1.4 is planned to use domain fronting inspired by meek~\cite{lantern-1.3
 
 \section{Threat model}
 
-The censor is able to inspect all traffic that passes through
-the censorship boundary and block or allow it at will.
-The censor is able to actively scan for proxies, and issue followup
-connections to hosts that clients connect to, in order to determine
-whether they are proxies.
-The censor may block the web host on which the reflector web app runs,
-but it must allow access to some domain that can front for it.
-In our deployment using App Engine, the censor may block appspot.com,
-but must allow www.google.com (or its IP address, or some other domain
-that goes through the frontend server).
+The model includes four actors:
+the censor,
+the censored client,
+the intermediate web service's frontend server (CDN edge server),
+and the destination proxy (Tor bridge).
+Circumvention is achieved when the client evades the censor to reach
+the destination proxy,
+because the proxy provides access to anywhere.
+The client and destination proxy cooperate with each other.
+The intermediate web service does not cooperate with either,
+except to the extent that it doesn't collude with the censor.
+% The censor's goal is to prevent circumvention.
 
-The censor must operate at line rate; that is,
-it must not delay traffic unduly while deciding whether to allow it.
-This consideration is one facet of the censor's sensitivity to
-collateral damage caused by false positives:
-mistakenly blocking or degrading non-circumvention traffic causes the censor
-to incur some penalty, just as mistakenly allowing circumvention traffic does.
-The censor must allow TLS connections; meek does not try to look like plaintext.
-% but the censor may look at TLS characteristics and block suspicious connections.
+The censor controls a network and the into and within it.
+The censor is able to inspect traffic flowing across all links under its control
+and may block or allow any packet.
+The censor may inject and replay traffic, and
+operate its own clients and servers.
+The client lies within the censor's network,
+while the intermediate web service and destination proxy lie outside the network.
+The censor blocks direct communication between the client and the destination proxy,
+but allows HTTPS between the client and at least one front domain or IP address
+on the intermediate web service.
 
-The user's computer, the third-party infrastructure (e.g., Google), and the Tor bridge
-are all uncontrolled and uncompromised by the censor.
-The user has a way to get a copy of the necessary client programs.
+% The censor must operate at line rate; that is,
+% it must not delay traffic unduly while deciding whether to allow it.
+% This consideration is one facet of the censor's sensitivity to
+% collateral damage caused by false positives:
+% mistakenly blocking or degrading non-circumvention traffic causes the censor
+% to incur some penalty, just as mistakenly allowing circumvention traffic does.
 
-We assume that the censor cannot observe the communication
-once it reaches the third-party infrastructure; i.e.,
-that no further obfuscation is needed once fronting is accomplished.
+The client,
+intermediate web service,
+and destination proxy
+are uncontrolled by the censor.
+The censor does not control a TLS certificate authority;
+specifically it cannot man-in-the-middle an HTTPS session
+without being caught by ordinary certificate verification.
+The client has a way to get a copy of the necessary client programs.
+
+See Section~\ref{sec:security} for what happens when some
+of these assumptions are violated;
+specifically what happens
+when the intermediate web service's frontend server is inside the censor's network
+and when the censor controls a certificate authority.
+
 % What about in-country edge servers; seems to work.
 
 \section{Architecture and protocol of meek}
