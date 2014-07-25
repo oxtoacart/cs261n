@@ -204,14 +204,13 @@ the earliest application of domain fronting to circumvention
 was by GoAgent~\cite{goagent},
 a tool based on App Engine and
 once widely used in China.
-Fronting has been used with success since 2013
+Fronting has also been used with success since 2013
 for the rendezvous component of another transport called flash proxy~\cite{flashproxy}.
-GoAgent and the flash proxy rendezvous are the most direct
+GoAgent and flash proxy's rendezvous are the most direct
 inspirations of this work.
 
-We have developed domain fronting into a system called meek,
-a full-fledged circumvention transport,
-implemented as a pluggable transport~\cite{pt} for Tor.
+We have developed domain fronting into a full-fledged circumvention system called meek,
+implemented as a Tor pluggable transport~\cite{pt}.
 meek combines fronting with an HTTP-based tunneling proxy:
 upstream data are transformed into a sequence of HTTP requests,
 which are fronted in order to reach a proxy server.
@@ -221,7 +220,7 @@ Downstream data received from the Tor relay
 are returned to the client as HTTP responses
 through the same fronted channel.
 meek's architecture appears in Figure~\ref{fig:architecture}.
-Section~\ref{sec:architecture} describes meek's workings in detail.
+Section~\ref{sec:architecture} describes its workings in detail.
 
 \begin{figure*}
 \centering
