@@ -577,47 +577,85 @@ That section also describes the use of meek apart from Tor.
 \label{sec:architecture}
 
 The components of the system are shown in Figure~\ref{fig:architecture}.
-The three parts that are new in our system are:
-\begin{enumerate}
-\item The client program \meekclient.
-Using the pluggable transports protocol, Tor treats \meekclient\ as a SOCKS proxy.
-When \meekclient\ receives data from Tor, it bundles it up in an HTTP POST
-request and sends it to the web app,
-using HTTPS to hide the contents and the domain fronting trick to hide the true destination.
-Downstream data are returned in HTTP responses, which \meekclient\ decodes and sends back to Tor.
-\item The ``reflector'' web app, running on App Engine.
-Its domain name \mbox{meek-reflect.appspot.com} is protected by domain fronting.
-It is called a reflector because it doesn't do anything intelligent:
-it merely copies the HTTP requests it receives and forwards them
-to \meekserver\ running on the Tor bridge.
-\item The server program \meekserver, which acts as an HTTP server.
-It receives reflected requests from the web app, decodes their bodies,
-and forwards the contents to an instance of Tor running on the same host.
-If there is anything pending to be sent back to the client,
-\meekserver\ sends it along with its HTTP response.
-\meekserver\ also takes care of stringing together multiple HTTP requests
-into one logical stream and multiplexing multiple concurrent connections,
-both using the technique of session IDs described in this section.
-\end{enumerate}
+The parts that are new in meek
+are the programs \meekclient\ and \meekserver,
+which are the pluggable-transports~\cite{pt} interface between Tor and meek.
+% All the programs are free software, naturally,
+% and may be downloaded from the meek home page at
+% \url{https://trac.torproject.org/projects/tor/wiki/doc/meek}.
 
-The main technical challenge in making this system work
-is in encoding a TCP stream as a sequence of HTTP requests and responses.
-\meekserver\ handles many clients at once, and their data streams
-are split across multiple HTTP transactions.
+\meekclient\ is essentially a web client that knows how to front HTTPS requests.
+When \meekclient\ receives data from a client Tor process, it bundles it up into a POST request
+and fronts the request through the web service
+(which in turn forwards it to \meekserver\ on the bridge).
+If the response contains any payload, \meekclient\ decodes it and returns it back to Tor.
+\meekclient\ takes pains to make its TLS fingerprint
+look like that of a browser; see Section~\ref{sec:browserextension}.
+
+\meekserver\ is a special-purpose web server.
+When \meekserver\ receives a request, it extracts the body and feeds it into
+a local Tor running as a bridge.
+If there are any data pending to be sent back to the client from Tor,
+\meekserver\ includes it in the body of the HTTP response.
+\meekserver\ also handles session management:
+as there may be many clients using the service at once,
+the server must determine which client session each incoming request belongs to.
+% It does this by means of an X-Session-ID header,
+% described in this section.
+
+When meek is used with Google App Engine, one other component is needed.
+It is a small ``reflector'' web app that simply copies any request
+it receives and forwards it to an instance of \meekserver\ running on a bridge.
+App Engine cannot directly run a Tor bridge,
+so we bounce the requests to somewhere that can.
+The reflector app emulates the behavior of an origin-pull CDN,
+which also simply copies and forwards a request to the origin server
+when the response is not already cached.
+
+The main technical challenge is handling a TCP stream
+that has been split up into a sequence of HTTP requests and responses.
+The body of each HTTP request and HTTP response carries
+a small chunk of upstream or downstream communication.
+\meekserver\ must handle many clients at once,
+and therefore maintains many open connections to the local Tor process,
+one for each active client.
+When a new request arrives, the server must determine which
+open session it belongs to
+(or whether it is a brand-new client needing a new session).
 In TCP, different streams are distinguished by their
 (source~IP, source port, dest~IP, dest~port) tuple,
-but we cannot do that because streams are split across multiple TCP sessions.
-Rather, each instance of \meekclient\ generates at startup a random 32-byte
-session ID, which is sent along with its requests in a special
-X-Session-ID HTTP header.
-\meekserver, when it sees a particular session ID for the first time,
-opens up a new connection to the local Tor process,
-and stores the session ID in a cache. Subsequent requests with the
+but that doesn't work for meek for two reasons:
+the source IP of the requests is that of the intermediate web service,
+not that of the client;
+and a logical stream is chopped into multiple independent HTTP requests,
+so the source port is always changing.
+Rather, each client generates a random 256-bit session ID,
+which it sends with each of its requests in a special
+X-Session-ID header.
+\meekserver, when it sees a session ID for the first time,
+opens up a new connection to the local Tor process
+and associates the connection and ID in a cache.
+Subsequent requests with the
 same session ID will reuse the same Tor connection.
-Entries are removed from the cache after a period of inactivity.
+Sessions are closed after a period of inactivity.
+Figure~\ref{fig:protocol} shows an sample of the protocol.
 
+\begin{figure}
 % Use a child's garden--like figure of the HTTP protocol here.
+\caption{
+The meek protocol.
+The session ID is randomly generated by the client.
+The protocol shown here is encrypted inside HTTPS until after
+it has been fronted,
+so the censor is unable to classify the traffic based on the
+Host or X-Session-ID headers.
+}
+\label{fig:protocol}
+\end{figure}
+
+% out of order, blah blah.
 % "concatenates successive bodies"
+% handle it by strict serialization, has performance issues, see ...
 
 HTTP is fundamentally a pull-based protocol.
 There is no way for the server to send data to the client without
@@ -633,16 +671,7 @@ Alternative techniques for push-like behavior,
 such as HTTP long polling,
 don't work well with App Engine,
 because App Engine requires requests to finish within 60 seconds.
-
-We implemented meek as a pluggable transport~\cite{pt} for Tor.
-Although it is possible to use the system with proxies other than Tor,
-using Tor has some attractive features.
-The pluggable transports infrastructure makes it relatively easy to prototype
-a circumvention technique and connect it to a global proxy network.
-We can treat confidentiality and integrity of tunneled communication
-as a problem solved by Tor, which we don't need to solve separately.
-Tor's extra proxy hops mean that the HTTP reflector (App Engine)
-and the entry bridge do not have to be trusted.
+% Psiphon did it.
 
 \section{Making the TLS handshake indistinguishable}
 \label{sec:browserextension}
@@ -1031,6 +1060,16 @@ but popular destinations by definition tend to be visited a lot.
 % Possible countermeasure is traffic fingerprinting resistance
 % like what mjuarez is working on, mostly orthogonal to circumvention.
 
+We implemented meek as a pluggable transport~\cite{pt} for Tor.
+Although it is possible to use the system with proxies other than Tor,
+using Tor has some attractive features.
+The pluggable transports infrastructure makes it relatively easy to prototype
+a circumvention technique and connect it to a global proxy network.
+We can treat confidentiality and integrity of tunneled communication
+as a problem solved by Tor, which we don't need to solve separately.
+Tor's extra proxy hops mean that the HTTP reflector (App Engine)
+and the entry bridge do not have to be trusted.
+
 % Edge servers within the censored region.
 % Censor could block on the way to the origin server,
 % if the censor has visibility to it.
@@ -1041,6 +1080,11 @@ but popular destinations by definition tend to be visited a lot.
 % Adversary controls CAs. Can MITM and read your tag and block you.
 % Maybe not willing to risk getting caught in MITM.
 % Could conceivably send cover traffic if MITM detected, but blah.
+
+% meek apart from Tor.
+% more risk for the proxy operator
+% can require people to run their own proxies à la GoAgent.
+% "Censorship implies surveillance"
 
 \section{Deployment}
 \label{sec:deployment}
