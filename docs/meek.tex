@@ -525,12 +525,12 @@ Lantern~1.4 is planned to use domain fronting inspired by meek~\cite{lantern-1.3
 The model includes four actors:
 the censor,
 the censored client,
-the intermediate web service's frontend server (CDN edge server),
-and the destination proxy (Tor bridge).
+the intermediate web service (CDN),
+and the destination Tor bridge.
 Circumvention is achieved when the client evades the censor to reach
-the destination proxy,
-because the proxy provides access to anywhere.
-The client and destination proxy cooperate with each other.
+the bridge,
+because the bridge proxies to anywhere.
+The client and bridge cooperate with each other.
 The intermediate web service does not cooperate with either,
 except to the extent that it doesn't collude with the censor.
 % The censor's goal is to prevent circumvention.
@@ -541,10 +541,12 @@ and may block or allow any packet.
 The censor may inject and replay traffic, and
 operate its own clients and servers.
 The client lies within the censor's network,
-while the intermediate web service and destination proxy lie outside the network.
-The censor blocks direct communication between the client and the destination proxy,
+while the intermediate web service and bridge lie outside the network.
+The censor blocks direct communication between the client and the bridge,
 but allows HTTPS between the client and at least one front domain or IP address
 on the intermediate web service.
+% In examples, we will use the \textbf{allowed.example} as the front domain
+% and \textbf{forbidden.example} as the domain name of the Tor bridge.
 
 % The censor must operate at line rate; that is,
 % it must not delay traffic unduly while deciding whether to allow it.
@@ -562,11 +564,12 @@ specifically it cannot man-in-the-middle an HTTPS session
 without being caught by ordinary certificate verification.
 The client has a way to get a copy of the necessary client programs.
 
-See Section~\ref{sec:security} for what happens when some
+Section~\ref{sec:security} shows what happens when some
 of these assumptions are violated;
 specifically what happens
 when the intermediate web service's frontend server is inside the censor's network
 and when the censor controls a certificate authority.
+That section also describes the use of meek apart from Tor.
 
 % What about in-country edge servers; seems to work.
 
