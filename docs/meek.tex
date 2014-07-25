@@ -224,9 +224,14 @@ Section~\ref{sec:architecture} describes meek's workings in detail.
 \includegraphics[width=\linewidth]{architecture}
 \caption{
 Architecture of meek.
-The Google frontend server is the server that dispatches requests to different services depending on the Host header.
-Components that are new in our system are outlined in blue.
-The ``Google infrastructure'' block may be replaced by other infrastructure that supports domain fronting.
+The client sends an HTTP request to the Tor bridge by way of an intermediate web service such as a CDN.
+The client protects the bridge's domain name \textbf{forbidden.example} from the censor
+by fronting it with another name, here \textbf{allowed.example}.
+The intermediate web server decrypts the TLS layer and forwards the request to the bridge
+according to the Host header.
+The bridge sends data back to the client in the HTTP response.
+\meekclient\ and \meekserver\ are transport plugins, the interface between Tor and meek.
+The host actually at allowed.example does not participate in the communication.
 }
 \label{fig:architecture}
 \end{figure*}
