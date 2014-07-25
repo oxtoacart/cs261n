@@ -696,25 +696,43 @@ Host and X-Session-ID headers for classification.
 \label{fig:protocol}
 \end{figure}
 
-% out of order, blah blah.
-% "concatenates successive bodies"
-% handle it by strict serialization, has performance issues, see ...
+The underlying TCP stream is broken into chunks so that
+There must therefore be some way of making sure that chunks
+are correctly reassembled at the other end,
+in order and without gaps and duplicates.
+meek takes a naive approach: requests and responses are strictly serialized.
+The client doesn't send a second chunk of data
+(i.e, make another HTTPS request) until it has
+receive the response to the first request.
+The underlying stream is simply the concatenation
+of chunks in the order they arrive.
+Doing it this way is simple and guarantees correctness,
+but has performance drawbacks because there is a full round-trip
+between every send.
+The performance drawbacks are not inherent to the design:
+it is domain fronting, not HTTP encoding, that is the fundamental strength of the system.
+Section~\ref{sec:futurework} describes more efficient encodings
+that enable multiple requests in parallel.
 
-HTTP is fundamentally a pull-based protocol.
-There is no way for the server to send data to the client without
-the client first making a request.
-The same applies to meek: when \meekserver\ has data to send back to
-a client with a particular session ID, it cannot do so until it
-receives a request from that client.
-For this reason, \meekclient\ polls the server,
-sending an empty request if necessary, every so often.
+HTTP is fundamentally a request-based protocol.
+There is no way for the server to ``push'' data to the client without
+having first received a request.
+In order to enable the server to send back data,
+meek uses one of two techniques.
+The first is polling:
+every so often the client sends a request with an empty payload
+if it has nothing else to send.
 The polling interval starts short (100~ms) and grows exponentially
 up to a maximum of 5~s.
-Alternative techniques for push-like behavior,
-such as HTTP long polling,
-don't work well with App Engine,
-because App Engine requires requests to finish within 60 seconds.
-% Psiphon did it.
+% Implemented in Psiphon's version.
+The other technique is to use
+long-lived persistent HTTP connections.
+When the server sends a response, it keeps the connection open,
+continually appending data to the response body while it has anything to send.
+When the server receives a new request from the same client,
+it closes any response it has open to the client and starts a new response.
+See Section~\ref{sec:otherdeployment} for more details
+on when each technique may be used.
 
 \section{Making the TLS handshake indistinguishable}
 \label{sec:browserextension}
@@ -1232,8 +1250,13 @@ which could be distributed using a system like BridgeDB.
 
 % Psiphon idea: use long-polling for downstream data.
 % Works with CDNs, not with App Engine.
+% Alternative techniques for push-like behavior,
+% such as HTTP long polling,
+% don't work well with App Engine,
+% because App Engine requires requests to finish within 60 seconds.
 
 \section{Future work}
+\label{sec:futurework}
 
 In future work we would like to implement pipelining of requests,
 so that more than one HTTP request can be outstanding at a time.
