@@ -143,7 +143,6 @@ but known to the server receiving the HTTPS request,
 which uses the header to internally route the request to its destination.
 No traffic ever reaches the front domain,
 which may be oblivious to the circumvention.
-
 For those familiar with decoy routing~\cite{decoyrouting,telex,cirripede,tapdance},
 domain fronting can be understood as
 ``decoy routing at the application layer.''
@@ -294,8 +293,8 @@ looking, for example, for forbidden protocols or keywords.
 Content-based blocking is sometimes called deep packet inspection (DPI).
 An address-blocking censor forbids all communication with certain
 addresses, for example IP addresses and domain names, whatever the contents may be.
-A skilled censor will use both means of censorship,
-and effective circumvention requires countering both.
+A savvy censor will use both means of censorship---therefore
+effective circumvention requires countering both.
 
 To the above challenges we may add a related one, active probing.
 An active-probing censor does not merely passively observe traffic;
@@ -317,7 +316,7 @@ There are two general strategies for countering DPI.
 The first is to make traffic look unlike
 anything forbidden by the censor; that is, fail to match a blacklist. The second is
 to resemble a protocol that is explicitly allowed by the censor; that is, match a whitelist.
-Falling into the first category are ``look-like-nothing'' transports whose
+Following the first strategy are the ``look-like-nothing'' transports whose
 payloads are indistinguishable from a uniformly random byte stream.
 Well-traveled look-like-nothing
 protocols are obfs2~\cite{obfs2} and its successor obfs3~\cite{obfs3},
@@ -333,7 +332,7 @@ obfs4~\cite{obfs4}
 (which despite the name has more in common with ScrambleSuit than with obfs2 and obfs3)
 builds on ScrambleSuit with more efficient cryptography and an authenticated handshake.
 
-The other strategy against content blocking is the steganographic approach: look like
+The other strategy against DPI is the steganographic approach: look like
 something the censor doesn't block.
 fteproxy~\cite{fte} uses format-transforming encryption to encode data into strings
 that match a given regular expression,
@@ -605,7 +604,7 @@ If there are any data pending to be sent back to the client from Tor,
 \meekserver\ also handles session management:
 as there may be many clients using the service at once,
 the server must determine which client session each incoming request belongs to.
-% It does this by means of an X-Session-ID header,
+% It does this by means of an X-Session-Id header,
 % described in this section.
 
 When meek is used with Google App Engine, one other component is needed.
@@ -636,7 +635,7 @@ and a logical stream is chopped into multiple independent HTTP requests,
 so the source port is always changing.
 Rather, each client generates a random 256-bit session ID,
 which it sends with each of its requests in a special
-X-Session-ID header.
+X-Session-Id header.
 \meekserver, when it sees a session ID for the first time,
 opens up a new connection to the local Tor process
 and associates the connection and ID in a cache.
@@ -691,7 +690,7 @@ The second POST request is an empty polling request.
 The messages shown here is encrypted inside HTTPS until after
 it has been fronted,
 so the censor cannot use the
-Host and X-Session-ID headers for classification.
+Host and X-Session-Id headers for classification.
 }
 \label{fig:protocol}
 \end{figure}
@@ -756,7 +755,7 @@ and how we use a web browser to camouflage meek's TLS.
 
 There are many parts of the TLS handshake, but the two that
 most distinguish the client are the list of ciphersuites and the
-list of TLS extensions in the Client Hello.
+list of TLS extensions in the ClientHello.
 Figure~\ref{fig:ciphersuites} shows how the list of ciphersuites
 differs in different client implementations.
 Figure~\ref{fig:ciphersuites:meek-client} is how our first prototype of \meekclient\ appeared on the wire,
@@ -893,7 +892,7 @@ Client architecture including a browser extension for TLS camouflage.
 Dashed lines show the process hierarchy.
 Solid lines show the flow of outgoing communication.
 The headless instance of the browser runs in the background and is invisible to the user.
-This figure is a detailed view of the ``Client's PC'' component of Figure~\ref{fig:architecture}.
+This figure is a zoomed-in view of the ``Client's PC'' component of Figure~\ref{fig:architecture}.
 }
 \label{fig:browser-architecture}
 \end{figure}
@@ -1137,6 +1136,8 @@ and the entry bridge do not have to be trusted.
 % Maybe the CDN has its own private high-speed cables,
 % or it VPNs its own stuff or something.
 
+% Censor could lean on the CDN to block the actual destination internally.
+
 % Firefox plugin uses normal browser trust store.
 % Adversary controls CAs. Can MITM and read your tag and block you.
 % Maybe not willing to risk getting caught in MITM.
@@ -1162,15 +1163,16 @@ and from there they were picked up by Tor Weekly News on the Tor blog.
 
 \begin{figure}
 \includegraphics[width=\linewidth]{clients-meek}
-\caption{Number of concurrent users using the meek transport,
-as reported by the Tor Metrics Portal.}
+\caption{Concurrent users of meek with Tor.}
 \label{fig:clients}
 \end{figure}
 
-Figure~\ref{fig:clients} shows the number of concurrent users of meek between January and May~2014,
+Figure~\ref{fig:clients} shows the average number of concurrent users of meek with Tor
+since close to the beginning of development,
 as reported by the Tor Metrics Portal~\cite{metrics-meek}.
-The number of concurrent users is estimated by counting directory requests made over the transport~\cite{counting-daily-bridge-users}.
-The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by meek.
+The number of users is estimated by counting the number
+of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
+% The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by meek.
 
 We are running a paid instance of the web app on App Engine for use by the public.
 The cost for bandwidth on App Engine is \$0.12 per gigabyte,
