@@ -51,7 +51,7 @@ x The discussion of GoAgent is hard to follow.  It would help
   for blocking to potentially cause *some* collateral damage, but usually
   not to a degree that worries the censor.)
 
-* "There are many parts of the TLS handshake, but the two that most
+x "There are many parts of the TLS handshake, but the two that most
   distinguish ..." - if there are many parts then it behooves you to
   analyze *all* of them lest one of the less obvious ones also leaks
   information.
