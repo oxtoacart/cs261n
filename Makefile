@@ -11,7 +11,7 @@ all: diagrams/datalen.png diagrams/datalen-in.png diagrams/datalen-out.png \
 diagrams:
 	mkdir -p $@
 
-table.dat: gentable traces/lbl.https.non-goog.dpriv traces/lbl.https.goog.dpriv
+table.dat: gentable traces/lbl.https.non-goog.dpriv traces/lbl.https.goog.dpriv traces/meek_tbb_extension_tcp.pcap
 	./gentable > "$@"
 
 traces/%: traces/%.gz
