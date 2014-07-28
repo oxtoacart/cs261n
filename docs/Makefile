@@ -2,7 +2,16 @@ INKSCAPE = inkscape
 
 all: meek.pdf
 
-meek.pdf: meek.tex meek.bib clients-meek.pdf clients-psiphon3.pdf fronting.pdf architecture.pdf browser-architecture.pdf wire-sequential.pdf wire-parallel.pdf
+FIGURES = \
+	clients-meek.pdf \
+	clients-psiphon3.pdf \
+	fronting.pdf \
+	architecture.pdf \
+	browser-architecture.pdf \
+	wire-sequential.pdf \
+	wire-parallel.pdf
+
+meek.pdf: meek.tex meek.bib $(FIGURES)
 
 %.pdf: %.tex %.bib
 	pdflatex $*
