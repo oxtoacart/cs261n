@@ -1221,12 +1221,21 @@ and from there they were picked up by Tor Weekly News on the Tor blog.
 \label{fig:clients}
 \end{figure}
 
+\begin{figure}
+\includegraphics[width=\linewidth]{clients-psiphon3}
+\caption{Daily unique users of meek with Psiphon3.}
+\label{fig:clients}
+\end{figure}
+
 Figure~\ref{fig:clients} shows the average number of concurrent users of meek with Tor
 since close to the beginning of development,
 as reported by the Tor Metrics Portal~\cite{metrics-meek}.
 The number of users is estimated by counting the number
 of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
 % The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by meek.
+
+% Psiphon. Drop in July is due to an unblocking event.
+% Different counting method. Client self-reporting of last connection date.
 
 We are running a paid instance of the web app on App Engine for use by the public.
 The cost for bandwidth on App Engine is \$0.12 per gigabyte,
@@ -1247,8 +1256,6 @@ about 800 lines of Go for the client programs,
 Each of the browser extensions
 (one for Firefox, one for Chrome)
 is about 300 lines of JavaScript.
-
-% Psiphon
 
 \subsection{Other deployment scenarios}
 \label{sec:otherdeployment}
@@ -1359,11 +1366,11 @@ but have not yet put numbers to our measurements.
 % We thank Vern Paxson, Nick Weaver, and Doug Tygar for inspiring conversation on this topic.
 % Special thanks go to the members of the tor-qa and tor-dev mailing lists
 % who responded to our design ideas, reviewed source code, and tested our prototypes.
+% Thanks to Psiphon~Inc. for help with design and development, and for providing user count estimates.
 % George Kadianakis
 % Georg Koppen
 % Lunar
 % Yawning Angel
-% Rod Hynes and Michael Hull of Psiphon.
 % Ox from Lantern.
 % Johanna Amann for getting the fraction of SNI from ICSI notary:
 %   https://trac.torproject.org/projects/tor/ticket/12208#comment:5

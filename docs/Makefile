@@ -2,7 +2,7 @@ INKSCAPE = inkscape
 
 all: meek.pdf
 
-meek.pdf: meek.tex meek.bib clients-meek.pdf fronting.pdf architecture.pdf browser-architecture.pdf wire-sequential.pdf wire-parallel.pdf
+meek.pdf: meek.tex meek.bib clients-meek.pdf clients-psiphon3.pdf fronting.pdf architecture.pdf browser-architecture.pdf wire-sequential.pdf wire-parallel.pdf
 
 %.pdf: %.tex %.bib
 	pdflatex $*
@@ -16,6 +16,8 @@ meek.pdf: meek.tex meek.bib clients-meek.pdf fronting.pdf architecture.pdf brows
 # wget -q -O - https://metrics.torproject.org/stats/clients.csv | sed -n -e '1p;/meek/p' > clients-meek.csv
 clients-meek.pdf: clients-meek.R clients-meek.csv
 	Rscript clients-meek.R
+clients-psiphon3.pdf: clients-psiphon3.R psiphon3-fronted-meek-unique-users-all-regions.csv
+	Rscript clients-psiphon3.R
 
 clean:
 	rm -f meek.pdf *.aux *.bbl *.log *.blg

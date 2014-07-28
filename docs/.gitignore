@@ -4,6 +4,7 @@
 *.log
 *.out
 
+clients-psiphon3.pdf
 fronting.pdf
 architecture.pdf
 browser-architecture.pdf
