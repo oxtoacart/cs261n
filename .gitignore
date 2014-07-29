@@ -1,6 +1,5 @@
 /traces/*.gz
 /traces/*.pcap
-/table.dat
 /meek.dat
 /*.log
 

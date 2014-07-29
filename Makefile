@@ -11,8 +11,9 @@ all: diagrams/datalen.png diagrams/datalen-in.png diagrams/datalen-out.png \
 diagrams:
 	mkdir -p $@
 
-table.dat: gentable traces/lbl.https.non-goog.dpriv traces/lbl.https.goog.dpriv traces/meek_tbb_extension_tcp.pcap
-	./gentable > "$@"
+%.tcp.log: % tcp.bro
+	bro -b -r "$<" tcp.bro
+	mv -f tcp.log "$@"
 
 traces/%: traces/%.gz
 	gzip -dk "$<"
@@ -32,7 +33,7 @@ tbb.log: traces/meek_tbb_extension_tcp.pcap
 diagrams/datalen.png diagrams/datalen-in.png diagrams/datalen-out.png \
 diagrams/datalen-google.png diagrams/datalen-google-in.png diagrams/datalen-google-out.png \
 diagrams/syninterval-out.eps diagrams/syninterval-google-out.eps \
-diagrams/syninterval-out-log.eps diagrams/syninterval-google-out-log.eps: diagrams.R table.dat diagrams
+diagrams/syninterval-out-log.eps diagrams/syninterval-google-out-log.eps: diagrams.R diagrams traces/lbl.https.goog.dpriv.tcp.log traces/lbl.https.non-goog.dpriv.tcp.log traces/meek_tbb_extension_tcp.pcap.tcp.log
 	Rscript diagrams.R
 
 diagrams/flowduration.eps diagrams/flowduration-google.eps diagrams/flowduration-tbb.eps \
@@ -42,4 +43,4 @@ diagrams/connections-google.eps: bro-diagrams.R non-goog.log goog.log diagrams
 	Rscript bro-diagrams.R
 
 .PHONY: all
-.SECONDARY: table.dat goog.log non-goog.log 
+.SECONDARY: goog.log non-goog.log

@@ -2,7 +2,12 @@ library(ggplot2)
 
 theme_set(theme_bw(base_size = 16))
 
-x <- read.delim("table.dat")
+col.names <- c("t", "src", "dst", "dir", "iplen", "datalen", "syn")
+
+x <- cbind(read.table("traces/lbl.https.goog.dpriv.tcp.log", col.names=col.names), type="google")
+x <- rbind(x, cbind(read.table("traces/lbl.https.non-goog.dpriv.tcp.log", col.names=col.names), type="non-google"))
+x <- rbind(x, cbind(read.table("traces/meek_tbb_extension_tcp.pcap.tcp.log", col.names=col.names), type="tbb"))
+
 x <- x[order(x$t),]
 
 min.datalen <- min(x$datalen)
