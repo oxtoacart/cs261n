@@ -38,8 +38,7 @@ diagrams/syninterval-out-log.eps diagrams/syninterval-google-out-log.eps: diagra
 
 diagrams/flowduration.eps diagrams/flowduration-google.eps diagrams/flowduration-tbb.eps \
 diagrams/ratio.eps diagrams/ratio-google.eps \
-diagrams/connections-google.eps: bro-diagrams.R non-goog.log goog.log tbb.log
-diagrams/connections-google.eps: bro-diagrams.R non-goog.log goog.log diagrams
+diagrams/connections-google.eps: bro-diagrams.R diagrams non-goog.log goog.log tbb.log
 	Rscript bro-diagrams.R
 
 .PHONY: all
