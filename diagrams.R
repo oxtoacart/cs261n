@@ -1,7 +1,5 @@
 library(ggplot2)
 
-theme_set(theme_bw(base_size = 16))
-
 col.names <- c("t", "src", "dst", "dir", "iplen", "datalen", "syn")
 
 x <- cbind(read.table("traces/lbl.https.goog.dpriv.tcp.log", col.names=col.names), google=T, source="lbl")
