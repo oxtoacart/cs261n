@@ -17,6 +17,12 @@ x <- cbind(read.table("../traces/lbl.https.goog.dpriv.tcp.log", col.names=col.na
 x <- rbind(x, cbind(read.table("../traces/lbl.https.non-goog.dpriv.tcp.log", col.names=col.names), google=F, source="lbl"))
 x <- rbind(x, cbind(read.table("../traces/meek_tbb_extension_tcp.pcap.tcp.log", col.names=col.names), google=T, source="tbb"))
 
+# Print the heavy hitters.
+t <- table(x[x$google & x$source=="lbl", ]$datalen)
+(t[order(t, decreasing=TRUE)] / sum(t))[1:15]
+t <- table(x[x$google & x$source=="tbb", ]$datalen)
+(t[order(t, decreasing=TRUE)] / sum(t))[1:15]
+
 binwidth = 5
 
 p <- ggplot(x[x$google, ], aes(datalen))
