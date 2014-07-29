@@ -58,13 +58,13 @@ x "There are many parts of the TLS handshake, but the two that most
 
 x Briefly explain what TLS session tickets are.
 
-* Figure 4 would work better as  histogram.  In addition, you could
+x Figure 4 would work better as  histogram.  In addition, you could
   plot both distributions on the same plot to enable more direct
   comparison.  (Explain TBB = Tor Browser Bundle.)
 
-* Tell us what LBL is.
+x Tell us what LBL is.
 
-* The mention of Google's TXT DNS records is baffling because it's
+x The mention of Google's TXT DNS records is baffling because it's
   so terse.
 
 * Consider assessing in the LBL trace each user's aggregate traffic
@@ -93,7 +93,7 @@ x Briefly explain what TLS session tickets are.
 * It's Highly Cool that you already have some real users!  (And at
   a whopping cost of one-hundred-and-eleven US cents. :-)
 
-* Tell us more about what's unclear in CloudFlare's ToS.
+x Tell us more about what's unclear in CloudFlare's ToS.
 
 * "... or else blocking a large number of unrelated web sites".  It's
   valuable here to reflect on Pakistan's blocking of YouTube, which

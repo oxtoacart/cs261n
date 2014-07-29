@@ -1078,57 +1078,80 @@ It is thus the only service for which the ``domainless'' fronting style is requi
 \section{Analysis}
 \label{sec:analysis}
 
+One of our goals in developing meek is to force
+the censor to use relatively expensive statistical classifiers
+to effect blocking---generally, to increase the cost of censorship.
+We believe meek as described is resistant to the ``easy''
+forms of blocking, namely IP address and DNS blocking,
+simple pattern-based DPI,
+and active probing.
+We hope that the censor will have to resort to measuring
+more subtle features of the communication like
+the packet length distribution and interpacket timing,
+or injecting traffic at the risk of causing collateral damage.
+In this section we provide a preliminary analysis
+of meek's resistance to such attacks.
+Specifically, we consider three traffic features:
+packet length distribution,
+number of simultaneous connections,
+and connection lifetime.
+
+The issue of statistical traffic anaysis is a general one~\cite{trafficmorphing},
+and mostly orthogonal to meek's main idea, domain fronting.
+It may be that the problem is
+best solved by a modular component not
+specifically designed for meek.
+
 % Advantage is that we are probably proxying web traffic.
+As meek is based on HTTPS,
+we compare traffic traces of meek against
+traces of ``ordinary'' HTTPS traffic.
+We did a packet capture
+automatically browsing the home pages
+of the top 500 Alexa web sites using meek,
+with a firewall in place so that no extraneous traffic was included.
+The browser used was Tor Browser,
+with the browser camouflage for meek described in Section~\ref{sec:browserextension},
+using Google App Engine as the intermediate web service.
+The meek trace is 687~megabytes in all.
+Our representative of ordinary HTTPS traffic
+is a sanitized trace of 10 minutes of HTTPS traffic
+% anon
+originating at Lawrence Berkeley National Laboratory (LBL).
+The LBL trace consists 313~megabytes of packet headers,
+not payloads, destined for TCP port 443 on any Google server.
+% Mention the non-google if it appears in a figure.
+The original IP addresses were replaced with a counter.
 
-The censor cannot sniff the content of communications or infer the usage of meek 
-from packet \emph{data}, 
-since the communication is encrypted inside the TLS session, and we have devoted large efforts 
-in hiding TLS handshake fingerprints. However, it is still possible that the censor can detect 
-the existence of meek according to the \emph{meta-data}, i.e. traffic characteristics. 
-In this section we study a collection of traffic characteristics and evaluate their possibilities of becoming
-the censor's interest. Specifically, we consider three characteristics: 1) payload length of
-TCP packets, 2) number of concurrent HTTPS connections, 3) HTTPS connection lifetime. 
-
-To collect the traffic trace of meek, we browses the Alexa top 500 websites sequentially using 
-the Tor Browser Bundle and dump the traffic trace from the network interface. We ensured only
-the browser can successfully access the network by setting
-up the \texttt{iptables} firewall so that packets from other processes will be dropped. We also 
-obtain a 10-minute sample of normal HTTPS traffic trace from LBL. The trace is 983~megabytes in total. 
-We also specifically extracted the traffic between LBL and Google from the trace. Since the trace 
-only has packet headers, we cannot extract the domain information. However, the \texttt{TXT} DNS
-records of the domain \texttt{\_netblocks.google.com} shows the IP address blocks that belongs to
-Google. Therefore, we determine whether a flow is from or to Google by examining the address in the 
-IP header. We only interested in the Google traffic only, because the censor who wants to defeat meek
-will be mostly likely to compare suspicious traffic with normal Google traffic. The size of the 
-Google trace is 312~megabytes. 
-
-\begin{figure*}
+\begin{figure}
 \centering
-\begin{subfigure}[b]{0.5\textwidth}
-\includegraphics[width=\textwidth]{figs/datalen-google-cdf.png}
-\caption{Normal Google Traffic}
-\label{fig:len:lbl}
-\end{subfigure}%
-%add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
-%(or a blank line to force the subfigure onto a new line)
-\begin{subfigure}[b]{0.5\textwidth}
-\includegraphics[width=\textwidth]{figs/datalen-tbb-cdf.png}
-\caption{Traffic Using meek}
-\label{fig:len:meek}
-\end{subfigure}
+\includegraphics[width=\linewidth]{datalen.pdf}
+\caption{
+Comparison of TCP payload length distributions
+between ordinary HTTPS connections to Google services
+from the LBL traffic trace,
+and meek running on App Engine, fronted through www.google.com.
+The histogram's bin width is 5~bytes.
+}
+\label{fig:datalen}
+\end{figure}
 
-\caption{TCP packet payload size distribution}
-\label{fig:len}
-\end{figure*}
-
-\paragraph{TCP payload length}
-Figure ~\ref{fig:len} shows the payload size distribution of normal traffic and meek's traffic. Both
-figures exhibit a significant amount of packets with no payload. These packets are mostly TCP SYN and ACK
-packets. Figure ~\ref{fig:len:lbl} shows the distribution of normal traffic, which indicates a large portion
-of small-sized packets. However, in the meek's traffic shown in Figure ~\ref{fig:len:meek}, most packets
-are large packets ranging from 1400 bytes to 1500 bytes. This result is unexpected, because the underlying packets 
-in the TLS session are sent from Tor. By default, each Tor cell is 512 bytes, but meek changes the packet size 
-distribution. Therefore, meek provides traffic shaping without additional efforts.
+\subsection{Packet length}
+Figure~\ref{fig:datalen}
+compares the packet length distribution of both traces in both directions.
+A few similarities are noticeable:
+roughly 37\% of packets have no payload; these are mostly ACKs.
+There is a small peak at the usual TCP Maximum Segment Size
+of 1460 bytes.
+% Other peaks near the max are probably near 1400, TLS maximum record size.
+The meek trace is missing a small peak of small packets
+present in the LBL trace.
+In its place, there are minor peaks at fairly distinct values,
+probably a reflection of Tor's fixed cell size
+and the fixed overhead of an encrypted HTTP header added
+to each transmission by meek.
+% Maybe mention apparent residue of a doubling of the three peaks at around 750.
+meek's trace is tends more overall to larger packets.
 
 To explain the phenomenon, recall that we use browsers to handle HTTPS connections for meek in order
 to hide TLS handshake characteristics.
@@ -1162,7 +1185,7 @@ We thus investigated other related characteristics.
 \label{fig:conconns}
 \end{figure}
 
-\paragraph{Concurrent connections}
+\subsection{Concurrent connections}
 Figure ~\ref{fig:connections} shows how many HTTPS connections to Google did a user make 
 during the 10-minute measurement window.
 There are 34,732 connections in total from 2,745 unique IPs. We observe that the majority of users have less than 
@@ -1196,7 +1219,7 @@ a small number of connections can be considered as a normal behavior.
 \label{fig:duration}
 \end{figure*}
 
-\paragraph{Connection lifetime}
+\subsection{Connection lifetime}
 We consider the connection lifetime as a potential weakness. Figure ~\ref{fig:duration:lbl} shows the 
 connection lifetime distribution of normal traffic. Interestingly we can see the concentration on 
 several discrete values: 60s, 120s, 180s, 240s. We hypothesize that it is due to the HTTP Keep-Alive 
@@ -1212,7 +1235,7 @@ censor can potentially block any long connections between users and Google. Even
 censor has to wait until a time threshold is reached. The user might have already obtained the forbidden data she wants, or 
 meek could simply restart a connection.
 
-\paragraph{Conclusion} So far we do not find any obvious traffic characteristics that can be useful for
+\subsection{Conclusion} So far we do not find any obvious traffic characteristics that can be useful for
 distinguishing meek's traffic. But admittedly there two potential weaknesses: long-lived connections 
 with bulk data transfer, and deviated distribution of packet sizes. To fundamentally fix these weaknesses 
 we need to transform to the traffic into the normal-looking traffic. The problem is inherently difficult, because we need to know \emph{what} is normal traffic, i.e. what is the model of normal traffic, which is an open problem. However, 
@@ -1223,7 +1246,7 @@ easy to defend against.
 \section{Security}
 \label{sec:security}
 
-% Censors that know no bounds: China on Google, Egypt.
+% Censors that know no bounds: China on Google, Egypt, Pakistan with YouTube.
 
 Domain fronting shares a weakness with decoy routing,
 which is that the overt and covert destinations lie on different
