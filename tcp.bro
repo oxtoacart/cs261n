@@ -1,6 +1,9 @@
 # Bro script that pulls field from individual TCP packets.
 # The input trace must contain nothing but TCP.
 
+# Also emit a conn.log.
+@load base/protocols/conn
+
 module TCP;
 
 export {
