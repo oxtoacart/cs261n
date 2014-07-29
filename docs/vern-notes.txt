@@ -153,18 +153,18 @@ x "Classic example ... early 2012" - something 2 years old is not "classic"!
 
 * Some of your paragraphs are quite long.  This gets tiring for the reader.
 
-* The HTTPS info in Figure 1 is too small to make out readily.
+x The HTTPS info in Figure 1 is too small to make out readily.
 
-* "HTTP long polling" is not clear.
+x "HTTP long polling" is not clear.
 
 * Figure 2 should be bigger.  You could move it to an Appendix to
   facilitate this.
 
-* The dashed lines in Figure 3 look solid in black-and-white.
+x The dashed lines in Figure 3 look solid in black-and-white.
 
-* "We only interested in the Google traffic only" reads awkwardly.
+x "We only interested in the Google traffic only" reads awkwardly.
 
-* "This result [different packet size distributions] is unexpected ... but
+x "This result [different packet size distributions] is unexpected ... but
   meek changes the packet size distribution".  The reader is confused at
   this point (why is it unexpected if you know that meek changes the
   distribution?).  You need to structure this more clearly to then lead
@@ -172,9 +172,9 @@ x "Classic example ... early 2012" - something 2 years old is not "classic"!
 
 x Typo, contract -> contrast
 
-* "how many HTTPS connections to Google did a user make" reads awkwardly.
+x "how many HTTPS connections to Google did a user make" reads awkwardly.
 
-* "most of the numbers concentrate on 1  10" - hyphen missing
+x "most of the numbers concentrate on 1  10" - hyphen missing
 
 x "typical pattern of using Google is ..." - add citation, or frame that
   *presumably* this is the case
