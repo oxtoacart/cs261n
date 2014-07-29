@@ -7,9 +7,9 @@ broNames <-   c("ts",      "uid",    "id.orig_h", "id.orig_p", "id.resp_h", "id.
 #types           time       string    addr         port         addr         port         enum      string     interval    count         count         string        bool          count           string       count        count            count        count            table[string]
 broClasses <- c("numeric", "factor", "factor",    "factor",    "factor",    "factor",    "factor", "factor",  "numeric",  "integer",    "integer",    "character",  "logical",    "integer",      "character", "integer",   "integer",       "integer",   "integer",       "character")
 
-nongoog <- (read.table('non-goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
-goog <- (read.table('goog.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
-tbb <- (read.table('tbb.log', col.names=broNames, colClasses=broClasses, na.strings=c("-")))
+nongoog <- (read.table("traces/lbl.https.non-goog.dpriv.conn.log", col.names=broNames, colClasses=broClasses, na.strings=c("-")))
+goog <- (read.table("traces/lbl.https.goog.dpriv.conn.log", col.names=broNames, colClasses=broClasses, na.strings=c("-")))
+tbb <- (read.table("traces/meek_tbb_extension_tcp.pcap.conn.log", col.names=broNames, colClasses=broClasses, na.strings=c("-")))
 
 y <- nongoog$duration
 postscript("diagrams/flowduration.eps")

@@ -11,9 +11,10 @@ all: diagrams/datalen.png diagrams/datalen-in.png diagrams/datalen-out.png \
 diagrams:
 	mkdir -p $@
 
-%.tcp.log: % tcp.bro
+%.tcp.log %.conn.log: % tcp.bro
 	bro -b -r "$<" tcp.bro
-	mv -f tcp.log "$@"
+	mv -f tcp.log "$*.tcp.log"
+	mv -f conn.log "$*.conn.log"
 
 traces/%: traces/%.gz
 	gzip -dk "$<"
@@ -38,7 +39,7 @@ diagrams/syninterval-out-log.eps diagrams/syninterval-google-out-log.eps: diagra
 
 diagrams/flowduration.eps diagrams/flowduration-google.eps diagrams/flowduration-tbb.eps \
 diagrams/ratio.eps diagrams/ratio-google.eps \
-diagrams/connections-google.eps: bro-diagrams.R diagrams non-goog.log goog.log tbb.log
+diagrams/connections-google.eps: bro-diagrams.R diagrams traces/lbl.https.goog.dpriv.conn.log traces/lbl.https.non-goog.dpriv.conn.log traces/meek_tbb_extension_tcp.pcap.conn.log
 	Rscript bro-diagrams.R
 
 .PHONY: all
