@@ -4,12 +4,14 @@ col.names <- c("t", "src", "dst", "dir", "iplen", "datalen", "syn")
 
 # http://www.cookbook-r.com/Graphs/Facets_%28ggplot2%29/#modifying-facet-label-text
 label = function(variable, value) {
-	if (as.character(variable) != "source") {
-		stop()
-	}
 	value <- as.character(value)
-	value[value == "lbl"] <- "LBL Google HTTPS"
-	value[value == "tbb"] <- "meek on App Engine"
+	if (variable == "source") {
+		value[value == "lbl"] <- "LBL Google HTTPS"
+		value[value == "tbb"] <- "meek on App Engine"
+	} else if (variable == "dir") {
+		value[value == "IN"] <- "inbound"
+		value[value == "OUT"] <- "outbound"
+	}
 	return(value)
 }
 
@@ -19,9 +21,18 @@ x <- rbind(x, cbind(read.table("../traces/meek_tbb_extension_tcp.pcap.tcp.log", 
 
 # Print the heavy hitters.
 t <- table(x[x$google & x$source=="lbl", ]$datalen)
-(t[order(t, decreasing=TRUE)] / sum(t))[1:15]
+(t[order(t, decreasing=TRUE)] / sum(t))[1:10]
 t <- table(x[x$google & x$source=="tbb", ]$datalen)
-(t[order(t, decreasing=TRUE)] / sum(t))[1:15]
+(t[order(t, decreasing=TRUE)] / sum(t))[1:10]
+
+# t <- table(x[x$google & x$source=="lbl" & x$dir=="IN", ]$datalen)
+# (t[order(t, decreasing=TRUE)] / sum(t))[1:10]
+# t <- table(x[x$google & x$source=="lbl" & x$dir=="OUT", ]$datalen)
+# (t[order(t, decreasing=TRUE)] / sum(t))[1:10]
+# t <- table(x[x$google & x$source=="tbb" & x$dir=="IN", ]$datalen)
+# (t[order(t, decreasing=TRUE)] / sum(t))[1:10]
+# t <- table(x[x$google & x$source=="tbb" & x$dir=="OUT", ]$datalen)
+# (t[order(t, decreasing=TRUE)] / sum(t))[1:10]
 
 binwidth = 5
 
