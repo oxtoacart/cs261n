@@ -1,5 +1,6 @@
 \documentclass[conference]{IEEEtran}
 \usepackage[utf8]{inputenc}
+\usepackage{array}
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage{caption}
@@ -190,7 +191,7 @@ Domainless fronting can be useful when there is no front domain
 with sufficiently high collateral damage.
 The censor is faced with the choice of blocking an entire IP address,
 blocking requests without SNI,
-or finding some more subtle and expensive test to distinguish
+or finding some other, presumably more expensive, test to distinguish
 circumvention traffic.
 
 We have developed domain fronting into a full-fledged circumvention system called meek,
@@ -239,7 +240,7 @@ including Psiphon~\cite{psiphon} and Lantern~\cite{lantern}.
 % In Tor Browser, users need only select ``meek''
 % from a pulldown menu in order to use it.
 % It resists blocking by address and by content,
-% Section~\ref{sec:security}
+% Section~\ref{sec:discussion}
 
 Domain fronting and HTTPS take care of two big circumvention challenges,
 namely hiding the destination and obscuring the contents of the message.
@@ -258,7 +259,7 @@ to be a frontier not of simple in-line packet filters,
 but of probabilities and false positives.
 A preliminary analysis of meek's resistance to detection
 based on traffic characteristics like packet size and timing
-appears in Section~\ref{sec:analysis}.
+appears in Section~\ref{sec:trafficanalysis}.
 The analysis is based on comparing traffic traces of meek
 with samples of HTTPS traffic at an Internet router.
 
@@ -564,7 +565,7 @@ specifically it cannot man-in-the-middle an HTTPS session
 without being caught by ordinary certificate verification.
 The client has a way to get a copy of the necessary client programs.
 
-Section~\ref{sec:security} shows what happens when some
+Section~\ref{sec:discussion} shows what happens when some
 of these assumptions are violated;
 specifically what happens
 when the intermediate web service's frontend server is inside the censor's network
@@ -742,7 +743,7 @@ This section is about TLS fingerprinting,
 which is the censor's remaining easy distinguisher,
 and how we use a web browser with an unremarkable TLS fingerprint
 to disguise the HTTPS tunnel.
-Section~\ref{sec:analysis} is about more subtle and hard-to-apply forms of DPI.
+Section~\ref{sec:trafficanalysis} is about more subtle and hard-to-apply forms of DPI.
 
 The TLS handshake is largely plaintext~\cite[Section~7.4]{rfc5246}.
 The plaintext SNI extension, for instance, has to be protected by domain fronting.
@@ -1073,10 +1074,11 @@ It is unique among the the services we tested in that
 it is the only one that appears to enforce the SNI:
 if the SNI and Host do not match,
 the Fastly edge server returns an HTTP 400 error.
-It is thus the only service for which the ``domainless'' fronting style is required.
+It is thus the only service we have found
+for which the ``domainless'' fronting style is required.
 
-\section{Analysis}
-\label{sec:analysis}
+\section{Resistance to traffic analysis}
+\label{sec:trafficanalysis}
 
 One of our goals in developing meek is to force
 the censor to use relatively expensive statistical classifiers
@@ -1110,18 +1112,22 @@ We did a packet capture
 automatically browsing the home pages
 of the top 500 Alexa web sites using meek,
 with a firewall in place so that no extraneous traffic was included.
-The browser used was Tor Browser,
-with the browser camouflage for meek described in Section~\ref{sec:browserextension},
-using Google App Engine as the intermediate web service.
+The used meek in Tor Browser,
+with the browser camouflage described in Section~\ref{sec:browserextension},
+and Google App Engine as the intermediate web service.
 The meek trace is 687~megabytes in all.
 Our representative of ordinary HTTPS traffic
 is a sanitized trace of 10 minutes of HTTPS traffic
 % anon
-originating at Lawrence Berkeley National Laboratory (LBL).
+from Lawrence Berkeley National Laboratory (LBL),
+comprising data to and from TCP port 443 on any Google server.
+% Mention the non-google if it appears in a figure.
+The trace contains packet headers only, not payloads
+were replaced by an incrementing counter.
 The LBL trace consists 313~megabytes of packet headers,
 not payloads, destined for TCP port 443 on any Google server.
-% Mention the non-google if it appears in a figure.
-The original IP addresses were replaced with a counter.
+The original IP addresses were masked by being
+replaced by a counter before we received the trace.
 
 \begin{figure}
 \centering
@@ -1131,7 +1137,7 @@ Comparison of TCP payload length distributions
 between ordinary HTTPS connections to Google services
 from the LBL traffic trace,
 and meek running on App Engine, fronted through www.google.com.
-The histogram's bin width is 5~bytes.
+% The histogram's bin width is 5~bytes.
 }
 \label{fig:datalen}
 \end{figure}
@@ -1139,36 +1145,70 @@ The histogram's bin width is 5~bytes.
 \subsection{Packet length}
 Figure~\ref{fig:datalen}
 compares the packet length distribution of both traces in both directions.
-A few similarities are noticeable:
-roughly 37\% of packets have no payload; these are mostly ACKs.
+Table~\ref{tab:datalen} summarizes the most common values.
+In both traces, about 38\% of packets have an empty payload, mostly ACKs.
 There is a small peak at the usual TCP Maximum Segment Size
 of 1460 bytes.
-% Other peaks near the max are probably near 1400, TLS maximum record size.
-The meek trace is missing a small peak of small packets
-present in the LBL trace.
-In its place, there are minor peaks at fairly distinct values,
-probably a reflection of Tor's fixed cell size
-and the fixed overhead of an encrypted HTTP header added
-to each transmission by meek.
-% Maybe mention apparent residue of a doubling of the three peaks at around 750.
-meek's trace is tends more overall to larger packets.
+The concentration of values near 1418 bytes
+may be caused by Google servers' sizing of TLS records so they fit within TCP segments.
+% https://github.com/joyent/node/issues/6889
+% http://mailman.nginx.org/pipermail/nginx-devel/2013-December/004703.html
+Conspicuous in the meek trace are a small number of
+likely packet sizes,
+and the lack of a cluster of small payload lengths of around 50 bytes.
+Both of these characteristics are probably artifacts
+of Tor's fixed cell size and the nearly fixed-size HTTP headers
+added by \meekclient\ and \meekserver.
 
-To explain the phenomenon, recall that we use browsers to handle HTTPS connections for meek in order
-to hide TLS handshake characteristics.
-Browsers also apply techniques like HTTP pipelining to improve performance. Since meek is always communicating with
-the same Google frontend server, the browser will keep the persistent TLS connection. In addition, small requests 
-can be batched into a large chunk before being sent. This explains why large packets are mostly seen from the trace that
-records meek's traffic.
-In contrast, normal users may not have persistent connections to Google. For example, a user may search a keyword on
-Google, click a result, and then close the tab that displays search results. The browser may close the 
-connection immediately after the user leaves the Google web page. Next time the user browses Google search, the browser 
-opens a new connection. In this case, small requests do not have such opportunity for batching.
+% Output of datalen.R.
+%
+% LBL
+%          0       1430       1418         41       1416       1460       1260
+% 0.37665361 0.09120402 0.08493944 0.06090732 0.03101247 0.02941974 0.02021770
+%       1400       1359         33
+% 0.01673740 0.01126137 0.01100281
+%
+% meek
+%        1418           0        1460         396         196        1024
+% 0.405263438 0.376721457 0.071558122 0.019904635 0.018484229 0.014867466
+%         811         783         151        1263
+% 0.012312158 0.007811639 0.007030949 0.006568932
+\begin{table}[h]
+\normalsize
+\centering
+\begin{tabular}{r r >{\qquad} r r}
+\multicolumn{2}{c}{LBL Google HTTPS} & \multicolumn{2}{>{\qquad}c}{meek on App Engine} \\
+0 bytes & 37.7\% & 1418 bytes & 40.5\% \\
+1430 bytes & 9.1\% & 0 bytes & 37.8\% \\
+1418 bytes & 8.5\% & 1460 bytes & 7.2\% \\
+41 bytes & 6.1\% & 396 bytes & 2.0\% \\
+1416 bytes & 3.1\% & 196 bytes & 1.8\% \\
+1460 bytes & 3.0\% & 1024 bytes & 1.5\%
+\end{tabular}
+\caption{The most common TCP payload lengths.}
+\label{tab:datalen}
+\end{table}
 
-These browser techniques improve performance, but also pose unexpected consequences. 
-Although meek alters the packet size distribution of underlying Tor traffic, 
-the censor may be aware of the distribution of meek itself. 
-Additionally, the persistent connection itself can be an issue.
-We thus investigated other related characteristics.
+% David: I don't think the following paragraph is true.
+% Almost all the length>1400 packets are Google→client, not client→Google,
+% as you can see if you split the histogram up by direction.
+%
+% To explain the phenomenon, recall that we use browsers to handle HTTPS connections for meek in order
+% to hide TLS handshake characteristics.
+% Browsers also apply techniques like HTTP pipelining to improve performance. Since meek is always communicating with
+% the same Google frontend server, the browser will keep the persistent TLS connection. In addition, small requests 
+% can be batched into a large chunk before being sent. This explains why large packets are mostly seen from the trace that
+% records meek's traffic.
+% In contrast, normal users may not have persistent connections to Google. For example, a user may search a keyword on
+% Google, click a result, and then close the tab that displays search results. The browser may close the 
+% connection immediately after the user leaves the Google web page. Next time the user browses Google search, the browser 
+% opens a new connection. In this case, small requests do not have such opportunity for batching.
+
+% These browser techniques improve performance, but also pose unexpected consequences. 
+% Although meek alters the packet size distribution of underlying Tor traffic, 
+% the censor may be aware of the distribution of meek itself. 
+% Additionally, the persistent connection itself can be an issue.
+% We thus investigated other related characteristics.
 
 \begin{figure}
 \centering
@@ -1243,8 +1283,8 @@ the arm-race game is symmetric; since finding a right model is a difficult task 
 the censor. Therefore, the censor can only find ad-hoc features to block forbidden traffic, which are relatively 
 easy to defend against. 
 
-\section{Security}
-\label{sec:security}
+\section{Discussion}
+\label{sec:discussion}
 
 % Censors that know no bounds: China on Google, Egypt, Pakistan with YouTube.
 
