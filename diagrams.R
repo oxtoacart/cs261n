@@ -8,9 +8,6 @@ x <- rbind(x, cbind(read.table("traces/meek_tbb_extension_tcp.pcap.tcp.log", col
 
 x <- x[order(x$t),]
 
-min.datalen <- min(x$datalen)
-max.datalen <- max(x$datalen)
-
 lbl = x[x$source=="lbl",]
 
 png("diagrams/datalen.png")
