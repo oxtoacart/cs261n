@@ -9,7 +9,8 @@ FIGURES = \
 	architecture.pdf \
 	browser-architecture.pdf \
 	wire-sequential.pdf \
-	wire-parallel.pdf
+	wire-parallel.pdf \
+	datalen.pdf
 
 meek.pdf: meek.tex meek.bib $(FIGURES)
 
@@ -27,6 +28,8 @@ clients-meek.pdf: clients-meek.R clients-meek.csv
 	Rscript clients-meek.R
 clients-psiphon3.pdf: clients-psiphon3.R psiphon3-fronted-meek-unique-users-all-regions.csv
 	Rscript clients-psiphon3.R
+datalen.pdf: datalen.R ../traces/lbl.https.goog.dpriv.tcp.log ../traces/lbl.https.non-goog.dpriv.tcp.log ../traces/meek_tbb_extension_tcp.pcap.tcp.log
+	Rscript datalen.R
 
 clean:
 	rm -f meek.pdf *.aux *.bbl *.log *.blg
