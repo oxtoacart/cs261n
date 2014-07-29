@@ -56,7 +56,7 @@ x "There are many parts of the TLS handshake, but the two that most
   analyze *all* of them lest one of the less obvious ones also leaks
   information.
 
-* Briefly explain what TLS session tickets are.
+x Briefly explain what TLS session tickets are.
 
 * Figure 4 would work better as  histogram.  In addition, you could
   plot both distributions on the same plot to enable more direct
