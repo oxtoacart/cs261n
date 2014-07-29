@@ -105,6 +105,7 @@ behind an HTTPS frontend server.
 These include such high--collateral damage infrastructure as
 big content delivery networks (CDNs)
 and Google's panoply of services---a nontrivial fraction of the web.
+See Section~\ref{sec:survey} for a listing of some suitable services.
 Domain fronting can be used as a means of tunneling traffic
 to a general-purpose proxy,
 so it is not limited to HTTPS, nor to the domains of any specific web service.
@@ -192,16 +193,6 @@ blocking requests without SNI,
 or finding some more subtle and expensive test to distinguish
 circumvention traffic.
 
-To our knowledge,
-the earliest application of domain fronting to circumvention
-was by GoAgent~\cite{goagent},
-a tool based on App Engine and
-once widely used in China.
-Fronting has also been used with success since 2013
-for the rendezvous component of another transport called flash proxy~\cite{flashproxy}.
-GoAgent and flash proxy's rendezvous are the most direct
-inspirations of this work.
-
 We have developed domain fronting into a full-fledged circumvention system called meek,
 implemented as a Tor pluggable transport~\cite{pt}.
 meek combines fronting with an HTTP-based tunneling proxy:
@@ -267,9 +258,19 @@ to be a frontier not of simple in-line packet filters,
 but of probabilities and false positives.
 A preliminary analysis of meek's resistance to detection
 based on traffic characteristics like packet size and timing
-appears in Section~\ref{sec:trafficstatistics}.
+appears in Section~\ref{sec:analysis}.
 The analysis is based on comparing traffic traces of meek
 with samples of HTTPS traffic at an Internet router.
+
+To our knowledge,
+the earliest application of domain fronting to circumvention
+was by GoAgent~\cite{goagent},
+a tool based on App Engine and
+once widely used in China.
+Fronting has also been used with success since 2013
+for the rendezvous component of another transport called flash proxy~\cite{flashproxy}.
+GoAgent and flash proxy's rendezvous are the most direct
+inspirations of this work.
 
 % We measure the performance...
 
@@ -719,15 +720,15 @@ if it has nothing else to send.
 The polling interval starts short (100~ms) and grows exponentially
 up to a maximum of 5~s.
 % Implemented in Psiphon's version.
-The other technique is to use
-long-lived persistent HTTP connections.
+The other technique,
+implemented in Psiphon's version of meek,
+uses long-lived persistent HTTP connections.
 When the server sends a response, it keeps the connection open,
 continually appending data to the response body while it has anything to send.
 When the server receives a new request from the same client,
 it closes any response it has open to the client and starts a new response.
-See Section~\ref{sec:otherdeployment} for more details
-on when each technique may be used;
-it depends on the intermediate web service.
+This second technique doesn't work on all services:
+notably Google App Engine doesn't support streaming downloads of this kind.
 
 \section{Camouflage for the TLS layer}
 \label{sec:browserextension}
@@ -741,7 +742,7 @@ This section is about TLS fingerprinting,
 which is the censor's remaining easy distinguisher,
 and how we use a web browser with an unremarkable TLS fingerprint
 to disguise the HTTPS tunnel.
-The next section is about more subtle and hard-to-apply forms of DPI.
+Section~\ref{sec:analysis} is about more subtle and hard-to-apply forms of DPI.
 
 The TLS handshake is largely plaintext~\cite[Section~7.4]{rfc5246}.
 The plaintext SNI extension, for instance, has to be protected by domain fronting.
@@ -1074,8 +1075,8 @@ if the SNI and Host do not match,
 the Fastly edge server returns an HTTP 400 error.
 It is thus the only service for which the ``domainless'' fronting style is required.
 
-\section{Camouflage of traffic characteristics}
-\label{sec:trafficstatistics}
+\section{Analysis}
+\label{sec:analysis}
 
 % Advantage is that we are probably proxying web traffic.
 
@@ -1092,15 +1093,14 @@ To collect the traffic trace of meek, we browses the Alexa top 500 websites sequ
 the Tor Browser Bundle and dump the traffic trace from the network interface. We ensured only
 the browser can successfully access the network by setting
 up the \texttt{iptables} firewall so that packets from other processes will be dropped. We also 
-obtain a 10-minute sample of normal HTTPS traffic trace from LBL. The trace is 983 MB in total. 
+obtain a 10-minute sample of normal HTTPS traffic trace from LBL. The trace is 983~megabytes in total. 
 We also specifically extracted the traffic between LBL and Google from the trace. Since the trace 
 only has packet headers, we cannot extract the domain information. However, the \texttt{TXT} DNS
 records of the domain \texttt{\_netblocks.google.com} shows the IP address blocks that belongs to
 Google. Therefore, we determine whether a flow is from or to Google by examining the address in the 
 IP header. We only interested in the Google traffic only, because the censor who wants to defeat meek
 will be mostly likely to compare suspicious traffic with normal Google traffic. The size of the 
-Google trace is 312 MB. 
-
+Google trace is 312~megabytes. 
 
 \begin{figure*}
 \centering
@@ -1223,6 +1223,8 @@ easy to defend against.
 \section{Security}
 \label{sec:security}
 
+% Censors that know no bounds: China on Google, Egypt.
+
 Domain fronting shares a weakness with decoy routing,
 which is that the overt and covert destinations lie on different
 network paths.
@@ -1290,6 +1292,8 @@ and the entry bridge do not have to be trusted.
 % more risk for the proxy operator
 % can require people to run their own proxies à la GoAgent.
 % "Censorship implies surveillance"
+
+% Prevalence of no SNI.
 
 \section{Deployment}
 \label{sec:deployment}
