@@ -176,7 +176,7 @@ x Typo, contract -> contrast
 
 * "most of the numbers concentrate on 1  10" - hyphen missing
 
-* "typical pattern of using Google is ..." - add citation, or frame that
+x "typical pattern of using Google is ..." - add citation, or frame that
   *presumably* this is the case
 
 * You should try Figure 5 log-scaled (X axis only) to see if it's
