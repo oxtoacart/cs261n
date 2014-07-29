@@ -176,17 +176,9 @@ The CDN's edge server won't forward requests just anywhere---it
 has to be to the domain of a customer.
 This means that in order to host a proxy,
 one has to create an account and pay for bandwidth.
-
 Fronting works with Google because Google App Engine, a web application platform,
 can host a simple ``reflector'' application that emulates
-an origin-pull CDN, simply forwarding every request to another server.
-Though App Engine's domain \urll{appspot.com}
-may be blocked because it can trivially be used to host a proxy,
-it can be fronted by essentially any Google domain, for example
-\urll{google.com}, \urll{gmail.com}, or \urll{googleapis.com}.
-App Engine charges for bandwidth,
-though it has a low-bandwidth free tier.
-% See Section~\ref{sec:deployment} for more discussion on deployment.
+an origin-pull CDN, simply forwarding every request to an origin server.
 
 A variation on fronting is ``domainless'' fronting,
 in which there is no DNS request and no SNI extension.
@@ -986,6 +978,102 @@ but rather made all HTTPS requests with the standard Android HTTP API.
 This decision makes sense because typical Android applications
 also use the standard API and share the same TLS fingerprint.
 
+\section{A survey of fronting-capable web services}
+\label{sec:survey}
+
+This section contains a brief survey of the fronting-capable
+web services we have found, each with its pros and cons.
+The list is not exhaustive and is meant to illustrate the broad
+support that exists for fronting.
+Of the services listed, we have deployed meek
+only on Google App Engine and Amazon CloudFront.
+We have only checked that fronting works on the others.
+Recall that even web services that support fronting
+will front only for their own customers,
+so each deployment typically requires an investment of time and money.
+
+Google App Engine (\url{https://developers.google.com/appengine/})
+is a web application platform.
+Each application gets a subdomain of \urll{appspot.com},
+which can be fronted through almost any Google domain,
+including google.com, gmail.com, googleapis.com, and many others.
+App Engine can run only web applications,
+not a full Tor bridge;
+for that reason we use a tiny ``reflector'' application
+that merely copies incoming requests to a Tor bridge hosted elsewhere.
+Fronting through App Engine is attractive in the case where
+\urll{appspot.com} is blocked---not unlikely,
+because of the ease of building a proxy there---but
+at least one other Google service is reachable.
+Applications that use less than one gigabyte of bandwidth daily
+are free of charge,
+making possible an upload-your-own-app model
+à la GoAgent.
+
+Amazon CloudFront (\url{https://aws.amazon.com/cloudfront/}),
+not to be confused with CloudFlare,
+is the CDN of Amazon Web Services.
+A CloudFront ``distribution'' associates
+a randomly generated subdomain of \urll{cloudflare.net}
+with an origin server,
+which in our case is an instance of \meekserver.
+The front domain may be any other randomly generated subdomain---all
+of which support HTTPS through a wildcard certificate---or
+certain domain aliases like \urll{a0.awsstatic.com}.
+CloudFront has a usage tier that is free of charge for a year,
+subject to a bandwidth limit of 50 gigabytes per month.
+
+CloudFlare (\url{https://www.cloudflare.com/}),
+not to be confused with CloudFront,
+is a CDN also marketed as protection against
+denial-of-service attacks.
+It appears that any domain name on CloudFlare
+can front for any other, even custom domains;
+however it is not obvious which one is best to use as a front.
+The front domain needs to be popular
+(causing high collateral damage if blocked),
+or else the censor may call our bluff and simply block the domain entirely.
+It is doubly bad if that happens because not only is circumvention foiled,
+some unsuspecting third part has just had their web site blocked.
+A solution may be to round-robin through
+a pool of domain names;
+or to use ``domainless'' fronting that doesn't send SNI.
+Though CloudFlare supports domain fronting,
+its terms of service~\cite{cloudflare-terms}
+seem to prohibit the kind of tunneled proxying that meek does:
+\begin{quote}
+\textsc{Section 10: Limitation on non-HTML caching}\\
+You acknowledge that CloudFlare's Service is offered as a platform to cache and
+serve web pages and websites and is not offered for other purposes
+\ldots\ you understand and agree to use the Service solely
+for the purpose of hosting and serving web pages\ldots
+\end{quote}
+
+Akamai (\url{http://www.akamai.com/}) is a large CDN.
+Requests may be fronted through the special domain
+\urll{a248.e.akamai.net},
+which serves a certificate also good for \urll{*.akamaihd.net}.
+The collateral damage of blocking Akamai is enormous:
+in 2010 it carried 15--20\% of all web traffic~\cite{akamai}.
+Akamai costs more than other CDNs;
+it would likely require institutional support
+to keep a circumvention system running in the long term.
+
+Microsoft Azure (\url{http://azure.microsoft.com/})
+is a cloud computing platform that features a CDN.
+Similarly to CloudFront, users get a subdomain
+of \urll{vo.msecnd.net},
+all of which subdomains can front for each other.
+There are other fronting domain names, like \urll{ajax.aspnetcdn.com},
+that may offer enough collateral damage.
+
+Fastly (\url{http://www.fastly.com/}) is a CDN.
+It is unique among the the services we tested in that
+it is the only one that appears to enforce the SNI:
+if the SNI and Host do not match,
+the Fastly edge server returns an HTTP 400 error.
+It is thus the only service for which the ``domainless'' fronting style is required.
+
 \section{Camouflage of traffic characteristics}
 \label{sec:trafficstatistics}
 
@@ -1283,22 +1371,8 @@ but other systems can take the place of Google.
 An attractive alternative is CloudFlare, a large content delivery network,
 which supports domain fronting, dispatching requests based on the Host header
 rather than IP or SNI.
-We did not test deployment on CloudFlare,
-because their terms of service are not clear on whether this kind of use is allowed,
-and we got an ambiguous answer when we asked for clarification.
-A particular concern when using CloudFlare or other content delivery networks is the choice of front domain.
-If one domain is being used particularly as a front for circumvention traffic,
-it may find itself blocked by the censor, even though it is not itself
-involved in any circumvention.
-One good solution to this problem may be not to use a domain name at all,
-but only the IP address of one of CloudFlare's servers.
-The censor will then face the choice of allowing circumvention traffic,
-or else blocking a large number of unrelated web sites.
 
-% We were not able to make the system work with Amazon CloudFront nor Akamai.
 % Dreamhost? Other HTTPS webhosts with PHP bridge?
-
-The collateral damage of blocking Akamai is enormous: in 2010 it carried 15--20\% of all web traffic~\cite{akamai}.
 
 The code that runs on App Engine is very simple.
 It just statelessly copies HTTP requests and responses.
