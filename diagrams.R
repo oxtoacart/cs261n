@@ -1,6 +1,6 @@
 library(ggplot2)
 
-col.names <- c("t", "src", "dst", "dir", "iplen", "datalen", "syn")
+col.names <- c("t", "src", "sport", "dst", "dport", "dir", "iplen", "datalen", "syn")
 
 x <- cbind(read.table("traces/lbl.https.goog.dpriv.tcp.log", col.names=col.names), google=T, source="lbl")
 x <- rbind(x, cbind(read.table("traces/lbl.https.non-goog.dpriv.tcp.log", col.names=col.names), google=F, source="lbl"))
