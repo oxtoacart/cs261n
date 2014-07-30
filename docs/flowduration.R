@@ -21,7 +21,7 @@ p <- p + scale_x_log10(breaks=c( 1,  5,  10,  24,  60,  120,  180, 240,  300,  6
 p <- p + coord_cartesian(xlim=c(5, 3800))
 p <- p + xlab("Duration (seconds)") + ylab("Fraction of connections")
 p <- p + theme(axis.text=element_text(size=7), axis.title=element_text(size=8))
-p <- p + theme(panel.grid.minor=element_blank())
+p <- p + theme(panel.grid.minor.x=element_blank())
 p <- p + theme(legend.position="none")
 p <- p + annotate("text", x=220, y=0.82, label="LBL Google HTTPS", hjust=1, size=2.5)
 p <- p + annotate("text", x=800, y=0.44, label="meek on App Engine", hjust=1, size=2.5)
