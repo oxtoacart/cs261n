@@ -1246,28 +1246,76 @@ due to background activities such as statistics reporting. In all cases the numb
 less than 5. We can conclude that the number of concurrent connections does not show distinct characteristics, as 
 a small number of connections can be considered as a normal behavior.
 
+\subsection{Connection lifetime}
+
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{flowduration}
-\caption{CDF of connection lifetime.}
+\caption{
+CDF of connection lifetime.
+The horizontal axis is logarithmic.
+meek's connections tend to last longer than those of ordinary HTTPS traffic.
+}
 \label{fig:duration}
 \end{figure}
 
-\subsection{Connection lifetime}
-We consider the connection lifetime as a potential weakness. Figure~\ref{fig:duration} shows the 
-connection lifetime distribution of normal traffic. Interestingly we can see the concentration on 
-several discrete values: 60s, 120s, 180s, 240s. We hypothesize that it is due to the HTTP Keep-Alive 
-timeout of different browsers and web services. Another important observation is the concentration on 
-durations that exceed 600 seconds. Note that our trace only contains 10 minutes' data, therefore the concentration 
-on 600 seconds does not reflect that these connections' actual duration is 600 seconds. Rather, 600 seconds
-is the lower bound of their actual duration. Thus, we can conclude that only about 10\% connections last 
-longer than 600 seconds.
+% Output of flowduration.R.
+% LBL
+% [1] "42.6%" "87.0%" "92.2%"
+% meek
+% [1] "10.0%" "30.0%" "40.0%"
 
-The distribution of \meek's traffic, in contrast, is totally different. First, there are much fewer connections, which is 
-consistent with the discussions above. Second, the durations are much longer if we notice the x-axis in Figure~\ref{fig:duration}. If there is not a case in which normal users also have such long connections when browsing Google, the 
-censor can potentially block any long connections between users and Google. Even if this is the case, the
-censor has to wait until a time threshold is reached. The user might have already obtained the forbidden data she wants, or 
-\meek could simply restart a connection.
+We consider the duration of TCP connections as a potential distinguisher.
+Figure~\ref{fig:duration} shows the cumulative probability
+of connection duration in our two traces.
+Considering the LBL trace first,
+we see interesting probability concentrations on
+some round numbers: 10~s, 60~s, 120~s, 180~s, and 240~s.
+We hypothesize that this phenomenon is caused by
+keepalive timeouts in web browsers and servers,
+and polling behavior of web apps.
+The small rise at 600 seconds is an artifact caused
+by the fact that the trace is only 10 minutes long.
+Connections lasting longer than 10 minutes are not accurately reflected,
+however we can say that only about 8\% of connections lasted longer than 10 minutes.
+
+The \meek trace shows a propensity for longer connections.
+Over 4.5 hours, there were only 10 connections,
+three of them lasting for an hour.
+The long connections are caused by the client browser extension's
+use of long-lived HTTP keepalive connections,
+combined with \meekclient's polling requests,
+which keep the connection from becoming idle.
+The traffic trace represents the browsing of hundreds of web sites
+and thousands of HTTPS transactions, but they all
+occurred over just a few TCP/TLS connections.
+60\% of \meek connections lasts five minutes or longer,
+while only 13\% of those of ordinary traffic does.
+\meek has essentially no connections lasting less than 24 seconds,
+but such short connections account for over 42\% of the LBL HTTPS connections.
+30\% (3 out of 10) of \meek's connections lasted almost exactly one hour,
+evidently reflecting a built-in time limit in either the client browser extension
+or in App Engine.
+
+The censor may decide to block any long-lived HTTPS connections between
+a client and a web service.
+According to our traffic trace, doing so will not disrupt more than 8\% of ordinary connections;
+whether that is an acceptable cost depends on the censor's
+tolerance for collateral damage.
+The censor can lower the timing threshold, at the cost of more false positives.
+Duration-based blocking is favorable for the circumventor,
+because if the censor terminates connections after, say, 10 minutes,
+that's 10 minutes of circumvention achieved,
+after which \meek can start a new connection
+and allow Tor to rebuild its circuits.
+Future enhancements may even allow reconnecting using the same session ID,
+so there will be no effect on the client other than a brief delay
+while a new HTTPS connection is established.
+
+% meek is fairly robust against connection termination.
+% Well, not really for long-lived TCP connections.
+% But it could be.
+% Can reconnect and make a new circuit.
 
 \subsection{Conclusion} So far we do not find any obvious traffic characteristics that can be useful for
 distinguishing \meek's traffic. But admittedly there two potential weaknesses: long-lived connections 
