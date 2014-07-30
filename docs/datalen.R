@@ -1,6 +1,6 @@
 library(ggplot2)
 
-col.names <- c("t", "src", "dst", "dir", "iplen", "datalen", "syn")
+col.names <- c("t", "src", "sport", "dst", "dport", "dir", "iplen", "datalen", "syn")
 
 # http://www.cookbook-r.com/Graphs/Facets_%28ggplot2%29/#modifying-facet-label-text
 label = function(variable, value) {

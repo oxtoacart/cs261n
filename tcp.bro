@@ -12,7 +12,9 @@ export {
 	type Info: record {
 		t: time	&log;
 		src: addr	&log;
+		sport: port	&log;
 		dst: addr	&log;
+		dport: port	&log;
 		dir: string	&log;
 		iplen: count	&log;
 		datalen: count	&log;
@@ -32,7 +34,9 @@ event new_packet(c: connection, p: pkt_hdr)
 	local rec: TCP::Info = [
 		$t=network_time(),
 		$src=c$id$orig_h,
+		$sport=c$id$orig_p,
 		$dst=c$id$resp_h,
+		$dport=c$id$resp_p,
 		$dir=p$tcp$dport==443/tcp ? "OUT" : "IN",
 		$iplen=p$ip$len,
 		$datalen=p$tcp$dl,
