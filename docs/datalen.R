@@ -17,7 +17,7 @@ label = function(variable, value) {
 
 x <- cbind(read.table("../traces/lbl.https.goog.dpriv.tcp.log", col.names=col.names), google=T, source="lbl")
 x <- rbind(x, cbind(read.table("../traces/lbl.https.non-goog.dpriv.tcp.log", col.names=col.names), google=F, source="lbl"))
-x <- rbind(x, cbind(read.table("../traces/meek_tbb_extension_tcp.pcap.tcp.log", col.names=col.names), google=T, source="tbb"))
+x <- rbind(x, cbind(subset(read.table("../traces/meek_tbb_extension_tcp.pcap.tcp.log", col.names=col.names), dport==443), google=T, source="tbb"))
 
 # Print the heavy hitters.
 t <- table(x[x$google & x$source=="lbl", ]$datalen)

@@ -7,7 +7,7 @@ bro.classes <- c("numeric", "factor", "factor",    "factor",    "factor",    "fa
 
 x <- cbind(read.table("../traces/lbl.https.goog.dpriv.conn.log", col.names=bro.names, colClasses=bro.classes, na.strings=c("-")), google=T, source="lbl")
 x <- rbind(x, cbind(read.table("../traces/lbl.https.non-goog.dpriv.conn.log", col.names=bro.names, colClasses=bro.classes, na.strings=c("-")), google=F, source="lbl"))
-x <- rbind(x, cbind(read.table("../traces/meek_tbb_extension_tcp.pcap.conn.log", col.names=bro.names, colClasses=bro.classes, na.strings=c("-")), google=T, source="tbb"))
+x <- rbind(x, cbind(subset(read.table("../traces/meek_tbb_extension_tcp.pcap.conn.log", col.names=bro.names, colClasses=bro.classes, na.strings=c("-")), id.resp_p==443), google=T, source="tbb"))
 
 p <- ggplot(x[x$google, ], aes(duration, colour=source))
 p <- p + stat_ecdf()
