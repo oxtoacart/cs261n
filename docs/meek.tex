@@ -55,9 +55,9 @@ with resulting expensive collateral damage.
 
 We have implemented domain fronting in a system called \meek,
 a pluggable transport for Tor.
-\meek combines fronting with a proxy server that encodes a TCP stream
+\meek\ combines fronting with a proxy server that encodes a TCP stream
 as a sequence of HTTP requests and responses.
-The \meek server's external interface is that of an ordinary web server.
+The \meek\ server's external interface is that of an ordinary web server.
 Communication with it is enabled through domain fronting.
 The server receives requests, decodes them, and feeds their payloads into a Tor relay,
 and returns downstream data in the HTTP response.
@@ -197,7 +197,7 @@ circumvention traffic.
 
 We have developed domain fronting into a full-fledged circumvention system called \meek,
 implemented as a Tor pluggable transport~\cite{pt}.
-\meek combines fronting with an HTTP-based tunneling proxy:
+\meek\ combines fronting with an HTTP-based tunneling proxy:
 upstream data are transformed into a sequence of HTTP requests,
 which are fronted in order to reach a proxy server.
 The server decodes the requests and feeds their payloads
@@ -225,18 +225,18 @@ The host actually at allowed.example does not participate in the communication.
 \label{fig:architecture}
 \end{figure*}
 
-\meek has been built into an alpha version of Tor Browser,
+\meek\ has been built into an alpha version of Tor Browser,
 and has seen use by a small number of users.
 Our deployment uses Google App Engine,
 with the hidden actual domain \urll{meek-reflect.appspot.com}
 hidden by the front \urll{www.google.com}.
-Section~\ref{sec:deployment} discusses other systems \meek can work with
+Section~\ref{sec:deployment} discusses other systems \meek\ can work with
 and other deployment scenarios.
 In addition to the Tor pluggable transport,
-systems based on \meek are now in use by other circumvention systems
+systems based on \meek\ are now in use by other circumvention systems
 including Psiphon~\cite{psiphon} and Lantern~\cite{lantern}.
 
-% \meek is designed to have features attractive in a circumvention transport.
+% \meek\ is designed to have features attractive in a circumvention transport.
 % It is easy to use, not requiring the configuration of any bridge addresses.
 % In Tor Browser, users need only select ``meek''
 % from a pulldown menu in order to use it.
@@ -251,7 +251,7 @@ For example, the handshake is a fingerprintable part of TLS.
 Section~\ref{sec:browserextension} describes how we use a web browser extension as an instrument for making HTTPS requests,
 in order that \meek's TLS and HTTPS characteristics
 match those of a browser as closely as possible.
-One of our goals for \meek is to force the censor
+One of our goals for \meek\ is to force the censor
 to employ more sophisticated, expensive, and error-prone statistical tests
 to classify traffic as allowed or prohibited,
 rather than simple domain blacklists or deep packet inspection;
@@ -390,7 +390,7 @@ If one of them is blocked, there is soon another to replace it.
 Flash proxy's approach to address blocking is in a sense
 the opposite of \meek's:
 where flash proxy uses many cheap, disposable, individually blockable proxies,
-\meek uses just a few high-value front domains on hard-to-block network infrastructure.
+\meek\ uses just a few high-value front domains on hard-to-block network infrastructure.
 A quirk of the browser proxy model is that
 the client must be able to receive a TCP connection; in particular it
 must not be behind network address translation~(NAT), which limits flash proxy's usefulness.
@@ -476,7 +476,7 @@ The path component \urll{/bucketname/filename},
 which would reveal that CloudTransport is being used,
 cannot be used for blocking because it is encrypted in HTTPS.
 
-GoAgent~\cite{goagent} is a direct inspiration for \meek in its use of App
+GoAgent~\cite{goagent} is a direct inspiration for \meek\ in its use of App
 Engine and Host header--based domain fronting.
 Traffic is fronted by the Google frontend server
 and delivered to its destination by a specialized app running on App Engine.
@@ -494,7 +494,7 @@ This figure is higher than that of paid~(29\%) and free VPNs~(18\%), and far
 above that of other special-purpose tools like Tor~(2.9\%) and Psiphon~(2.5\%).
 Use of GoAgent in China was disrupted starting in the beginning of June~2014
 when all Google services (including GoAgent's front domains) were blocked~\cite{cn-google-block}.
-\meek over App Engine was similarly affected.
+\meek\ over App Engine was similarly affected.
 % Users identified reliability, speed, and ease of installation as the most important features of a circumvention tool.
 
 Cloud-Entry~\cite{cloud-entry} is somewhat similar to GoAgent.
@@ -508,7 +508,7 @@ so users must reconnect at least every 60~seconds.
 
 Psiphon~\cite{psiphon} is a network of many one-hop proxies,
 with encryption and traffic obfuscation between client and server.
-Psiphon uses domain fronting based on \meek as one of its blocking defenses since June~2014~\cite{psiphon-meek-merge}.
+Psiphon uses domain fronting based on \meek\ as one of its blocking defenses since June~2014~\cite{psiphon-meek-merge}.
 Lantern~\cite{lantern} uses a network of proxies running on volunteer computers;
 proxy addresses are shared only with trusted friends in order to make them difficult to enumerate.
 Lantern~1.4 is planned to use domain fronting inspired by \meek~\cite{lantern-1.3.1}.
@@ -517,7 +517,7 @@ Lantern~1.4 is planned to use domain fronting inspired by \meek~\cite{lantern-1.
 % Freegate
 % Ultrasurf
 
-% CORDON? Say how \meek would be classified in it?
+% CORDON? Say how \meek\ would be classified in it?
 
 % Section~\ref{sec:browserextension}, JumpBox
 % http://securecomm.org/2014/show/tutorials
@@ -571,7 +571,7 @@ of these assumptions are violated;
 specifically what happens
 when the intermediate web service's frontend server is inside the censor's network
 and when the censor controls a certificate authority.
-That section also describes the use of \meek apart from Tor.
+That section also describes the use of \meek\ apart from Tor.
 
 % What about in-country edge servers; seems to work.
 
@@ -583,7 +583,7 @@ The parts that are new in \meek
 are the programs \meekclient\ and \meekserver,
 which are the pluggable-transports~\cite{pt} interface between Tor and \meek.
 % All the programs are free software, naturally,
-% and may be downloaded from the \meek home page at
+% and may be downloaded from the \meek\ home page at
 % \url{https://trac.torproject.org/projects/tor/wiki/doc/meek}.
 
 \meekclient\ is essentially a web client that knows how to front HTTPS requests.
@@ -605,7 +605,7 @@ the server must determine which client session each incoming request belongs to.
 % It does this by means of an X-Session-Id header,
 % described in this section.
 
-When \meek is used with Google App Engine, one other component is needed.
+When \meek\ is used with Google App Engine, one other component is needed.
 It is a small ``reflector'' web app that simply copies any request
 it receives and forwards it to an instance of \meekserver\ running on a bridge.
 App Engine cannot directly run a Tor bridge,
@@ -626,7 +626,7 @@ open session it belongs to
 (or whether it is a brand-new client needing a new session).
 In TCP, different streams are distinguished by their
 (source~IP, source port, dest~IP, dest~port) tuple,
-but that doesn't work for \meek for two reasons:
+but that doesn't work for \meek\ for two reasons:
 the source IP of the requests is that of the intermediate web service,
 not that of the client;
 and a logical stream is chopped into multiple independent HTTP requests,
@@ -679,7 +679,7 @@ Content-Length: 75
 \end{verbatim}
 \end{quote}
 \caption{
-Requests and responses in the \meek HTTP protocol.
+Requests and responses in the \meek\ HTTP protocol.
 The session ID is randomly generated by the client.
 Request/response bodies contain successive chunks of a Tor TLS stream
 (\texttt{\textbackslash{}x16\textbackslash{}x03\textbackslash{}x01\textbackslash{}x02}
@@ -697,7 +697,7 @@ The underlying TCP stream is broken into chunks so that
 There must therefore be some way of making sure that chunks
 are correctly reassembled at the other end,
 in order and without gaps and duplicates.
-\meek takes a naive approach: requests and responses are strictly serialized.
+\meek\ takes a naive approach: requests and responses are strictly serialized.
 The client doesn't send a second chunk of data
 (i.e, make another HTTPS request) until it has
 receive the response to the first request.
@@ -715,7 +715,7 @@ HTTP is fundamentally a request-based protocol.
 There is no way for the server to ``push'' data to the client without
 having first received a request.
 In order to enable the server to send back data,
-\meek uses one of two techniques.
+\meek\ uses one of two techniques.
 The first is polling:
 every so often the client sends a request with an empty payload
 if it has nothing else to send.
@@ -766,7 +766,7 @@ Figure~\ref{fig:ciphersuites:golang}
 shows how it would appear with no TLS camouflage.
 Figures~\ref{fig:ciphersuites:firefox} and~\ref{fig:ciphersuites:chrome},
 which are browsers, are different; the browsers are also unlike each other.
-A censor could block an uncamouflaged \meek using Go's fingerprint,
+A censor could block an uncamouflaged \meek\ using Go's fingerprint,
 if it considered the collateral damage resulting from blocking other Go programs to be slight enough.
 
 \begin{figure*}
@@ -942,13 +942,13 @@ have no relation to the URLs the user actually browses;
 the extension only ever makes requests to the front domain.
 
 The use of a browser extension brings benefits beyond TLS camouflage.
-It means \meek inherits other traffic characteristics of the browser:
+It means \meek\ inherits other traffic characteristics of the browser:
 for instance
 how often it resolves DNS names,
 its connection reuse,
 and its HTTP keepalive behavior.
 The Firefox extension has special advantages
-when \meek is used with Tor Browser
+when \meek\ is used with Tor Browser
 because Tor Browser
 is a modified version of Firefox.
 We can use the same browser executable for both the browser the user interacts with (Tor Browser)
@@ -957,7 +957,7 @@ saving space in distribution packages
 and sparing the user from having to separately configure a browser to run the extension.
 In Tor Browser,
 the headless Firefox is started and stopped transparently
-when \meek is activated and deactivated.
+when \meek\ is activated and deactivated.
 
 % The development of the browser extensions posed some unexpected challenges.
 % Tor Browser disables TLS session tickets because they can be used as linking identifiers,
@@ -1043,7 +1043,7 @@ a pool of domain names;
 or to use ``domainless'' fronting that doesn't send SNI.
 Though CloudFlare supports domain fronting,
 its terms of service~\cite{cloudflare-terms}
-seem to prohibit the kind of tunneled proxying that \meek does:
+seem to prohibit the kind of tunneled proxying that \meek\ does:
 \begin{quote}
 \textsc{Section 10: Limitation on non-HTML caching}\\
 You acknowledge that CloudFlare's Service is offered as a platform to cache and
@@ -1081,10 +1081,10 @@ that requires the ``domainless'' fronting style.
 \section{Resistance to traffic analysis}
 \label{sec:trafficanalysis}
 
-One of our goals in developing \meek is to force
+One of our goals in developing \meek\ is to force
 the censor to use relatively expensive statistical classifiers
 to effect blocking---generally, to increase the cost of censorship.
-We believe \meek as described is resistant to the ``easy''
+We believe \meek\ as described is resistant to the ``easy''
 forms of blocking, namely IP address and DNS blocking,
 simple pattern-based DPI,
 and active probing.
@@ -1106,17 +1106,17 @@ best solved by a modular component not
 necessarily specifically designed for \meek.
 
 % Advantage is that we are probably proxying web traffic.
-As \meek is based on HTTPS,
-we compare traffic traces of \meek against
+As \meek\ is based on HTTPS,
+we compare traffic traces of \meek\ against
 traces of ``ordinary'' HTTPS traffic.
 We did a packet capture
 automatically browsing the home pages
 of the top 500 Alexa web sites using \meek,
 with a firewall in place so that no extraneous traffic was included.
-The used \meek in Tor Browser,
+The used \meek\ in Tor Browser,
 with the browser camouflage described in Section~\ref{sec:browserextension},
 and Google App Engine as the intermediate web service.
-The \meek trace is 687~megabytes in all
+The \meek\ trace is 687~megabytes in all
 and covers about 4.5 hours of network activity.
 Our representative of ordinary HTTPS traffic
 is a sanitized trace of 10 minutes of HTTPS traffic
@@ -1138,7 +1138,7 @@ replaced by a counter before we received the trace.
 Comparison of TCP payload length distributions
 between ordinary HTTPS connections to Google services
 from the LBL traffic trace,
-and \meek running on App Engine, fronted through www.google.com.
+and \meek\ running on App Engine, fronted through www.google.com.
 % The histogram's bin width is 5~bytes.
 }
 \label{fig:datalen}
@@ -1155,7 +1155,7 @@ The concentration of values near 1418 bytes
 may be caused by Google servers' sizing of TLS records so they fit within TCP segments.
 % https://github.com/joyent/node/issues/6889
 % http://mailman.nginx.org/pipermail/nginx-devel/2013-December/004703.html
-Conspicuous in the \meek trace are a small number of
+Conspicuous in the \meek\ trace are a small number of
 likely packet sizes,
 and the lack of a cluster of small payload lengths of around 50 bytes.
 Both of these characteristics are probably artifacts
@@ -1179,7 +1179,7 @@ added by \meekclient\ and \meekserver.
 \normalsize
 \centering
 \begin{tabular}{r r >{\qquad} r r}
-\multicolumn{2}{c}{LBL Google HTTPS} & \multicolumn{2}{>{\qquad}c}{\meek on App Engine} \\
+\multicolumn{2}{c}{LBL Google HTTPS} & \multicolumn{2}{>{\qquad}c}{\meek\ on App Engine} \\
 0 bytes & 37.6\% & 1418 bytes & 40.5\% \\
 1430 bytes & 9.1\% & 0 bytes & 37.7\% \\
 1418 bytes & 8.5\% & 1460 bytes & 7.2\% \\
@@ -1195,9 +1195,9 @@ added by \meekclient\ and \meekserver.
 % Almost all the length>1400 packets are Google→client, not client→Google,
 % as you can see if you split the histogram up by direction.
 %
-% To explain the phenomenon, recall that we use browsers to handle HTTPS connections for \meek in order
+% To explain the phenomenon, recall that we use browsers to handle HTTPS connections for \meek\ in order
 % to hide TLS handshake characteristics.
-% Browsers also apply techniques like HTTP pipelining to improve performance. Since \meek is always communicating with
+% Browsers also apply techniques like HTTP pipelining to improve performance. Since \meek\ is always communicating with
 % the same Google frontend server, the browser will keep the persistent TLS connection. In addition, small requests 
 % can be batched into a large chunk before being sent. This explains why large packets are mostly seen from the trace that
 % records \meek's traffic.
@@ -1207,8 +1207,8 @@ added by \meekclient\ and \meekserver.
 % opens a new connection. In this case, small requests do not have such opportunity for batching.
 
 % These browser techniques improve performance, but also pose unexpected consequences. 
-% Although \meek alters the packet size distribution of underlying Tor traffic, 
-% the censor may be aware of the distribution of \meek itself. 
+% Although \meek\ alters the packet size distribution of underlying Tor traffic, 
+% the censor may be aware of the distribution of \meek\ itself. 
 % Additionally, the persistent connection itself can be an issue.
 % We thus investigated other related characteristics.
 
@@ -1279,7 +1279,7 @@ by the fact that the trace is only 10 minutes long.
 Connections lasting longer than 10 minutes are not accurately reflected,
 however we can say that only about 8\% of connections lasted longer than 10 minutes.
 
-The \meek trace shows a propensity for longer connections.
+The \meek\ trace shows a propensity for longer connections.
 Over 4.5 hours, there were only 10 connections,
 three of them lasting for an hour.
 The long connections are caused by the client browser extension's
@@ -1289,9 +1289,9 @@ which keep the connection from becoming idle.
 The traffic trace represents the browsing of hundreds of web sites
 and thousands of HTTPS transactions, but they all
 occurred over just a few TCP/TLS connections.
-60\% of \meek connections lasts five minutes or longer,
+60\% of \meek\ connections lasts five minutes or longer,
 while only 13\% of those of ordinary traffic does.
-\meek has essentially no connections lasting less than 24 seconds,
+\meek\ has essentially no connections lasting less than 24 seconds,
 but such short connections account for over 42\% of the LBL HTTPS connections.
 30\% (3 out of 10) of \meek's connections lasted almost exactly one hour,
 evidently reflecting a built-in time limit in either the client browser extension
@@ -1306,7 +1306,7 @@ The censor can lower the timing threshold, at the cost of more false positives.
 Duration-based blocking is favorable for the circumventor,
 because if the censor terminates connections after, say, 10 minutes,
 that's 10 minutes of circumvention achieved,
-after which \meek can start a new connection
+after which \meek\ can start a new connection
 and allow Tor to rebuild its circuits.
 Future enhancements may even allow reconnecting using the same session ID,
 so there will be no effect on the client other than a brief delay
@@ -1370,7 +1370,7 @@ but popular destinations by definition tend to be visited a lot.
 % Possible countermeasure is traffic fingerprinting resistance
 % like what mjuarez is working on, mostly orthogonal to circumvention.
 
-We implemented \meek as a pluggable transport~\cite{pt} for Tor.
+We implemented \meek\ as a pluggable transport~\cite{pt} for Tor.
 Although it is possible to use the system with proxies other than Tor,
 using Tor has some attractive features.
 The pluggable transports infrastructure makes it relatively easy to prototype
@@ -1393,7 +1393,7 @@ and the entry bridge do not have to be trusted.
 % Maybe not willing to risk getting caught in MITM.
 % Could conceivably send cover traffic if MITM detected, but blah.
 
-% \meek apart from Tor.
+% \meek\ apart from Tor.
 % more risk for the proxy operator
 % can require people to run their own proxies à la GoAgent.
 % "Censorship implies surveillance"
@@ -1403,29 +1403,29 @@ and the entry bridge do not have to be trusted.
 \section{Deployment}
 \label{sec:deployment}
 
-We implemented \meek as a Tor pluggable transport~\cite{pt}
+We implemented \meek\ as a Tor pluggable transport~\cite{pt}
 and built experimental releases of the Tor Browser Bundle featuring \meek.
 The browser bundle includes Tor and a version of Firefox
 called Tor Browser that is patched to defend against application-layer identity leaks.
-Users need to download and run the bundle and select \meek from the list of transports,
+Users need to download and run the bundle and select \meek\ from the list of transports,
 and then a browser window appears,
-configured to use \meek for circumvention and Tor for anonymity.
+configured to use \meek\ for circumvention and Tor for anonymity.
 We announced our prototype bundles on Tor development mailing lists,
 and from there they were picked up by Tor Weekly News on the Tor blog.
 
 \begin{figure}
 \includegraphics[width=\linewidth]{clients-meek}
-\caption{Concurrent users of \meek with Tor.}
+\caption{Concurrent users of \meek\ with Tor.}
 \label{fig:clients}
 \end{figure}
 
 \begin{figure}
 \includegraphics[width=\linewidth]{clients-psiphon3}
-\caption{Daily unique users of \meek with Psiphon3 (note vertical axis).}
+\caption{Daily unique users of \meek\ with Psiphon3 (note vertical axis).}
 \label{fig:clients}
 \end{figure}
 
-Figure~\ref{fig:clients} shows the average number of concurrent users of \meek with Tor
+Figure~\ref{fig:clients} shows the average number of concurrent users of \meek\ with Tor
 since close to the beginning of development,
 as reported by the Tor Metrics Portal~\cite{metrics-meek}.
 The number of users is estimated by counting the number
@@ -1443,7 +1443,7 @@ The total cost has so far been \$1.11, with bills of
 \$0.73 in April,
 and \$0.29 in the first half of May.
 
-\meek has a home page at
+\meek\ has a home page at
 \url{https://trac.torproject.org/projects/tor/wiki/doc/meek}.
 Our source code is in the Git repository at
 \url{https://git.torproject.org/pluggable-transports/meek.git}.
@@ -1533,7 +1533,7 @@ from sending fronted requests in parallel.
 
 % Performance measurements
 We would like to do more quantitative performance measurements,
-in order to measure the overhead in bandwidth and latency that \meek has over plain Tor.
+in order to measure the overhead in bandwidth and latency that \meek\ has over plain Tor.
 We have done informal tests, such as browsing YouTube,
 but have not yet put numbers to our measurements.
 
