@@ -760,12 +760,12 @@ because of the distinctive ciphersuite list it used at that time~\cite{bug4744}.
 
 Figure~\ref{fig:ciphersuites} shows examples of how TLS client
 implementations may differ.
-Figure~\ref{fig:ciphersuites:golang} is from the Go programming languages
-built-in net/http library~\cite{golang-net/http},
-which has a custom TLS implementation;
-it is how \meekclient\ would appear with no TLS camouflage.
-It is unlike Figures~\ref{fig:ciphersuites:firefox} and~\ref{fig:ciphersuites:chrome},
-which are browsers; the browsers are also unlike each other.
+\meekclient\ is written in the Go programming language,
+which has a custom TLS library~\cite{golang-crypto/tls};
+Figure~\ref{fig:ciphersuites:golang}
+shows how it would appear with no TLS camouflage.
+Figures~\ref{fig:ciphersuites:firefox} and~\ref{fig:ciphersuites:chrome},
+which are browsers, are different; the browsers are also unlike each other.
 A censor could block an uncamouflaged \meek using Go's fingerprint,
 if it considered the collateral damage resulting from blocking other Go programs to be slight enough.
 
@@ -1075,8 +1075,8 @@ It is unique among the the services we tested in that
 it is the only one that appears to enforce the SNI:
 if the SNI and Host do not match,
 the Fastly edge server returns an HTTP 400 error.
-It is thus the only service we have found
-for which the ``domainless'' fronting style is required.
+It is the only service we have found
+that requires the ``domainless'' fronting style.
 
 \section{Resistance to traffic analysis}
 \label{sec:trafficanalysis}
@@ -1103,7 +1103,7 @@ The issue of statistical traffic anaysis is a general one~\cite{trafficmorphing}
 and mostly orthogonal to \meek's main idea, domain fronting.
 It may be that the problem is
 best solved by a modular component not
-specifically designed for \meek.
+necessarily specifically designed for \meek.
 
 % Advantage is that we are probably proxying web traffic.
 As \meek is based on HTTPS,
@@ -1116,7 +1116,8 @@ with a firewall in place so that no extraneous traffic was included.
 The used \meek in Tor Browser,
 with the browser camouflage described in Section~\ref{sec:browserextension},
 and Google App Engine as the intermediate web service.
-The \meek trace is 687~megabytes in all.
+The \meek trace is 687~megabytes in all
+and covers about 4.5 hours of network activity.
 Our representative of ordinary HTTPS traffic
 is a sanitized trace of 10 minutes of HTTPS traffic
 % anon
