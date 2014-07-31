@@ -1134,34 +1134,6 @@ replaced by a counter before we received the trace.
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{datalen.pdf}
-\caption{
-Comparison of TCP payload length distributions
-between ordinary HTTPS connections to Google services
-from the LBL traffic trace,
-and \meek\ running on App Engine, fronted through www.google.com.
-% The histogram's bin width is 5~bytes.
-}
-\label{fig:datalen}
-\end{figure}
-
-\subsection{Packet length}
-Figure~\ref{fig:datalen}
-compares the packet length distribution of both traces in both directions.
-Table~\ref{tab:datalen} summarizes the most common values.
-In both traces, about 38\% of packets have an empty payload, mostly ACKs.
-There is a small peak at the usual TCP Maximum Segment Size
-of 1460 bytes.
-The concentration of values near 1418 bytes
-may be caused by Google servers' sizing of TLS records so they fit within TCP segments.
-% https://github.com/joyent/node/issues/6889
-% http://mailman.nginx.org/pipermail/nginx-devel/2013-December/004703.html
-Conspicuous in the \meek\ trace are a small number of
-likely packet sizes,
-and the lack of a cluster of small payload lengths of around 50 bytes.
-Both of these characteristics are probably artifacts
-of Tor's fixed cell size and the nearly fixed-size HTTP headers
-added by \meekclient\ and \meekserver.
-
 % Output of datalen.R.
 %
 % LBL
@@ -1175,9 +1147,6 @@ added by \meekclient\ and \meekserver.
 % 0.405280243 0.376703906 0.071561089 0.019905460 0.018484996 0.014868083
 %         811         783         151        1263
 % 0.012312668 0.007811963 0.007031241 0.006569205
-\begin{table}[ht]
-\normalsize
-\centering
 \begin{tabular}{r r >{\qquad} r r}
 \multicolumn{2}{c}{LBL Google HTTPS} & \multicolumn{2}{>{\qquad}c}{\meek\ on App Engine} \\
 0 bytes & 37.6\% & 1418 bytes & 40.5\% \\
@@ -1187,9 +1156,32 @@ added by \meekclient\ and \meekserver.
 1416 bytes & 3.1\% & 196 bytes & 1.8\% \\
 1460 bytes & 2.9\% & 1024 bytes & 1.5\%
 \end{tabular}
-\caption{The most common TCP payload lengths.}
-\label{tab:datalen}
-\end{table}
+\caption{
+Comparison of TCP payload length distributions
+between ordinary HTTPS connections to Google services
+from the LBL traffic trace,
+and \meek\ running on App Engine, fronted through www.google.com.
+% The histogram's bin width is 5~bytes.
+}
+\label{fig:datalen}
+\end{figure}
+
+\subsection{Packet length}
+Figure~\ref{fig:datalen}
+compares the packet length distribution of both traces in both directions.
+In both traces, about 38\% of packets have an empty payload, mostly ACKs.
+There is a small peak at the usual TCP Maximum Segment Size
+of 1460 bytes.
+The concentration of values near 1418 bytes
+may be caused by Google servers' sizing of TLS records so they fit within TCP segments.
+% https://github.com/joyent/node/issues/6889
+% http://mailman.nginx.org/pipermail/nginx-devel/2013-December/004703.html
+Conspicuous in the \meek\ trace are a small number of
+likely packet sizes,
+and the lack of a cluster of small payload lengths of around 50 bytes.
+Both of these characteristics are probably artifacts
+of Tor's fixed cell size and the nearly fixed-size HTTP headers
+added by \meekclient\ and \meekserver.
 
 % David: I don't think the following paragraph is true.
 % Almost all the length>1400 packets are Google→client, not client→Google,
