@@ -1204,39 +1204,43 @@ added by \meekclient\ and \meekserver.
 % Additionally, the persistent connection itself can be an issue.
 % We thus investigated other related characteristics.
 
-\begin{figure}
-\centering
-\includegraphics[height=\linewidth, angle=270]{figs/connections-google.eps}
-\caption{Histogram of each user's connections in the 10-minute window}
-\label{fig:connections}
-\end{figure}
-%add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
-%(or a blank line to force the subfigure onto a new line)
-\begin{figure}
-\centering
-\includegraphics[width=\linewidth]{figs/conns.eps}
-\caption{Concurrent HTTPS connections over time. We measure the trace for the Tor Browser Bundle and Firefox/Chrome extensions.}
-\label{fig:conconns}
-\end{figure}
-
 \subsection{Concurrent connections}
-Figure ~\ref{fig:connections} shows how many HTTPS connections to Google user made
-during the 10-minute measurement window.
-There are 34,732 connections in total from 2,745 unique IPs. We observe that the majority of users have less than 
-50 connections to the Google frontend server, and most of the numbers concentrate on 1--10.
 
-% David: I think this needs to be justified. Leaving Gmail open all day is a common use case,
-% as is YouTube, as is finding +1 buttons and Google-source JavaScript on unrelated web sites.
-% This is not unexpected
-% because a typical pattern of using Google is using the Google search as a stepping stone for other websites.
+% Output of concurrent.R.
+% [1] 2745
+% [1] 2.610621
+% [1] 1
+% [1] 1.002148
 
-We measure the number of concurrent HTTPS connections during the automated browsing of Alexa
-top 500 sites using three platforms: Tor Browser Bundle, Safari + Firefox extension, and Safari + Chrome extension.
-Figure ~\ref{fig:conconns} shows the number over time. We can see that most of the time
-the browser has one HTTPS connection to Google. Sometimes the browser may have more than one connection
-due to background activities such as statistics reporting. In all cases the number of connections is always 
-less than 5. We can conclude that the number of concurrent connections does not show distinct characteristics, as 
-a small number of connections can be considered as a normal behavior.
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{concurrent.pdf}
+\caption{
+Number of simultaneous HTTPS connections to any Google server.
+Each pale line indicates the number of HTTPS connections
+of a single client IP address.
+The LBL trace shows 2,745 unique clients and the meek trace only one.
+The dark line is a smoothed average number of connections per client.
+The meek count stays close to~1 throughout, only momentarily
+jumping to 0 or~2.
+The average number of connections per user in the LBL trace is 2.61,
+and in the meek trace is 1.002.
+}
+\label{fig:concurrent}
+\end{figure}
+
+The number of concurrent connections is another potential distinguisher.
+We have seen how meek tends to use one long-lived connection
+through which it tunnels all its requests.
+Figure~\ref{fig:concurrent} compares the number of concurrent HTTPS connections to
+Google per client in both traces.
+The number of connections in the LBL trace is variable,
+with some hosts briefly spiking up above 50 connections,
+but the average case if very heavily skewed to smaller numbers.
+The average number of connections in the LBL trace is 2.61,
+while that in the meek trace is almost exactly 1, only briefly
+deviating when one connection ends and another begins.
+We conclude that a small number of concurrent connections is unremarkable.
 
 \subsection{Connection lifetime}
 
