@@ -1393,13 +1393,30 @@ as a problem solved by Tor, which we don't need to solve separately.
 Tor's extra proxy hops mean that the HTTP reflector (App Engine)
 and the entry bridge do not have to be trusted.
 
+A censor could attack domain fronting by
+going directly to the operators of the intermediate web service
+and asking them either to break fronting
+(i.e., require SNI to be present and SNI and Host header to agree),
+or merely to get rid of their customers who are
+engaged in fronting in the support of circumvention.
+The censor could threaten to block the web service entirely otherwise.
+Whether the attack will succeed depends on the censor's
+and the web service's specific motivations,
+so we cannot make any general statements.
+It is ultimately a question of who needs whom more:
+whether it hurts the web service or the censor more
+when a web service is blocked.
+Nothing works against a censor with sufficiently high tolerance for
+collateral damage,
+but we also don't have to defeat the world's
+most powerful censor in order to be successful.
+What doesn't work in one place may work in another.
+
 % Edge servers within the censored region.
 % Censor could block on the way to the origin server,
 % if the censor has visibility to it.
 % Maybe the CDN has its own private high-speed cables,
 % or it VPNs its own stuff or something.
-
-% Censor could lean on the CDN to block the actual destination internally.
 
 % Firefox plugin uses normal browser trust store.
 % Adversary controls CAs. Can MITM and read your tag and block you.
@@ -1412,6 +1429,25 @@ and the entry bridge do not have to be trusted.
 % "Censorship implies surveillance"
 
 % Prevalence of no SNI.
+
+The key idea of meek is domain fronting,
+but its HTTPS tunnel has independent utility.
+Another idea for deployment is to use
+thousands of simple HTTP reflectors on cheap web hosting
+(in place of domain fronting on a big CDN).
+The request-reflecting role of a CDN could
+be played by a PHP script, for example,
+or a special web server configuration.
+Their URLs unprotected by domain fronting,
+each reflector would be easily blockable,
+so there would need to be sufficiently many that
+a censor could not block them all.
+This deployment model is essentially the same as with
+ordinary Tor bridges: have lots of volunteer-operated bridges
+and make it hard to enumerate them all.
+The advantage that an HTTP transport would have
+is that it is easier for a volunteer to upload a PHP file to a web host
+than to set up and maintain a Tor bridge.
 
 \section{Deployment}
 \label{sec:deployment}
@@ -1489,18 +1525,6 @@ but the user's traffic patterns are no longer visible to the operators of a publ
 % Outgoing HTTP requests include app id? As good as an IP address.
 
 % Dreamhost? Other HTTPS webhosts with PHP bridge?
-
-The code that runs on App Engine is very simple.
-It just statelessly copies HTTP requests and responses.
-Another possible deployment scenario uses a PHP implementation of the reflector,
-deployed on an ordinary web hosting service other than App Engine.
-In this scenario, domain fronting is not used;
-instead unblockability depends on there being many (individually blockable) PHP reflectors.
-In other words, it is roughly the same situation as exists today with Tor bridges,
-except that it can be much easier for a volunteer to upload a PHP file to a web host
-than to set up Tor bridge.
-Such PHP bridges could potentially automatically report their own URLs,
-which could be distributed using a system like BridgeDB.
 
 % Psiphon idea: use long-polling for downstream data.
 % Works with CDNs, not with App Engine.
