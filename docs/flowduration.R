@@ -3,11 +3,26 @@ library(ggplot2)
 #fields           ts         uid       id.orig_h    id.orig_p    id.resp_h    id.resp_p    proto     service    duration    orig_bytes    resp_bytes    conn_state    local_orig    missed_bytes    history      orig_pkts    orig_ip_bytes    resp_pkts    resp_ip_bytes    tunnel_parents
 bro.names <-   c("ts",      "uid",    "id.orig_h", "id.orig_p", "id.resp_h", "id.resp_p", "proto",  "service", "duration", "orig_bytes", "resp_bytes", "conn_state", "local_orig", "missed_bytes", "history",   "orig_pkts", "orig_ip_bytes", "resp_pkts", "resp_ip_bytes", "tunnel_parents")
 #types            time       string    addr         port         addr         port         enum      string     interval    count         count         string        bool          count           string       count        count            count        count            table[string]
-bro.classes <- c("numeric", "factor", "factor",    "factor",    "factor",    "factor",    "factor", "factor",  "numeric",  "integer",    "integer",    "factor",     "logical",    "integer",      "character", "integer",   "integer",       "integer",   "integer",       "character")
+bro.classes <- c("numeric", "factor", "character", "integer",   "character", "integer",   "factor", "factor",  "numeric",  "integer",    "integer",    "factor",     "logical",    "integer",      "character", "integer",   "integer",       "integer",   "integer",       "character")
 
 x <- cbind(read.table("../traces/lbl.https.goog.dpriv.conn.log", col.names=bro.names, colClasses=bro.classes, na.strings=c("-")), google=T, source="lbl")
 x <- rbind(x, cbind(read.table("../traces/lbl.https.non-goog.dpriv.conn.log", col.names=bro.names, colClasses=bro.classes, na.strings=c("-")), google=F, source="lbl"))
 x <- rbind(x, cbind(subset(read.table("../traces/meek_tbb_extension_tcp.pcap.conn.log", col.names=bro.names, colClasses=bro.classes, na.strings=c("-")), id.resp_p==443), google=T, source="tbb"))
+
+# Some RSTOS0 have duration==0, not sure what that's about.
+x <- x[!is.na(x$duration), ]
+# Flip connections that Bro got backwards because they
+# started before the beginning of the trace.
+for (i in 1:nrow(x)) {
+	if (x[i,"id.resp_p"] != 443) {
+		t <- x[i,"id.resp_p"];
+		x[i,"id.resp_p"] <- x[i,"id.orig_p"];
+		x[i,"id.orig_p"] <- t;
+		t <- x[i,"id.resp_h"];
+		x[i,"id.resp_h"] <- x[i,"id.orig_h"];
+		x[i,"id.orig_h"] <- t;
+	}
+}
 
 # Read some values off the LBL graph.
 print(sprintf("%.1f%%", 100*ecdf(x[x$google & x$source=="lbl", ]$duration)(c(24, 300, 600))))
