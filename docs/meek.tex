@@ -732,6 +732,8 @@ notably Google App Engine doesn't support streaming downloads of this kind.
 As discussed in Section~\ref{sec:trafficanalysis},
 the same TLS session is used for many requests,
 so the overhead of the TLS handshake is amortized.
+Tor uses fixed-size cells of 514 bytes~\cite[Section~0.2]{tor-spec}.
+% 514 → 543 → 957 → 1079
 
 \section{Camouflage for the TLS layer}
 \label{sec:browserextension}
@@ -1185,6 +1187,8 @@ and the lack of a cluster of small payload lengths of around 50 bytes.
 Both of these characteristics are probably artifacts
 of Tor's fixed cell size and the nearly fixed-size HTTP headers
 added by \meekclient\ and \meekserver.
+% In this trace, packets of 1024 bytes are probably single
+% Tor cells and those of 396 are probably empty polling requests.
 
 % David: I don't think the following paragraph is true.
 % Almost all the length>1400 packets are Google→client, not client→Google,
