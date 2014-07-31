@@ -1167,9 +1167,13 @@ and \meek\ running on App Engine, fronted through www.google.com.
 \end{figure}
 
 \subsection{Packet length}
+
+Protocols vary in their packet lengths;
+a censor may block a circumvention protocol if its length distribution
+is distinct enough.
 Figure~\ref{fig:datalen}
-compares the packet length distribution of both traces in both directions.
-In both traces, about 38\% of packets have an empty payload, mostly ACKs.
+compares the packet length distribution of both sample traffic traces in both directions.
+In both cases, about 38\% of packets have an empty payload, mostly ACKs.
 There is a small peak at the usual TCP Maximum Segment Size
 of 1460 bytes.
 The concentration of values near 1418 bytes
@@ -1177,7 +1181,7 @@ may be caused by Google servers' sizing of TLS records so they fit within TCP se
 % https://github.com/joyent/node/issues/6889
 % http://mailman.nginx.org/pipermail/nginx-devel/2013-December/004703.html
 Conspicuous in the \meek\ trace are a small number of
-likely packet sizes,
+frequent packet sizes,
 and the lack of a cluster of small payload lengths of around 50 bytes.
 Both of these characteristics are probably artifacts
 of Tor's fixed cell size and the nearly fixed-size HTTP headers
