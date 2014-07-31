@@ -26,8 +26,8 @@ binwidth = 5
 x <- cbind(x, label=ifelse(x$source=="lbl", "LBL Google HTTPS", "meek on App Engine"))
 
 p <- ggplot(x[x$google, ], aes(datalen))
-p <- p + geom_histogram(aes(y=..density..), binwidth=binwidth)
-p <- p + xlab("TCP payload length") + ylab("Fraction of TCP segments")
 p <- p + scale_y_continuous(labels = function(y) binwidth * y)
+p <- p + xlab("TCP payload length") + ylab("Fraction of TCP segments")
 p <- p + facet_wrap(~ label, ncol=1, scales="fixed")
+p <- p + geom_histogram(aes(y=..density..), binwidth=binwidth)
 ggsave("datalen.pdf", width=4, height=3.75, units="in")
