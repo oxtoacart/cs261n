@@ -582,9 +582,6 @@ The components of the system are shown in Figure~\ref{fig:architecture}.
 The parts that are new in \meek
 are the programs \meekclient\ and \meekserver,
 which are the pluggable-transports~\cite{pt} interface between Tor and \meek.
-% All the programs are free software, naturally,
-% and may be downloaded from the \meek\ home page at
-% \url{https://trac.torproject.org/projects/tor/wiki/doc/meek}.
 
 \meekclient\ is essentially a web client that knows how to front HTTPS requests.
 When \meekclient\ receives data from a client Tor process, it bundles it up into a POST request
@@ -1168,7 +1165,7 @@ and \meek\ running on App Engine, fronted through www.google.com.
 \label{fig:datalen}
 \end{figure}
 
-\subsection{Packet length}
+\subsection{Packet lengths}
 
 Protocols vary in their packet lengths;
 a censor may block a circumvention protocol if its length distribution
@@ -1440,10 +1437,8 @@ then fronting will still work.
 % can require people to run their own proxies à la GoAgent.
 % "Censorship implies surveillance"
 
-% Prevalence of no SNI.
-
 The key idea of meek is domain fronting,
-but its HTTPS tunnel has independent utility.
+but its HTTP-tunneling ability is useful on its own.
 Another idea for deployment is to use
 thousands of simple HTTP reflectors on cheap web hosting
 (in place of domain fronting on a big CDN).
@@ -1460,6 +1455,37 @@ and make it hard to enumerate them all.
 The advantage that an HTTP transport would have
 is that it is easier for a volunteer to upload a PHP file to a web host
 than to set up and maintain a Tor bridge.
+
+The ``domainless'' fronting style, which omits SNI,
+is useful when there is no good front domain known for a web service.
+At least one CDN, Fastly, requires the domainless style.
+All current web browsers support SNI,
+so it is possible that lack of SNI could be used as a distinguisher.
+According to our communication with
+a representative of the International Computer Science Institute's
+certificate notary~\cite{icsi-notary},
+which observes on the order of 50~million TLS connections daily,
+83.5\% of connections used SNI in June~2014.
+There are apparently enough connections without SNI
+that a censor will at least have to consider seriously
+the costs and benefits before deciding to block SNI outright.
+
+The deployment we envision and have started to implement
+uses a single paid App Engine instance, which is publicly known and usable by anyone.
+Client software is configured to use this public instance by default.
+A preconfigured public instance has great usability advantages
+because there is nothing for the user to upload and nothing to configure.
+The number of parties able to analyze users' traffic patterns is somewhat increased:
+the path from user to Tor bridge now includes App Engine and the web app operators,
+in addition to the ISP and intermediate routers that were there before.
+On the other hand, the Tor bridge no longer gets to see users' IP addresses:
+all it sees are many connections from App Engine.
+
+Users are also free to upload their own personal copy of the App Engine code, as is done with GoAgent.
+App Engine imposes bandwidth quotas on unpaid apps, but they are high enough to allow daily web browsing.
+In this scenario, Google still has a privileged network position,
+but the user's traffic patterns are no longer visible to the operators of a public app instance.
+% Outgoing HTTP requests include app id? As good as an IP address.
 
 \section{Deployment}
 \label{sec:deployment}
@@ -1503,55 +1529,12 @@ of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
 % Different counting method. Client self-reporting of last connection date.
 
 We are running a paid instance of the web app on App Engine for use by the public.
-The cost for bandwidth on App Engine is \$0.12 per gigabyte,
-with one gigabyte free each day.
-The total cost has so far been \$1.11, with bills of
-\$0.09 in March,
-\$0.73 in April,
-and \$0.29 in the first half of May.
-
-\meek\ has a home page at
-\url{https://trac.torproject.org/projects/tor/wiki/doc/meek}.
-Our source code is in the Git repository at
-\url{https://git.torproject.org/pluggable-transports/meek.git}.
-As of version 0.5 (May~7, 2014), the source code consists of
-about 800 lines of Go for the client programs,
-400 lines for \meekserver, and
-100 lines for the reflector web app.
-Each of the browser extensions
-(one for Firefox, one for Chrome)
-is about 300 lines of JavaScript.
-
-\subsection{Other deployment scenarios}
-\label{sec:otherdeployment}
-
-The deployment we envision and have started to implement
-uses a single paid App Engine instance, which is publicly known and usable by anyone.
-Client software is configured to use this public instance by default.
-A preconfigured public instance has great usability advantages
-because there is nothing for the user to upload and nothing to configure.
-The number of parties able to analyze users' traffic patterns is somewhat increased:
-the path from user to Tor bridge now includes App Engine and the web app operators,
-in addition to the ISP and intermediate routers that were there before.
-On the other hand, the Tor bridge no longer gets to see users' IP addresses:
-all it sees are many connections from App Engine.
-
-Users are also free to upload their own personal copy of the App Engine code, as is done with GoAgent.
-App Engine imposes bandwidth quotas on unpaid apps, but they are high enough to allow daily web browsing.
-In this scenario, Google still has a privileged network position,
-but the user's traffic patterns are no longer visible to the operators of a public app instance.
-% Outgoing HTTP requests include app id? As good as an IP address.
-
-% Dreamhost? Other HTTPS webhosts with PHP bridge?
-
-% Psiphon idea: use long-polling for downstream data.
-% Works with CDNs, not with App Engine.
-% Alternative techniques for push-like behavior,
-% such as HTTP long polling,
-% don't work well with App Engine,
-% because App Engine requires requests to finish within 60 seconds.
-
-% App Engine works when appspot.com is blocked but google.com is not.
+% The cost for bandwidth on App Engine is \$0.12 per gigabyte,
+% with one gigabyte free each day.
+% The total cost has so far been \$1.11, with bills of
+% \$0.09 in March,
+% \$0.73 in April,
+% and \$0.29 in the first half of May.
 
 \section{Future work}
 \label{sec:futurework}
@@ -1593,6 +1576,34 @@ We have done informal tests, such as browsing YouTube,
 but have not yet put numbers to our measurements.
 
 % Load balancing
+
+\section{Summary}
+\label{sec:summary}
+
+We have presented domain fronting,
+an HTTPS technique that uses different domain names
+at different communication layers in
+order to hide the remote endpoint of a communication.
+We implemented meek,
+a pluggable transport for Tor,
+show that it resists common methods of blocking,
+and begin an investigation into its
+resistance against more subtle and expensive means of traffic analysis.
+We discuss the results of an initial deployment of meek
+in both Tor and Psiphon.
+
+\meek\ has a home page at
+\url{https://trac.torproject.org/projects/tor/wiki/doc/meek}.
+Our source code is in the Git repository at
+\url{https://git.torproject.org/pluggable-transports/meek.git}.
+All our programs are free software.
+% As of version 0.9 (June~19, 2014), the source code consists of
+% about 1,100 lines of Go for the client programs,
+% 400 lines for \meekserver, and
+% 100 lines for the reflector application for App Engine.
+% Each of the browser extensions
+% (one for Firefox, one for Chrome)
+% is about 400 lines of JavaScript.
 
 % \section*{Acknowledgments}
 
