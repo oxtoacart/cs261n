@@ -17,25 +17,25 @@ x <- x[!is.na(x$duration), ]
 calc.numconns <- function(x) {
 	n <- nrow(x)
 	ts <- numeric(2*n)
-	srcdst <- character(2*n)
+	orig_h <- character(2*n)
 	dconns <- integer(2*n)
 	for (i in 1:n) {
 		# Connection begin
 		ts[2*(i-1) + 1] <- x$ts[i]
-		srcdst[2*(i-1) + 1] <- sprintf("%s-%s", x$id.orig_h[i], x$id.resp_h[i])
+		orig_h[2*(i-1) + 1] <- x$id.orig_h[i]
 		dconns[2*(i-1) + 1] <- +1
 		# Connection end
 		ts[2*(i-1) + 2] <- x$ts[i] + x$duration[i]
-		srcdst[2*(i-1) + 2] <- sprintf("%s-%s", x$id.orig_h[i], x$id.resp_h[i])
+		orig_h[2*(i-1) + 2] <- x$id.orig_h[i]
 		dconns[2*(i-1) + 2] <- -1
 	}
-	y <- data.frame(ts, srcdst, dconns, scale=length(unique(x$id.orig_h)))
-	y$srcdst <- factor(y$srcdst)
+	y <- data.frame(ts, orig_h, dconns, scale=length(unique(x$id.orig_h)))
+	y$orig_h <- factor(y$orig_h)
 	y <- y[order(y$ts), ]
 	y$ts <- y$ts - min(y$ts)
 	y$weight <- c(diff(y$ts), 0)
 	# https://stackoverflow.com/questions/7409138/combining-split-and-cumsum/7409310#7409310
-	y$numconns <- with(y, ave(dconns, srcdst, FUN=cumsum))
+	y$numconns <- with(y, ave(dconns, orig_h, FUN=cumsum))
 	y
 }
 
@@ -59,7 +59,7 @@ p <- ggplot(data=data)
 p <- p + scale_y_continuous(breaks=calc.breaks)
 p <- p + xlab("Time (seconds)") + ylab("Concurrent connections")
 p <- p + facet_wrap(~ label, ncol=1, scales="free")
-p <- p + geom_step(aes(ts, numconns, group=srcdst, alpha=data$alpha, colour="coral"))
+p <- p + geom_step(aes(ts, numconns, group=orig_h, alpha=data$alpha, colour="coral"))
 p <- p + geom_smooth(aes(ts, cumsum(dconns)/scale, weight=weight), size=0.4, colour="black", se=FALSE)
 p <- p + theme(axis.text=element_text(size=7), axis.title=element_text(size=8))
 p <- p + theme(legend.position="none")
