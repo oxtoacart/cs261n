@@ -1089,9 +1089,7 @@ forms of blocking, namely IP address and DNS blocking,
 simple pattern-based DPI,
 and active probing.
 We hope that the censor will have to resort to measuring
-more subtle features of the communication like
-the packet length distribution and interpacket timing,
-or injecting traffic at the risk of causing collateral damage.
+more subtle features of the communication.
 In this section we provide a preliminary analysis
 of \meek's resistance to such attacks.
 Specifically, we consider three traffic features:
@@ -1317,13 +1315,28 @@ while that in the meek trace is almost exactly 1, only briefly
 deviating when one connection ends and another begins.
 We conclude that a small number of concurrent connections is unremarkable.
 
-\subsection{Conclusion} So far we do not find any obvious traffic characteristics that can be useful for
-distinguishing \meek's traffic. But admittedly there two potential weaknesses: long-lived connections 
-with bulk data transfer, and deviated distribution of packet sizes. To fundamentally fix these weaknesses 
-we need to transform to the traffic into the normal-looking traffic. The problem is inherently difficult, because we need to know \emph{what} is normal traffic, i.e. what is the model of normal traffic, which is an open problem. However, 
-the arm-race game is symmetric; since finding a right model is a difficult task for us, it is also difficult for 
-the censor. Therefore, the censor can only find ad-hoc features to block forbidden traffic, which are relatively 
-easy to defend against. 
+$$\diamondsuit$$
+
+So far we do not find any obvious traffic characteristics that can be useful to reliably distinguish meek
+from other HTTPS traffic.
+The long-lived connections and few common packet sizes are
+potential targets for a more concerted attack.
+The fundamental problem we face is essentially that of steganography,
+the need to make our traffic fit some model of ``normal'' traffic.
+The problem is inherently difficult,
+because it's difficult to say just what normal traffic \emph{is}.
+It depends on the network environment;
+it also depends on the endpoint.
+Google is likely to be different than Akamai,
+and it's hard to characterize what normal use of a CDN is:
+they provide access to ordinary web sites,
+but also video streams and software updates,
+and not all clients are browsers.
+The difficulty is symmetric;
+if finding the right model is difficult task for us,
+it is also difficult for the censor.
+We have seen that censors prefer to use easy classifiers when they exist.
+By removing the easy ways, we increase the cost to the censor.
 
 \section{Discussion}
 \label{sec:discussion}
