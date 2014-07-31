@@ -66,6 +66,14 @@ calc.breaks <- function(v) {
 	}
 }
 
+data <- x[x$google & x$source=="lbl", ]
+length(unique(data$id.orig_h))
+sum(data$duration)/(max(data$ts + data$duration) - min(data$ts))/length(unique(data$id.orig_h))
+
+data <- x[x$google & x$source=="tbb", ]
+length(unique(data$id.orig_h))
+sum(data$duration)/(max(data$ts + data$duration) - min(data$ts))/length(unique(data$id.orig_h))
+
 data <- numconns[numconns$google, ]
 p <- ggplot(data=data)
 p <- p + scale_y_continuous(breaks=calc.breaks)
