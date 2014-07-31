@@ -1412,11 +1412,19 @@ but we also don't have to defeat the world's
 most powerful censor in order to be successful.
 What doesn't work in one place may work in another.
 
-% Edge servers within the censored region.
-% Censor could block on the way to the origin server,
-% if the censor has visibility to it.
-% Maybe the CDN has its own private high-speed cables,
-% or it VPNs its own stuff or something.
+We have assumed that the intermediate web service is
+outside the censor's domain of control,
+so that communication between the web service and Tor bridge
+doesn't have to be protected.
+What happens when the web service---a CDN edge server, for instance---is
+inside the network controlled by the censor?
+If the edge server forwards the request to the Tor bridge
+as an ordinary HTTP request on the public Internet,
+then blocking it is as easy as blocking the IP address of the bridge.
+On the other hand, if the web service encapsulates
+the request and sends it encrypted, or over its own fast private network,
+to another server outside of the censor's control,
+then fronting will still work.
 
 % Firefox plugin uses normal browser trust store.
 % Adversary controls CAs. Can MITM and read your tag and block you.
