@@ -1401,6 +1401,55 @@ it is also difficult for the censor.
 We have seen that censors prefer to use easy classifiers when they exist.
 By removing the easy ways, we increase the cost to the censor.
 
+\section{Deployment}
+\label{sec:deployment}
+
+We implemented \meek\ as a Tor pluggable transport~\cite{pt}
+and built experimental releases of the Tor Browser Bundle featuring \meek.
+The browser bundle includes Tor and a version of Firefox
+called Tor Browser that is patched to defend against application-layer identity leaks.
+Users need to download and run the bundle and select \meek\ from the list of transports,
+and then a browser window appears,
+configured to use \meek\ for circumvention and Tor for anonymity.
+We announced our prototype bundles on Tor development mailing lists,
+and from there they were picked up by Tor Weekly News on the Tor blog.
+
+\begin{figure}
+\includegraphics[width=\linewidth]{clients-meek}
+\caption{
+Concurrent users of \meek\ with Tor.
+}
+\label{fig:clients}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=\linewidth]{clients-psiphon3}
+\caption{
+Daily unique users of \meek\ with Psiphon (note vertical axis).
+The decrease at the end of June
+was caused by an unblocking event that made meek unnecessary for some users.
+}
+\label{fig:clients}
+\end{figure}
+
+Figure~\ref{fig:clients} shows the average number of concurrent users of \meek\ with Tor
+since close to the beginning of development,
+as reported by the Tor Metrics Portal~\cite{metrics-meek}.
+The number of users is estimated by counting the number
+of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
+% The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by \meek.
+
+% Psiphon. Drop in July is due to an unblocking event.
+% Different counting method. Client self-reporting of last connection date.
+
+We are running a paid instance of the web app on App Engine for use by the public.
+% The cost for bandwidth on App Engine is \$0.12 per gigabyte,
+% with one gigabyte free each day.
+% The total cost has so far been \$1.11, with bills of
+% \$0.09 in March,
+% \$0.73 in April,
+% and \$0.29 in the first half of May.
+
 \section{Discussion}
 \label{sec:discussion}
 
@@ -1598,55 +1647,6 @@ App Engine imposes bandwidth quotas on unpaid apps, but they are high enough to 
 In this scenario, Google still has a privileged network position,
 but the user's traffic patterns are no longer visible to the operators of a public app instance.
 % Outgoing HTTP requests include app id? As good as an IP address.
-
-\section{Deployment}
-\label{sec:deployment}
-
-We implemented \meek\ as a Tor pluggable transport~\cite{pt}
-and built experimental releases of the Tor Browser Bundle featuring \meek.
-The browser bundle includes Tor and a version of Firefox
-called Tor Browser that is patched to defend against application-layer identity leaks.
-Users need to download and run the bundle and select \meek\ from the list of transports,
-and then a browser window appears,
-configured to use \meek\ for circumvention and Tor for anonymity.
-We announced our prototype bundles on Tor development mailing lists,
-and from there they were picked up by Tor Weekly News on the Tor blog.
-
-\begin{figure}
-\includegraphics[width=\linewidth]{clients-meek}
-\caption{
-Concurrent users of \meek\ with Tor.
-}
-\label{fig:clients}
-\end{figure}
-
-\begin{figure}
-\includegraphics[width=\linewidth]{clients-psiphon3}
-\caption{
-Daily unique users of \meek\ with Psiphon (note vertical axis).
-The decrease at the end of June
-was caused by an unblocking event that made meek unnecessary for some users.
-}
-\label{fig:clients}
-\end{figure}
-
-Figure~\ref{fig:clients} shows the average number of concurrent users of \meek\ with Tor
-since close to the beginning of development,
-as reported by the Tor Metrics Portal~\cite{metrics-meek}.
-The number of users is estimated by counting the number
-of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
-% The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by \meek.
-
-% Psiphon. Drop in July is due to an unblocking event.
-% Different counting method. Client self-reporting of last connection date.
-
-We are running a paid instance of the web app on App Engine for use by the public.
-% The cost for bandwidth on App Engine is \$0.12 per gigabyte,
-% with one gigabyte free each day.
-% The total cost has so far been \$1.11, with bills of
-% \$0.09 in March,
-% \$0.73 in April,
-% and \$0.29 in the first half of May.
 
 \section{Summary}
 \label{sec:summary}
