@@ -1044,16 +1044,16 @@ some unsuspecting third part has just had their web site blocked.
 A solution may be to round-robin through
 a pool of domain names;
 or to use ``domainless'' fronting that doesn't send SNI.
-Though CloudFlare supports domain fronting,
-its terms of service~\cite{cloudflare-terms}
-seem to prohibit the kind of tunneled proxying that \meek\ does:
-\begin{quote}
-\textsc{Section 10: Limitation on non-HTML caching}\\
-You acknowledge that CloudFlare's Service is offered as a platform to cache and
-serve web pages and websites and is not offered for other purposes
-\ldots\ you understand and agree to use the Service solely
-for the purpose of hosting and serving web pages\ldots
-\end{quote}
+% Though CloudFlare supports domain fronting,
+% its terms of service~\cite{cloudflare-terms}
+% seem to prohibit the kind of tunneled proxying that \meek\ does:
+% \begin{quote}
+% \textsc{Section 10: Limitation on non-HTML caching}\\
+% You acknowledge that CloudFlare's Service is offered as a platform to cache and
+% serve web pages and websites and is not offered for other purposes
+% \ldots\ you understand and agree to use the Service solely
+% for the purpose of hosting and serving web pages\ldots
+% \end{quote}
 
 Akamai (\url{http://www.akamai.com/}) is a large CDN.
 Requests may be fronted through the special domain
