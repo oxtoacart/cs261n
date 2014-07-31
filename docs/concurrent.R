@@ -69,7 +69,7 @@ calc.breaks <- function(v) {
 data <- numconns[numconns$google, ]
 p <- ggplot(data=data)
 p <- p + scale_y_continuous(breaks=calc.breaks)
-p <- p + xlab("Time (seconds)") + ylab("Concurrent connections")
+p <- p + xlab("Time (seconds)") + ylab("Concurrent HTTPS connections per client")
 p <- p + facet_wrap(~ label, ncol=1, scales="free")
 p <- p + geom_step(aes(ts, numconns, group=orig_h, alpha=data$alpha, colour="coral"))
 p <- p + geom_smooth(aes(ts, cumsum(dconns)/scale, weight=weight), size=0.4, colour="black", se=FALSE)
