@@ -1446,15 +1446,51 @@ but popular destinations by definition tend to be visited a lot.
 % Possible countermeasure is traffic fingerprinting resistance
 % like what mjuarez is working on, mostly orthogonal to circumvention.
 
-We implemented \meek\ as a pluggable transport~\cite{pt} for Tor.
-Although it is possible to use the system with proxies other than Tor,
-using Tor has some attractive features.
-The pluggable transports infrastructure makes it relatively easy to prototype
-a circumvention technique and connect it to a global proxy network.
-We can treat confidentiality and integrity of tunneled communication
-as a problem solved by Tor, which we don't need to solve separately.
-Tor's extra proxy hops mean that the HTTP reflector (App Engine)
-and the entry bridge do not have to be trusted.
+% We implemented \meek\ as a pluggable transport~\cite{pt} for Tor.
+% Although it is possible to use the system with proxies other than Tor,
+% using Tor has some attractive features.
+% The pluggable transports infrastructure makes it relatively easy to prototype
+% a circumvention technique and connect it to a global proxy network.
+% We can treat confidentiality and integrity of tunneled communication
+% as a problem solved by Tor, which we don't need to solve separately.
+% Tor's extra proxy hops mean that the HTTP reflector (App Engine)
+% and the entry bridge do not have to be trusted.
+
+\begin{figure}
+\centering
+\begin{subfigure}[t]{0.40\linewidth}
+\includegraphics[width=\linewidth]{wire-sequential}
+\caption{Sequential}
+\label{fig:wire-sequential}
+\end{subfigure}
+\qquad
+\begin{subfigure}[t]{0.40\linewidth}
+\includegraphics[width=\linewidth]{wire-parallel}
+\caption{Parallel}
+\label{fig:wire-parallel}
+\end{subfigure}
+
+\caption{
+The nature of potential performance gain
+from sending fronted requests in parallel.
+}
+\label{fig:wire}
+\end{figure}
+
+The current implementation of meek strictly serializes
+its HTTPS requests and responses,
+in order to keep the chunks of the underlying TCP stream
+in the proper order.
+The unfortunate side effect of this simple approach
+is delay that gets worse with higher round-trip times.
+In future work we plan to add an additional reliability layer,
+perhaps like the system of sequence numbers and acknowledgments used in OSS~\cite{oss},
+that would allow requests to be pipelined
+and cope with out-of-order delivery.
+Figure~\ref{fig:wire-sequential} shows the current implementation,
+and Figure~\ref{fig:wire-parallel} shows the nature of performance
+improvement that could be gained with a reliability layer.
+% Would be useful for Iran-like session cutoff, independent of \meek.
 
 A censor could attack domain fronting by
 going directly to the operators of the intermediate web service
@@ -1489,10 +1525,24 @@ the request and sends it encrypted, or over its own fast private network,
 to another server outside of the censor's control,
 then fronting will still work.
 
-% Firefox plugin uses normal browser trust store.
-% Adversary controls CAs. Can MITM and read your tag and block you.
-% Maybe not willing to risk getting caught in MITM.
-% Could conceivably send cover traffic if MITM detected, but blah.
+meek's use of HTTPS is subject to the usual public key infrastructure
+and trust model.
+The browser running the HTTPS camouflage extension (Section~\ref{sec:browserextension})
+has a standard list of trusted certificate authorities.
+A censor that controls a certificate authority trusted by the browser
+would be able to do a man-in-the-middle attack
+between the client and the intermediate web service,
+and detect fronting by decrypting HTTP requests and checking for specific Host headers.
+Such a censor would be able to detect circumvention,
+but still not read the client's plaintext because of the
+additional encryption and authentication of the tunneled Tor layer.
+It seems risky for the censor to risk being detected in
+ia man-in-the-middle attack merely to confirm that a user is circumventing,
+but it is not impossible for a sufficiently powerful censor.
+The problem doesn't exist when the front domain is one
+that happens have its public key ``pinned'' in the headless browser,
+for instance when using the Chrome extension and fronting through
+\urll{www.google.com}.
 
 % \meek\ apart from Tor.
 % more risk for the proxy operator
@@ -1597,47 +1647,6 @@ We are running a paid instance of the web app on App Engine for use by the publi
 % \$0.09 in March,
 % \$0.73 in April,
 % and \$0.29 in the first half of May.
-
-\section{Future work}
-\label{sec:futurework}
-
-In future work we would like to implement pipelining of requests,
-so that more than one HTTP request can be outstanding at a time.
-This would have better performance compared to the current system,
-which serializes requests and responses in order to keep the
-underlying TCP stream in order.
-A system of sequence numbers and acknowledgments as used in OSS~\cite{oss}
-could make this possible.
-% Would be useful for Iran-like session cutoff, independent of \meek.
-
-\begin{figure}
-\centering
-\begin{subfigure}[t]{0.40\linewidth}
-\includegraphics[width=\linewidth]{wire-sequential}
-\caption{Sequential}
-\label{fig:wire-sequential}
-\end{subfigure}
-\qquad
-\begin{subfigure}[t]{0.40\linewidth}
-\includegraphics[width=\linewidth]{wire-parallel}
-\caption{Parallel}
-\label{fig:wire-parallel}
-\end{subfigure}
-
-\caption{
-The nature of potential performance gain
-from sending fronted requests in parallel.
-}
-\label{fig:wire}
-\end{figure}
-
-% Performance measurements
-We would like to do more quantitative performance measurements,
-in order to measure the overhead in bandwidth and latency that \meek\ has over plain Tor.
-We have done informal tests, such as browsing YouTube,
-but have not yet put numbers to our measurements.
-
-% Load balancing
 
 \section{Summary}
 \label{sec:summary}
