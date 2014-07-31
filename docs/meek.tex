@@ -705,7 +705,7 @@ but has performance drawbacks because there is a full round-trip
 between every send.
 The performance drawbacks are not inherent to the design:
 it is domain fronting, not HTTP encoding, that is the fundamental strength of the system.
-Section~\ref{sec:futurework} describes more efficient encodings
+Section~\ref{sec:discussion} describes more efficient encodings
 that enable multiple requests in parallel.
 
 HTTP is fundamentally a request-based protocol.
@@ -728,12 +728,70 @@ it closes any response it has open to the client and starts a new response.
 This second technique doesn't work on all services:
 notably Google App Engine doesn't support streaming downloads of this kind.
 
-% Overhead estimate.
-As discussed in Section~\ref{sec:trafficanalysis},
-the same TLS session is used for many requests,
-so the overhead of the TLS handshake is amortized.
+As an encrypted tunneling protocol, meek adds some overhead.
+Each chunk of data gets an HTTP header, and then the HTTP
+request is wrapped in a TLS Application Data record.
+We estimate the overhead when meek is used to transport Tor.
 Tor uses fixed-size cells of 514 bytes~\cite[Section~0.2]{tor-spec}.
-% 514 → 543 → 957 → 1079
+Each cell is wrapped in a TLS Application Data record, which adds 29 bytes
+using a GCM ciphersuite.
+% (in Tor version~0.2.4.22 using a GCM ciphersuite).
+This 543-byte record is what is received by \meekclient,
+which adds an HTTP header whose length is about 400 bytes
+(varying slightly depending on the length of the Host field).
+The HTTP request goes into its own TLS Application Data record,
+which adds about 50~bytes
+(depending on how much padding is used by the ciphersuite selected by the web service).
+
+% 514 → 543 → 956 → 1013
+
+\begin{center}
+\begin{tabular}{r@{}r l}
+          &    514 & Tor cell \\
+          &  $+$29 & Tor TLS record \\
+$\approx$ & $+$400 & meek HTTP header \\
+$\approx$ &  $+$50 & meek TLS record \\
+\hline
+$\approx$ &   1000 & total
+\end{tabular}
+\end{center}
+
+% >>> (1*543+450.)/(1*543)
+% 1.828729281767956
+% >>> (2*543+450.)/(2*543)
+% 1.4143646408839778
+% >>> (3*543+450.)/(3*543)
+% 1.276243093922652
+\noindent
+The total overhead varies according to the length
+of the Host field and the specifics of the intermediate web service's TLS,
+but is somewhere in the neightborhood of $(543+450)/543-1\approx83$\%.
+This is the worst case, when Tor sends a single cell.
+Tor can bunch multiple cells into one transmission;
+if two cells are sent at once, the overhead drops to
+${\approx}41$\%; if three, it is ${\approx}28$\%.
+Bulk uploads and downloads tend to bunch many cells at once.
+Persistent HTTP connections as used by Psiphon reduce overhead further,
+because only one HTTP header is sent for a large number of transmissions.
+Empty polling requests also use bandwidth,
+but they are sent only when the connection is idle
+so they don't affect upload or download speed.
+As is discussed in Section~\ref{sec:trafficanalysis},
+\meekclient\ reuses the same TLS connection for many requests,
+so the fixed overhead of the initial TLS handshake is amortized.
+
+There is additional latency overhead caused by the extra network hop:
+rather than accessing the Tor bridge directly,
+the client first goes through the intermediate web service before
+reaching the bridge.
+How much latency this adds, of course depends on the network location
+of the client, web service, and Tor bridge.
+Strict serialization of requests and responses
+becomes a problem with large round-trip times,
+because bandwidth becomes a function of latency.
+Section~\ref{sec:discussion} describes ways to improve
+performance with high latencies;
+Psiphon's use of persistent connections as described in this section is one of them.
 
 \section{Camouflage for the TLS layer}
 \label{sec:browserextension}
