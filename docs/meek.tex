@@ -721,7 +721,6 @@ every so often the client sends a request with an empty payload
 if it has nothing else to send.
 The polling interval starts short (100~ms) and grows exponentially
 up to a maximum of 5~s.
-% Implemented in Psiphon's version.
 The other technique,
 implemented in Psiphon's version of \meek,
 uses long-lived persistent HTTP connections.
@@ -731,6 +730,11 @@ When the server receives a new request from the same client,
 it closes any response it has open to the client and starts a new response.
 This second technique doesn't work on all services:
 notably Google App Engine doesn't support streaming downloads of this kind.
+
+% Overhead estimate.
+As discussed in Section~\ref{sec:trafficanalysis},
+the same TLS session is used for many requests,
+so the overhead of the TLS handshake is amortized.
 
 \section{Camouflage for the TLS layer}
 \label{sec:browserextension}
@@ -1343,7 +1347,7 @@ By removing the easy ways, we increase the cost to the censor.
 
 % Censors that know no bounds: China on Google, Egypt, Pakistan with YouTube.
 
-Domain fronting shares a weakness with decoy routing,
+Domain fronting shares a potential weakness with decoy routing,
 which is that the overt and covert destinations lie on different
 network paths.
 The difference in paths may create side channels---latency measurements for instance---that
@@ -1472,13 +1476,19 @@ and from there they were picked up by Tor Weekly News on the Tor blog.
 
 \begin{figure}
 \includegraphics[width=\linewidth]{clients-meek}
-\caption{Concurrent users of \meek\ with Tor.}
+\caption{
+Concurrent users of \meek\ with Tor.
+}
 \label{fig:clients}
 \end{figure}
 
 \begin{figure}
 \includegraphics[width=\linewidth]{clients-psiphon3}
-\caption{Daily unique users of \meek\ with Psiphon3 (note vertical axis).}
+\caption{
+Daily unique users of \meek\ with Psiphon (note vertical axis).
+The decrease at the end of June
+was caused by an unblocking event that made meek unnecessary for some users.
+}
 \label{fig:clients}
 \end{figure}
 
