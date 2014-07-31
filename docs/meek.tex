@@ -1074,7 +1074,7 @@ Fastly (\url{http://www.fastly.com/}) is a CDN.
 It is unique among the the services we tested in that
 it is the only one that appears to enforce the SNI:
 if the SNI and Host do not match,
-the Fastly edge server returns an HTTP 400 error.
+the Fastly edge server returns an HTTP 400 (``Bad Request'') error.
 It is the only service we have found
 that requires the ``domainless'' fronting style.
 
