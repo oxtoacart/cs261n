@@ -75,6 +75,14 @@ data <- x[x$google & x$source=="tbb", ]
 length(unique(data$id.orig_h))
 sum(data$duration)/(max(data$ts + data$duration) - min(data$ts))/length(unique(data$id.orig_h))
 
+# Number of client IPs.
+numhosts <- length(unique(numconns[numconns$google & numconns$source=="lbl", ]$orig_h))
+# Number of client IPs that never had more than 2 connections.
+numfew <- numhosts - length(unique(numconns[numconns$google & numconns$source=="lbl" & numconns$numconns>2, ]$orig_h))
+numfew
+numhosts
+numfew / numhosts
+
 data <- numconns[numconns$google, ]
 p <- ggplot(data=data)
 p <- p + scale_y_continuous(breaks=calc.breaks)
