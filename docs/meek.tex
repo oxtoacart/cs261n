@@ -263,7 +263,7 @@ but of probabilities and false positives.
 A preliminary analysis of \meek's resistance to detection
 based on traffic characteristics like packet length distribution
 appears in Section~\ref{sec:trafficanalysis}.
-The analysis is based on comparing traffic traces of meek
+The analysis is based on comparing traffic traces of \meek
 with samples of HTTPS traffic at an Internet router.
 
 To our knowledge,
@@ -1052,7 +1052,7 @@ This section contains a brief survey of fronting-capable
 web services we have found, each with its pros and cons.
 The list is not exhaustive and is meant to illustrate the broad
 support for fronting that exists.
-Of the services listed, we have so far deployed meek
+Of the services listed, we have so far deployed \meek
 only on Google App Engine and Amazon CloudFront.
 For the others, we have only checked that fronting works.
 Recall that even web services that support fronting
@@ -1275,7 +1275,7 @@ added by \meekclient and \meekserver.
 \caption{
 CDF of connection lifetime.
 The horizontal axis is logarithmic.
-meek's connections tend to last longer than those of ordinary HTTPS traffic.
+\meek's connections tend to last longer than those of ordinary HTTPS traffic.
 }
 \label{fig:duration}
 \end{figure}
@@ -1330,7 +1330,7 @@ because if the censor terminates connections after, say, 10 minutes,
 in any case that's 10 minutes of circumvention achieved,
 after which \meek can start a new connection
 and allow Tor to rebuild its circuits.
-Future enhancements in meek may even allow reconnecting using the same session ID,
+Future enhancements in \meek may even allow reconnecting using the same session ID,
 so there will be no effect on the client other than a brief delay
 while a new HTTPS connection is established.
 
@@ -1354,18 +1354,18 @@ while a new HTTPS connection is established.
 Number of simultaneous HTTPS connections to any Google server.
 Each pale line indicates the number of HTTPS connections
 of a single client IP address.
-The LBL trace shows 2,745 unique clients and the meek trace only one.
+The LBL trace shows 2,745 unique clients and the \meek trace only one.
 The dark line is a smoothed average number of connections per client.
-The meek count stays close to~1 throughout, only momentarily
+The \meek count stays close to~1 throughout, only momentarily
 jumping to 0 or~2.
 The average number of connections per user in the LBL trace is 2.61,
-and in the meek trace is 1.002.
+and in the \meek trace is 1.002.
 }
 \label{fig:concurrent}
 \end{figure}
 
 The number of concurrent connections is another potential distinguisher.
-We have seen how meek tends to use one long-lived connection
+We have seen how \meek tends to use one long-lived connection
 through which it tunnels all its requests.
 Figure~\ref{fig:concurrent} compares the number of concurrent HTTPS connections to
 Google per client in both traces.
@@ -1373,18 +1373,18 @@ The number of connections in the LBL trace is variable,
 with some hosts briefly spiking up above 50 connections,
 but the average case is very heavily skewed to smaller numbers.
 The average number of connections in the LBL trace is 2.61,
-while in the meek trace it is almost exactly 1, only briefly
+while in the \meek trace it is almost exactly 1, only briefly
 deviating when one connection ends and another begins.
 We conclude that having a small number of concurrent connections is unremarkable.
 
 % TODO: Since the average numbers of connections are quite different, reviewers may think
 % it is remarkable. We should probably show a large percentage of users in the LBL trace only
-% have 1~2 connections throughout. Therefore a meek user is a needle in the haystack. 
+% have 1~2 connections throughout. Therefore a \meek user is a needle in the haystack. 
 
 
 $$\diamondsuit$$
 
-So far we do not find any obvious traffic characteristics that can be useful to reliably distinguish meek
+So far we do not find any obvious traffic characteristics that can be useful to reliably distinguish \meek
 from other HTTPS traffic.
 The long-lived connections and few common packet sizes are
 potential targets for a more concerted attack.
@@ -1415,14 +1415,14 @@ By removing the easy ways, we increase the censor's cost.
 \section{Deployment}
 \label{sec:deployment}
 
-Development on meek as a Tor pluggable transport~\cite{pt} began in January~2014.
+Development on \meek as a Tor pluggable transport~\cite{pt} began in January~2014.
 Most users who use Tor, use it with Tor Browser~\cite{torbrowser},
 a customized version of Firefox that is
 preconfigured to use a built-in Tor client.
 % and patched to defend against application-layer privacy and anonymity threats
 % like tracking cookies and web browser fingerprinting.
 Tor Browser has an easy interface for selecting pluggable transports.
-We made a series experimental releases of Tor Browser featuring meek,
+We made a series experimental releases of Tor Browser featuring \meek,
 releasing the first one on February~18.
 On April~18 we made the first release featuring the browser camouflage
 that is the subject of Section~\ref{sec:browserextension}.
@@ -1445,7 +1445,7 @@ Concurrent users of the \meek pluggable transport for Tor.
 \caption{
 Daily unique users of \meek with Psiphon (note vertical axis).
 The decrease at the end of June
-was caused by an unblocking event that made meek unnecessary for some users.
+was caused by an unblocking event that made \meek unnecessary for some users.
 }
 \label{fig:clients-psiphon3}
 \end{figure}
@@ -1458,13 +1458,13 @@ The number of users is estimated by counting the number
 of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
 % The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by \meek.
 
-Psiphon began their deployment of meek in June~2014.
+Psiphon began their deployment of \meek in June~2014.
 Figure~\ref{fig:clients-psiphon3} shows the number
-of unique daily users of meek with Psiphon,
+of unique daily users of \meek with Psiphon,
 estimated through clients' self-reporting of their most recent connection date.
 The Psiphon developers tell us that the drop that occurs
 in the middle of June was not caused by a blocking event,
-but rather an unblocking event that made meek unnecessary for some users.
+but rather an unblocking event that made \meek unnecessary for some users.
 Although Figures~\ref{fig:clients-tor} and~\ref{fig:clients-psiphon3}
 are not directly comparable because they count slightly different things,
 it is clear that meek-with-Psiphon, with its thousands of daily users,
@@ -1480,7 +1480,7 @@ with most days' usage being below the billable threshold.
 There has not yet been enough use of CloudFront to cost anything.
 
 A longer-term goal is to find a way to fund continued operation
-if meek becomes popular.
+if \meek becomes popular.
 Although some of the systems listed in Section~\ref{sec:survey}
 are inexpensive enough that some users could upload their own fronting backend,
 thereby diffusing costs,
@@ -1637,7 +1637,7 @@ There are apparently enough connections without SNI
 that a censor will at least have to consider seriously
 the costs and benefits before deciding to block SNI-less TLS outright.
 
-The current implementation of meek strictly serializes
+The current implementation of \meek strictly serializes
 its HTTPS requests and responses,
 in order to keep chunks of the underlying TCP stream
 in the proper order.
@@ -1653,7 +1653,7 @@ improvement that could be gained with a reliability layer
 and parallel requests.
 % Would be useful for Iran-like session cutoff, independent of \meek.
 
-meek's use of HTTPS is subject to the usual public key infrastructure
+\meek's use of HTTPS is subject to the usual public key infrastructure
 and trust model.
 The browser running the HTTPS camouflage extension (Section~\ref{sec:browserextension})
 has a list of trusted certificate authorities.
@@ -1677,7 +1677,7 @@ for instance when using the Chrome extension and fronting through
 % can require people to run their own proxies à la GoAgent.
 % "Censorship implies surveillance"
 
-The key idea of meek is domain fronting,
+The key idea of \meek is domain fronting,
 but its HTTP tunneling ability is useful on its own.
 Another idea for deployment is to use
 thousands of simple HTTP reflectors on cheap web hosting
@@ -1703,12 +1703,12 @@ We have presented domain fronting,
 an HTTPS technique that uses different domain names
 at different communication layers in
 order to hide the remote endpoint of a communication.
-We implemented meek,
+We implemented \meek,
 a pluggable transport for Tor.
 We show that it resists common methods of blocking,
 and begin an investigation into its
 resistance against more subtle and expensive means of traffic analysis.
-We discuss the results of an initial deployment of meek
+We discuss the results of an initial deployment of \meek
 in both Tor and Psiphon.
 
 \meek has a home page at
