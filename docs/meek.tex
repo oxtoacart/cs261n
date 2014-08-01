@@ -1058,7 +1058,7 @@ Recall that even web services that support fronting
 will front only for their own customers,
 so new each deployment typically means becoming a customer and an investment of time and money.
 
-Google App Engine (\url{https://developers.google.com/appengine/})
+Google App Engine~\cite{googleappengine}
 is a web application platform.
 Each application gets a user-specified subdomain of \urll{appspot.com},
 which can be fronted through almost any Google domain,
@@ -1076,7 +1076,7 @@ are free of charge,
 making possible an upload-your-own-app model
 à la GoAgent.
 
-Amazon CloudFront (\url{https://aws.amazon.com/cloudfront/}),
+Amazon CloudFront~\cite{cloudfront},
 not to be confused with CloudFlare,
 is the CDN of Amazon Web Services.
 A CloudFront ``distribution'' associates
@@ -1088,7 +1088,7 @@ of which support HTTPS through a wildcard certificate.
 CloudFront has a usage tier that is free of charge for a year,
 subject to a bandwidth limit of 50 gigabytes per month.
 
-CloudFlare (\url{https://www.cloudflare.com/}),
+CloudFlare~\cite{cloudflare},
 not to be confused with CloudFront,
 is a CDN also marketed as protection against
 denial-of-service attacks.
@@ -1114,7 +1114,7 @@ or to use ``domainless'' fronting that doesn't send SNI.
 % for the purpose of hosting and serving web pages\ldots
 % \end{quote}
 
-Akamai (\url{http://www.akamai.com/}) is a large CDN.
+Akamai~\cite{akamai-site} is a large CDN.
 Requests may be fronted through the special HTTPS domain
 \urll{a248.e.akamai.net},
 which serves a certificate also good for \urll{*.akamaihd.net}.
@@ -1124,7 +1124,7 @@ Akamai costs more than other CDNs;
 it would likely require institutional support
 to keep a circumvention system running on it in the long term.
 
-Microsoft Azure (\url{http://azure.microsoft.com/})
+Microsoft Azure~\cite{azure}
 is a cloud computing platform that features a CDN.
 Similarly to CloudFront, users get automatically generated subdomains
 of \urll{vo.msecnd.net},
@@ -1132,7 +1132,7 @@ all of which can front for each other.
 There are other fronting domain names, like \urll{ajax.aspnetcdn.com},
 that may offer high collateral damage.
 
-Fastly (\url{http://www.fastly.com/}) is a CDN.
+Fastly~\cite{fastly} is a CDN.
 It is unique among the the services we tested in that
 it is the only one that appears to enforce the SNI:
 if the SNI and Host do not match,
