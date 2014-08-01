@@ -68,7 +68,10 @@ and returns downstream data in the HTTP response.
 A censor watching the communication sees only a sequence of HTTPS requests to an allowed domain.
 We describe the results of an initial deployment.
 \meek, or something based on it,
-has been adopted by other circumvention systems including Lantern and Psiphon.
+has been adopted by other circumvention systems including
+[blinded for anonymous submission].
+% ANON
+% Lantern and Psiphon.
 
 Hiding the endpoint and obscuring byte patterns are important parts of blocking-resistant communication,
 but there are other, more subtle considerations.
@@ -236,8 +239,10 @@ Our deployment so far uses Google App Engine and Amazon CloudFront.
 Section~\ref{sec:deployment} discusses other fronting-capable services
 and deployment scenarios.
 In addition to the Tor pluggable transport,
-systems based on \meek\ are now used by other circumvention systems
-including Psiphon~\cite{psiphon} and Lantern~\cite{lantern}.
+systems based on \meek\ are now used by other circumvention systems including
+[blinded for anonymous submission].
+% ANON
+% including Psiphon~\cite{psiphon} and Lantern~\cite{lantern}.
 
 % \meek\ is designed to have features attractive in a circumvention transport.
 % It is easy to use, not requiring the configuration of any bridge addresses.
@@ -513,10 +518,12 @@ so users must reconnect at least that often.
 
 Psiphon~\cite{psiphon} is a network of many one-hop proxies,
 with encryption and traffic obfuscation between client and server.
-Psiphon uses domain fronting based on \meek\ as one of its blocking defenses since June~2014~\cite{psiphon-meek-merge}.
+% ANON
+% Psiphon uses domain fronting based on \meek\ as one of its blocking defenses since June~2014~\cite{psiphon-meek-merge}.
 Lantern~\cite{lantern} uses a network of proxies running on volunteer computers;
 proxy addresses are shared only with trusted friends in order to make them difficult to enumerate.
-Lantern~1.4 is planned to use domain fronting inspired by \meek~\cite{lantern-1.3.1}.
+% ANON
+% Lantern~1.4 is planned to use domain fronting inspired by \meek~\cite{lantern-1.3.1}.
 
 % Infranet
 % Freegate
@@ -720,8 +727,10 @@ if it has nothing else to send,
 simply to give the server an opportunity to reply.
 The polling interval starts short (100~ms) and grows exponentially
 up to a maximum of 5~s.
-The other technique,
-implemented in Psiphon's version of \meek,
+% ANON
+% The other technique,
+% implemented in Psiphon's version of \meek,
+The other technique
 uses long-lived persistent HTTP connections.
 When the server sends a response, it keeps the connection open,
 continually appending data to the response body while it has anything to send.
@@ -774,7 +783,9 @@ Tor can bunch multiple cells into one transmission;
 if two cells are sent at once, the overhead drops to
 ${\approx}41$\%; if three, it is ${\approx}28$\%.
 Bulk uploads and downloads tend to have less overhead, bunching many cells at once.
-Persistent HTTP connections as used by Psiphon reduce overhead further,
+Persistent HTTP connections, when they are possible, reduce overhead further,
+% ANON
+% Persistent HTTP connections as used by Psiphon reduce overhead further,
 because only one HTTP header is needed for a large number of transmissions.
 Empty polling requests also use bandwidth,
 but they are sent only when the connection is idle
@@ -795,8 +806,9 @@ Strict serialization of requests and responses
 becomes a problem with large round-trip times,
 as throughput becomes limited by latency.
 Section~\ref{sec:discussion} describes ways to improve
-performance with high latencies;
-Psiphon's use of persistent connections as described in this section is one of them.
+% ANON
+% performance with high latencies;
+% Psiphon's use of persistent connections as described in this section is one of them.
 
 \section{Camouflage for the TLS layer}
 \label{sec:browserextension}
@@ -1040,7 +1052,11 @@ because that portion of the communication flow is not observed by the censor.
 
 Appropriate TLS camouflage may differ depending on circumstances.
 On a traditional desktop PC, using a browser is probably the right choice.
-When Psiphon ported \meekclient to Android,
+When
+[blinded circumcention tool]
+% ANON
+% Psiphon
+ported \meekclient to Android,
 they didn't use a browser as camouflage,
 but rather made all HTTPS requests with the standard Android HTTP API.
 This decision makes sense because other Android applications
@@ -1427,13 +1443,15 @@ preconfigured to use a built-in Tor client.
 Tor Browser has an easy interface for selecting pluggable transports.
 We made a series experimental releases of Tor Browser featuring \meek,
 releasing the first one on February~18.
-On April~18 we made the first release featuring the browser camouflage
-that is the subject of Section~\ref{sec:browserextension}.
-We announced our releases on Tor development mailing lists,
-whence they were picked up by Tor Weekly News on the Tor blog.
-Our code was merged by the Tor Browser maintainers
-in June and is scheduled for an alpha release,
-still pending as of this writing.
+[Some details of deployment are omitted for anonymous submission.]
+% ANON
+% On April~18 we made the first release featuring the browser camouflage
+% that is the subject of Section~\ref{sec:browserextension}.
+% We announced our releases on Tor development mailing lists,
+% whence they were picked up by Tor Weekly News on the Tor blog.
+% Our code was merged by the Tor Browser maintainers
+% in June and is scheduled for an alpha release,
+% still pending as of this writing.
 
 \begin{figure}
 \includegraphics[width=\linewidth]{clients-meek}
@@ -1446,7 +1464,11 @@ Concurrent users of the \meek\ pluggable transport for Tor.
 \begin{figure}
 \includegraphics[width=\linewidth]{clients-psiphon3}
 \caption{
-Daily unique users of \meek\ with Psiphon (note vertical axis).
+Daily unique users of \meek\ with
+[blinded circumvention tool]
+% ANON
+% Psiphon
+(note vertical axis).
 The decrease at the end of June
 was caused by an unblocking event that made \meek\ unnecessary for some users.
 }
@@ -1461,16 +1483,26 @@ The number of users is estimated by counting the number
 of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
 % The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by \meek.
 
-Psiphon began their deployment of \meek\ in June~2014.
+[Blinded circumvention tool]
+% ANON
+% Psiphon
+began their deployment of \meek\ in June~2014.
 Figure~\ref{fig:clients-psiphon3} shows the number
-of unique daily users of \meek\ with Psiphon,
+of unique daily users of \meek%
+,
+% ANON
+% with Psiphon,
 estimated through clients' self-reporting of their most recent connection date.
-The Psiphon developers tell us that the drop that occurs
+The developers tell us that the drop that occurs
 in the middle of June was not caused by a blocking event,
 but rather an unblocking event that made \meek\ unnecessary for some users.
 Although Figures~\ref{fig:clients-tor} and~\ref{fig:clients-psiphon3}
 are not directly comparable because they count slightly different things,
-it is clear that meek-with-Psiphon, with its thousands of daily users,
+it is clear that meek-with-%
+[blinded circumvention tool],
+% ANON
+% Psiphon,
+with its thousands of daily users,
 is much more widely used than meek-with-Tor, which has not yet seen a formal release,
 
 The experimental Tor Browser releases have all been based on Google with App Engine.
@@ -1714,8 +1746,9 @@ a pluggable transport for Tor.
 We show that it resists common methods of blocking,
 and begin an investigation into its
 resistance against more subtle and expensive means of traffic analysis.
-We discuss the results of an initial deployment of \meek\
-in both Tor and Psiphon.
+We discuss the results of an initial deployment.
+% ANON
+% in both Tor and Psiphon.
 
 % ANON
 % \meek\ has a home page at
