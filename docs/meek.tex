@@ -13,6 +13,7 @@
 \newcommand{\meekclient}{\mbox{meek-client}\xspace}
 \newcommand{\meekserver}{\mbox{meek-server}\xspace}
 \newcommand{\meek}{\texttt{meek}\xspace}
+\newcommand{\lbl}{ResearchLab\xspace}
 \def\urll#1{\begin{NoHyper}\url{#1}\end{NoHyper}}
 
 % https://tex.stackexchange.com/questions/113338/use-sans-serif-in-a-verbatim-environment/113339#113339
@@ -1180,10 +1181,12 @@ The \meek trace is 687~megabytes in all
 and covers about 4.5 hours of network activity.
 Our representative of ordinary HTTPS traffic
 is a sanitized 10-minute trace
-from Lawrence Berkeley National Laboratory (LBL),
+from 
+%Lawrence Berkeley National Laboratory (\lbl)
+a research lab (anonymized as \lbl for blind submission),
 comprising data to and from TCP port 443 on any Google server.
 % Mention the non-google if it appears in a figure.
-The LBL trace consists 313~megabytes of packet headers,
+The \lbl trace consists 313~megabytes of packet headers,
 not payloads, destined for TCP port 443 on any Google server.
 The original IP addresses were masked by being
 replaced by a counter before we received the trace.
@@ -1205,7 +1208,7 @@ replaced by a counter before we received the trace.
 %         811         783         151        1263
 % 0.012312668 0.007811963 0.007031241 0.006569205
 \begin{tabular}{r r >{\qquad} r r}
-\multicolumn{2}{c}{LBL Google HTTPS} & \multicolumn{2}{>{\qquad}c}{\meek on App Engine} \\
+\multicolumn{2}{c}{\lbl Google HTTPS} & \multicolumn{2}{>{\qquad}c}{\meek on App Engine} \\
 0 bytes & 37.6\% & 1418 bytes & 40.5\% \\
 1430 bytes & 9.1\% & 0 bytes & 37.7\% \\
 1418 bytes & 8.5\% & 1460 bytes & 7.2\% \\
@@ -1216,7 +1219,7 @@ replaced by a counter before we received the trace.
 \caption{
 Comparison of TCP payload length distributions
 between ordinary HTTPS connections to Google services
-from the LBL traffic trace,
+from the \lbl traffic trace,
 and \meek running on App Engine, fronted through www.google.com.
 % The histogram's bin width is 5~bytes.
 }
@@ -1289,7 +1292,7 @@ The horizontal axis is logarithmic.
 We consider the duration of TCP connections as a potential distinguisher.
 Figure~\ref{fig:duration} shows the cumulative probability
 of connection durations in our two traces.
-Considering the LBL trace first,
+Considering the \lbl trace first,
 we see interesting probability concentrations on
 round numbers: 10~s, 60~s, 120~s, 180~s, and 240~s.
 We hypothesize that this phenomenon is caused by
@@ -1313,7 +1316,7 @@ occurred over just a few TCP/TLS connections.
 60\% of \meek connections lasts five minutes or longer,
 while only 13\% of those of ordinary traffic do.
 \meek has essentially no connections lasting less than 24 seconds,
-but such short connections account for over 42\% of the LBL HTTPS connections.
+but such short connections account for over 42\% of the \lbl HTTPS connections.
 30\% (3 out of 10) of \meek's connections lasted almost exactly one hour,
 evidently reflecting a built-in time limit in either the client browser extension
 or in App Engine.
@@ -1354,11 +1357,11 @@ while a new HTTPS connection is established.
 Number of simultaneous HTTPS connections to any Google server.
 Each pale line indicates the number of HTTPS connections
 of a single client IP address.
-The LBL trace shows 2,745 unique clients and the \meek trace only one.
+The \lbl trace shows 2,745 unique clients and the \meek trace only one.
 The dark line is a smoothed average number of connections per client.
 The \meek count stays close to~1 throughout, only momentarily
 jumping to 0 or~2.
-The average number of connections per user in the LBL trace is 2.61,
+The average number of connections per user in the \lbl trace is 2.61,
 and in the \meek trace is 1.002.
 }
 \label{fig:concurrent}
@@ -1369,16 +1372,16 @@ We have seen how \meek tends to use one long-lived connection
 through which it tunnels all its requests.
 Figure~\ref{fig:concurrent} compares the number of concurrent HTTPS connections to
 Google per client in both traces.
-The number of connections in the LBL trace is variable,
+The number of connections in the \lbl trace is variable,
 with some hosts briefly spiking up above 50 connections,
 but the average case is very heavily skewed to smaller numbers.
-The average number of connections in the LBL trace is 2.61,
+The average number of connections in the \lbl trace is 2.61,
 while in the \meek trace it is almost exactly 1, only briefly
 deviating when one connection ends and another begins.
 We conclude that having a small number of concurrent connections is unremarkable.
 
 % TODO: Since the average numbers of connections are quite different, reviewers may think
-% it is remarkable. We should probably show a large percentage of users in the LBL trace only
+% it is remarkable. We should probably show a large percentage of users in the \lbl trace only
 % have 1~2 connections throughout. Therefore a \meek user is a needle in the haystack. 
 
 

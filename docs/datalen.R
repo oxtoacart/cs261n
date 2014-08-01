@@ -23,7 +23,7 @@ t <- table(x[x$google & x$source=="tbb", ]$datalen)
 
 binwidth = 5
 
-x <- cbind(x, label=ifelse(x$source=="lbl", "LBL Google HTTPS", "meek on App Engine"))
+x <- cbind(x, label=ifelse(x$source=="lbl", "ResearchLab Google HTTPS", "meek on App Engine"))
 
 p <- ggplot(x[x$google, ], aes(datalen))
 p <- p + scale_y_continuous(labels = function(y) binwidth * y)

@@ -56,7 +56,7 @@ numconns <- rbind(numconns, cbind(calc.numconns(x[!x$google & x$source=="lbl", ]
 numconns <- rbind(numconns, cbind(calc.numconns(x[x$google & x$source=="tbb", ]), google=T, source="tbb"))
 
 numconns <- cbind(numconns, alpha=ifelse(numconns$source=="lbl", 0.15, 1.0))
-numconns <- cbind(numconns, label=ifelse(numconns$source=="lbl", "LBL Google HTTPS", "meek on App Engine"))
+numconns <- cbind(numconns, label=ifelse(numconns$source=="lbl", "ResearchLab Google HTTPS", "meek on App Engine"))
 
 calc.breaks <- function(v) {
 	if (v[2] - v[1] < 10) {
