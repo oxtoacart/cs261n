@@ -71,7 +71,7 @@ x The mention of Google's TXT DNS records is baffling because it's
   to Google (# connections, # bytes).  The worry would be that that
   sort of summary statistic may make meek stand out.
 
-* OTOH, you should also frame that meek doesn't have to conform with an
+x OTOH, you should also frame that meek doesn't have to conform with an
   *average* traffic profile, just with one that isn't *too* unusual.  The
   censor will incur serious collateral damage even if they block just
   the upper 1% of strong-traffic-to-Google.
@@ -95,7 +95,7 @@ x It's Highly Cool that you already have some real users!  (And at
 
 x Tell us more about what's unclear in CloudFlare's ToS.
 
-* "... or else blocking a large number of unrelated web sites".  It's
+x "... or else blocking a large number of unrelated web sites".  It's
   valuable here to reflect on Pakistan's blocking of YouTube, which
   was meant to just prevent access to one video, but they lacked the
   technical means to do that, so they blocked the whole thing - clearly
