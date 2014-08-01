@@ -1404,22 +1404,39 @@ By removing the easy ways, we increase the cost to the censor.
 \section{Deployment}
 \label{sec:deployment}
 
-We implemented \meek\ as a Tor pluggable transport~\cite{pt}
-and built experimental releases of the Tor Browser Bundle featuring \meek.
-The browser bundle includes Tor and a version of Firefox
-called Tor Browser that is patched to defend against application-layer identity leaks.
-Users need to download and run the bundle and select \meek\ from the list of transports,
-and then a browser window appears,
-configured to use \meek\ for circumvention and Tor for anonymity.
-We announced our prototype bundles on Tor development mailing lists,
-and from there they were picked up by Tor Weekly News on the Tor blog.
+Development on meek as a Tor pluggable transport~\cite{pt} began in January~2014.
+Most users who use Tor use Tor Browser~\cite{torbrowser},
+a customized version of Firefox that is
+preconfigured to use a built-in Tor client.
+% and patched to defend against application-layer privacy and anonymity threats
+% like tracking cookies and web browser fingerprinting.
+Tor Browser has an easy interface for selecting a pluggable transport.
+We made a series experimental releases of Tor Browser featuring meek,
+releasing the first one on February~18.
+On April~18 we made the first release featuring the browser camouflage
+that is the subject of Section~\ref{sec:browserextension}.
+We announced our releases on Tor development mailing lists,
+whence they were picked up by Tor Weekly News on the Tor blog.
+Our code was merged by the Tor Browser maintainers
+in June and scheduled for an alpha release,
+which is still pending as of this writing.
+
+The experimental Tor Browser releases have all used Google as the intermediate web service.
+Support for CloudFront was not realized until late July.
+We are running the backends on paid accounts for use by the public.
+The cost for bandwidth on App Engine is \$0.12 per gigabyte,
+with one gigabyte free each day.
+The total App Engine bill so far has been \$2.07.
+There has not yet been enough use of CloudFront to cost any money.
+A longer-term goal is to find a way to fund continued operation
+if the system becomes popular.
 
 \begin{figure}
 \includegraphics[width=\linewidth]{clients-meek}
 \caption{
-Concurrent users of \meek\ with Tor.
+Concurrent users of the \meek\ pluggable transport for Tor.
 }
-\label{fig:clients}
+\label{fig:clients-tor}
 \end{figure}
 
 \begin{figure}
@@ -1429,26 +1446,28 @@ Daily unique users of \meek\ with Psiphon (note vertical axis).
 The decrease at the end of June
 was caused by an unblocking event that made meek unnecessary for some users.
 }
-\label{fig:clients}
+\label{fig:clients-psiphon3}
 \end{figure}
 
-Figure~\ref{fig:clients} shows the average number of concurrent users of \meek\ with Tor
-since close to the beginning of development,
-as reported by the Tor Metrics Portal~\cite{metrics-meek}.
+Figure~\ref{fig:clients-tor} shows the average number of concurrent users of \meek\ with Tor
+since close to the beginning of development.
+The measurements come from the Tor Metrics Portal~\cite{metrics-meek},
+which aggregates statistics self-reported by Tor relays.
 The number of users is estimated by counting the number
 of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
 % The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by \meek.
 
-% Psiphon. Drop in July is due to an unblocking event.
-% Different counting method. Client self-reporting of last connection date.
-
-We are running a paid instance of the web app on App Engine for use by the public.
-% The cost for bandwidth on App Engine is \$0.12 per gigabyte,
-% with one gigabyte free each day.
-% The total cost has so far been \$1.11, with bills of
-% \$0.09 in March,
-% \$0.73 in April,
-% and \$0.29 in the first half of May.
+Psiphon began their deployment of meek in June~2014.
+Figure~\ref{fig:clients-psiphon3} shows the number
+of unique daily users of meek with Psiphon,
+estimated through clients' self-reporting of most recent connection date.
+The Psiphon developers tell us that the drop that occurs
+in the middle of June was not caused by a blocking event,
+but rather an unblocking event that made meek unnecessary for some users.
+Although Figures~\ref{fig:clients-tor} and~\ref{fig:clients-psiphon3}
+are not directly comparable because they count slightly different things,
+it is clear that meek-with-Psiphon, with its thousands of daily users,
+is much more widely used than meek-with-Tor, which has not yet seen a formal release,
 
 \section{Discussion}
 \label{sec:discussion}
@@ -1490,8 +1509,8 @@ browsing YouTube reveals both their entry and exit traffic to Google,
 which may attempt through traffic analysis to determine
 which entry packets correspond to which exit packets.
 The problem is hard to counter, because the front domain needs
-to be a popular destination in order to have high collateral damage,
-but popular destinations by definition tend to be visited a lot.
+to be popular in order to have high collateral damage,
+but popular domains are also the ones people tend to want to go to.
 % Possible countermeasure is traffic fingerprinting resistance
 % like what mjuarez is working on, mostly orthogonal to circumvention.
 
@@ -1536,8 +1555,8 @@ In future work we plan to add an additional reliability layer,
 perhaps like the system of sequence numbers and acknowledgments used in OSS~\cite{oss},
 that would allow requests to be pipelined
 and cope with out-of-order delivery.
-Figure~\ref{fig:wire-sequential} shows the current implementation,
-and Figure~\ref{fig:wire-parallel} shows the nature of performance
+Figure~\ref{fig:wire-sequential} shows how the current implementation works,
+and Figure~\ref{fig:wire-parallel} shows the nature of the performance
 improvement that could be gained with a reliability layer.
 % Would be useful for Iran-like session cutoff, independent of \meek.
 
