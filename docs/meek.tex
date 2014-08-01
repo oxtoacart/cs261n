@@ -1472,7 +1472,25 @@ is much more widely used than meek-with-Tor, which has not yet seen a formal rel
 \section{Discussion}
 \label{sec:discussion}
 
-% Censors that know no bounds: China on Google, Egypt, Pakistan with YouTube.
+Domain fronting derives part of its unblockability from the
+high collateral damage of blocking the domain fronted through.
+Fronting through \urll{www.google.com} to App Engine, for example,
+is betting that censor will lack the temerity to block Google.
+The Great Firewall of China called our bluff in June of 2014,
+when it blocked access to all Google services~\cite{cn-google-block}.
+In 2012, the government of Pakisten blocked to all of YouTube
+in order to restrict access to one video,
+and in 2011, the government of Egypt briefly ``turned off the net'' completely.
+% http://www.washingtonpost.com/business/economy/youtube-blocked-in-pakistan/2012/09/17/30081fa2-00ea-11e2-b257-e1c2b3548a4a_story.html
+% https://en.wikipedia.org/wiki/Internet_censorship_in_Egypt#2011_Internet_shutdown
+These examples show that blocking resistance is not an absolute,
+black-and-white security property;
+it can only be discussed in an economic context, relative to the costs borne
+by the censor and by users of a system.
+To block Google is an extreme measure,
+probably out of reach of most censors.
+Blocking all of the fronting-capable services listed in
+Section~\ref{sec:survey} would be even harder.
 
 Domain fronting shares a potential weakness with decoy routing,
 which is that the overt and covert destinations lie on different
