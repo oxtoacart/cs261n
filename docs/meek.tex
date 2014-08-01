@@ -1421,16 +1421,6 @@ Our code was merged by the Tor Browser maintainers
 in June and scheduled for an alpha release,
 which is still pending as of this writing.
 
-The experimental Tor Browser releases have all used Google as the intermediate web service.
-Support for CloudFront was not realized until late July.
-We are running the backends on paid accounts for use by the public.
-The cost for bandwidth on App Engine is \$0.12 per gigabyte,
-with one gigabyte free each day.
-The total App Engine bill so far has been \$2.07.
-There has not yet been enough use of CloudFront to cost any money.
-A longer-term goal is to find a way to fund continued operation
-if the system becomes popular.
-
 \begin{figure}
 \includegraphics[width=\linewidth]{clients-meek}
 \caption{
@@ -1469,6 +1459,32 @@ are not directly comparable because they count slightly different things,
 it is clear that meek-with-Psiphon, with its thousands of daily users,
 is much more widely used than meek-with-Tor, which has not yet seen a formal release,
 
+The experimental Tor Browser releases have all used Google with App Engine as the intermediate web service.
+Support for CloudFront was not realized until late July.
+We are running the backends on paid accounts for use by the public.
+The cost for bandwidth on App Engine is \$0.12 per gigabyte,
+with one gigabyte free each day.
+The total App Engine bill so far has been \$2.07,
+with most days' usage being below the billable threshold.
+There has not yet been enough use of CloudFront to cost anything.
+
+A longer-term goal is to find a way to fund continued operation
+if the system becomes popular.
+Although some of the systems listed in Section~\ref{sec:survey}
+are inexpensive enough that some users could upload their own fronting backend,
+thereby diffusing costs,
+we believe that an organization operating a backend for the use of the public
+has compelling usability advantages.
+With client software can be configured to use the public backend by default,
+there is nothing for the user to upload and no out-of-band communication is needed before getting
+started---if everything works it offers no-configure circumvention.
+
+% The number of parties able to analyze users' traffic patterns is somewhat increased:
+% the path from user to Tor bridge now includes App Engine and the web app operators,
+% in addition to the ISP and intermediate routers that were there before.
+% On the other hand, the Tor bridge no longer gets to see users' IP addresses:
+% all it sees are many connections from App Engine.
+
 \section{Discussion}
 \label{sec:discussion}
 
@@ -1492,6 +1508,25 @@ probably out of reach of most censors.
 Blocking all of the fronting-capable services listed in
 Section~\ref{sec:survey} would be even harder.
 
+A censor could attack domain fronting by
+going directly to the operators of the intermediate web service
+and asking them either to break fronting
+(i.e., require SNI to be present and SNI and Host header to agree),
+or merely to get rid of their customers who are
+engaged in fronting in the support of circumvention.
+The censor could threaten to block the web service entirely otherwise.
+Whether the attack will succeed depends on the censor's
+and the web service's specific motivations,
+so we cannot make any general statements.
+It is ultimately a question of who needs whom more:
+whether it hurts the web service or the censor more
+when a web service is blocked.
+Nothing works against a censor with sufficiently high tolerance for
+collateral damage,
+but we also don't have to defeat the world's
+most powerful censor in order to be successful.
+What doesn't work in one place may work in another.
+
 Domain fronting shares a potential weakness with decoy routing,
 which is that the overt and covert destinations lie on different
 network paths.
@@ -1510,26 +1545,26 @@ who compared empirical round-trip-time distributions using a
 Kolmogorov--Smirnov test.
 % time between ChangeCipherSpec and ApplicationData
 
-When domain fronting is combined with Tor,
-the CDN or web service effectively becomes
-what Tor calls a ``guard node,''
-a host with a privileged network position that can observe
-the ciphertext entering the network.
-One consequence of this fact is that Google (for example)
-knows the IP addresses of everyone using the circumvention system,
-just as if it were those users' ISP.
-Another consequence is that the CDN or web service gets
-to observe and correlate both entry and exit traffic,
-in the special case where the target of the communication
-also lies on the same CDN or web service.
-For example, a user fronting through App Engine and
-browsing YouTube reveals both their entry and exit traffic to Google,
-which may attempt through traffic analysis to determine
-which entry packets correspond to which exit packets.
-The problem is hard to counter, because the front domain needs
+The intermediate web service enjoys a privileged network position
+from which it is able to monitor all circumvention traffic.
+Even if the censor doesn't know who the users are, the CDN knows.
+The web service has basically the same network visibility
+as a client's ISP would have if the client were connecting to Tor directly.
+For this reason, domain fronting should be combined with another
+layer, for example Tor, that prevents the web service from
+observing the contents and destination of messages.
+There is additional risk when the client is browsing a web site
+controlled by the same service as that they are fronting through,
+for example browsing YouTube while fronting through \urll{www.google.com}.
+Even with Tor, in this case the web service gets to see
+both entry and exit traffic, and is in a position to
+perform traffic correlation attacks.
+The problem seems hard to counter, because the front domain needs
 to be popular in order to have high collateral damage,
 but popular domains are also the ones people tend to want to go to.
-% Possible countermeasure is traffic fingerprinting resistance
+A possible mitigation is traffic obfuscation that lasts all
+the way to the second hop of a three-hop Tor circuit,
+which would reduce the correlation between entry and exit traffic.
 % like what mjuarez is working on, mostly orthogonal to circumvention.
 
 % We implemented \meek\ as a pluggable transport~\cite{pt} for Tor.
@@ -1563,6 +1598,34 @@ from sending fronted requests in parallel.
 \label{fig:wire}
 \end{figure}
 
+We have assumed that the intermediate web service is
+outside the censor's domain of control,
+so that communication between the web service and Tor bridge
+doesn't have to be protected.
+What happens when the web service---a CDN edge server, for instance---is
+inside the network controlled by the censor?
+If the edge server forwards the request to the Tor bridge
+as an ordinary HTTP request on the public Internet,
+then blocking it is as easy as blocking the IP address of the bridge.
+On the other hand, if the web service encapsulates
+the request and sends it encrypted, or over its own fast private network,
+to another server outside of the censor's control,
+then fronting will still work.
+
+The ``domainless'' fronting style, which omits SNI,
+is useful when there is no good front domain known for a web service.
+At least one CDN, Fastly, requires the domainless style.
+All current web browsers support SNI,
+so it is possible that lack of SNI could be used as a distinguisher.
+According to our communication with
+a representative of the International Computer Science Institute's
+certificate notary~\cite{icsi-notary},
+which observes on the order of 50~million TLS connections daily,
+83.5\% of connections used SNI in June~2014.
+There are apparently enough connections without SNI
+that a censor will at least have to consider seriously
+the costs and benefits before deciding to block SNI outright.
+
 The current implementation of meek strictly serializes
 its HTTPS requests and responses,
 in order to keep the chunks of the underlying TCP stream
@@ -1577,39 +1640,6 @@ Figure~\ref{fig:wire-sequential} shows how the current implementation works,
 and Figure~\ref{fig:wire-parallel} shows the nature of the performance
 improvement that could be gained with a reliability layer.
 % Would be useful for Iran-like session cutoff, independent of \meek.
-
-A censor could attack domain fronting by
-going directly to the operators of the intermediate web service
-and asking them either to break fronting
-(i.e., require SNI to be present and SNI and Host header to agree),
-or merely to get rid of their customers who are
-engaged in fronting in the support of circumvention.
-The censor could threaten to block the web service entirely otherwise.
-Whether the attack will succeed depends on the censor's
-and the web service's specific motivations,
-so we cannot make any general statements.
-It is ultimately a question of who needs whom more:
-whether it hurts the web service or the censor more
-when a web service is blocked.
-Nothing works against a censor with sufficiently high tolerance for
-collateral damage,
-but we also don't have to defeat the world's
-most powerful censor in order to be successful.
-What doesn't work in one place may work in another.
-
-We have assumed that the intermediate web service is
-outside the censor's domain of control,
-so that communication between the web service and Tor bridge
-doesn't have to be protected.
-What happens when the web service---a CDN edge server, for instance---is
-inside the network controlled by the censor?
-If the edge server forwards the request to the Tor bridge
-as an ordinary HTTP request on the public Internet,
-then blocking it is as easy as blocking the IP address of the bridge.
-On the other hand, if the web service encapsulates
-the request and sends it encrypted, or over its own fast private network,
-to another server outside of the censor's control,
-then fronting will still work.
 
 meek's use of HTTPS is subject to the usual public key infrastructure
 and trust model.
@@ -1636,7 +1666,7 @@ for instance when using the Chrome extension and fronting through
 % "Censorship implies surveillance"
 
 The key idea of meek is domain fronting,
-but its HTTP-tunneling ability is useful on its own.
+but its HTTP tunneling ability is useful on its own.
 Another idea for deployment is to use
 thousands of simple HTTP reflectors on cheap web hosting
 (in place of domain fronting on a big CDN).
@@ -1653,37 +1683,6 @@ and make it hard to enumerate them all.
 The advantage that an HTTP transport would have
 is that it is easier for a volunteer to upload a PHP file to a web host
 than to set up and maintain a Tor bridge.
-
-The ``domainless'' fronting style, which omits SNI,
-is useful when there is no good front domain known for a web service.
-At least one CDN, Fastly, requires the domainless style.
-All current web browsers support SNI,
-so it is possible that lack of SNI could be used as a distinguisher.
-According to our communication with
-a representative of the International Computer Science Institute's
-certificate notary~\cite{icsi-notary},
-which observes on the order of 50~million TLS connections daily,
-83.5\% of connections used SNI in June~2014.
-There are apparently enough connections without SNI
-that a censor will at least have to consider seriously
-the costs and benefits before deciding to block SNI outright.
-
-The deployment we envision and have started to implement
-uses a single paid App Engine instance, which is publicly known and usable by anyone.
-Client software is configured to use this public instance by default.
-A preconfigured public instance has great usability advantages
-because there is nothing for the user to upload and nothing to configure.
-The number of parties able to analyze users' traffic patterns is somewhat increased:
-the path from user to Tor bridge now includes App Engine and the web app operators,
-in addition to the ISP and intermediate routers that were there before.
-On the other hand, the Tor bridge no longer gets to see users' IP addresses:
-all it sees are many connections from App Engine.
-
-Users are also free to upload their own personal copy of the App Engine code, as is done with GoAgent.
-App Engine imposes bandwidth quotas on unpaid apps, but they are high enough to allow daily web browsing.
-In this scenario, Google still has a privileged network position,
-but the user's traffic patterns are no longer visible to the operators of a public app instance.
-% Outgoing HTTP requests include app id? As good as an IP address.
 
 \section{Summary}
 \label{sec:summary}
