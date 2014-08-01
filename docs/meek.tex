@@ -1365,6 +1365,9 @@ while a new HTTPS connection is established.
 % [1] 2.610621
 % [1] 1
 % [1] 1.002148
+% [1] 772
+% [1] 2745
+% [1] 0.2812386
 
 \begin{figure}
 \centering
@@ -1392,13 +1395,10 @@ The number of connections in the \lbl trace is variable,
 with some hosts briefly spiking up above 50 connections,
 but the average case is very heavily skewed to smaller numbers.
 The average number of connections in the \lbl trace is 2.61,
-while in the \meek\ trace it is almost exactly 1, only briefly
+with 28\% of clients never having more than 2 concurrent connections.
+In the \meek trace the average is almost exactly 1, only briefly
 deviating when one connection ends and another begins.
 We conclude that having a small number of concurrent connections is unremarkable.
-
-% TODO: Since the average numbers of connections are quite different, reviewers may think
-% it is remarkable. We should probably show a large percentage of users in the \lbl trace only
-% have 1~2 connections throughout. Therefore a \meek\ user is a needle in the haystack. 
 
 
 $$\diamondsuit$$
