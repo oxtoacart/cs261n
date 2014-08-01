@@ -19,7 +19,7 @@ x In general, meek doesn't need to be tied to Tor, or in fact to any
   hugely enables deployment of a system (such as SSH's leap-of-faith "PKI"
   approach).
 
-* Related to this, you should assess how much performance overhead your
+x Related to this, you should assess how much performance overhead your
   approach imposes.
 
 x Figure 1 should come much earlier, basically in the Introduction.
@@ -76,21 +76,21 @@ x The mention of Google's TXT DNS records is baffling because it's
   censor will incur serious collateral damage even if they block just
   the upper 1% of strong-traffic-to-Google.
 
-* Related to this, you shouldn't just look at the distributions but
+x Related to this, you shouldn't just look at the distributions but
   also the associated *variance* across users.
 
-* "model of normal traffic, which is an open problem" - that's quite a 
+x "model of normal traffic, which is an open problem" - that's quite a 
   strong statement.  Arguably a *complete* model is an open problem,
   but that's not what's needed here.  If you had more/longer traces,
   wouldn't that enable you to address this fairly well?
 
-* I particularly like the observation that if this modeling is hard for
+x I particularly like the observation that if this modeling is hard for
   you-the-meek-designer then it's also hard for the censor.
 
-* What's meant by Tor Browser being "patched to defend against
+x What's meant by Tor Browser being "patched to defend against
   application-layer identity leaks"?
 
-* It's Highly Cool that you already have some real users!  (And at
+x It's Highly Cool that you already have some real users!  (And at
   a whopping cost of one-hundred-and-eleven US cents. :-)
 
 x Tell us more about what's unclear in CloudFlare's ToS.
@@ -101,7 +101,7 @@ x Tell us more about what's unclear in CloudFlare's ToS.
   technical means to do that, so they blocked the whole thing - clearly
   with collateral damage.  So it's not unprecedented.
 
-* The discussion about PHP implementations etc. at the end of section 7
+x The discussion about PHP implementations etc. at the end of section 7
   is opaque.  (Seems PHP here is a red herring and you really just mean
   lots-of-App-Engine-services.)
 
@@ -132,20 +132,20 @@ Presentation:
 * Likewise, you didn't submit your document source as asked.  Glitches
   like these put the reviewer in a grumpy mood :-(.
 
-* What's up with citations like "[7, Section 3]"?  The point referred
+x What's up with citations like "[7, Section 3]"?  The point referred
   to here (in the Intro) is on page 6, not page 7.  And in any case,
   that's not the usual convention for section cross-references.
 
-* Cross-reference glitch in the Intro: "Section 14.23"
+x Cross-reference glitch in the Intro: "Section 14.23"
 
 * Is it really "flash proxy" and not "Flash proxy"?  (More lowercasing?)
   I found that visually distracting; it's reminiscent of "flash crowd".
   If that's the reference, rather than use of Flash, then explain that
   to the reader.
 
-* Avoid use of "things", it's quite vague.
+x Avoid use of "things", it's quite vague.
 
-* Avoid use of contractions like "it's" or "doesn't".
+x Avoid use of contractions like "it's" or "doesn't".
 
 x "Classic example ... early 2012" - something 2 years old is not "classic"!
 
@@ -179,23 +179,23 @@ x "most of the numbers concentrate on 1  10" - hyphen missing
 x "typical pattern of using Google is ..." - add citation, or frame that
   *presumably* this is the case
 
-* You should try Figure 5 log-scaled (X axis only) to see if it's
+x You should try Figure 5 log-scaled (X axis only) to see if it's
   more illuminating.  As it is, all of the action is in the leftmost
   part of the plot.
 
-* Figure 6 is baffling in black-and-white.  Also, it says "Concurrent
+x Figure 6 is baffling in black-and-white.  Also, it says "Concurrent
   HTTPS connections over time" but doesn't state at what granularity.
   Per user?  For your sequential visiting of the Alexa sites?
 
-* Figure 7 should be bigger (for the report); should merge the two halves;
+x Figure 7 should be bigger (for the report); should merge the two halves;
   and should employ log-scaling so the two halves will both reasonably fit.
 
-* The lines in Figure 8 are not particularly meaningful.  Stick with
+x The lines in Figure 8 are not particularly meaningful.  Stick with
   points/barplots.
 
-* Avoid orphan subsections like 7.1 (i.e., there's no subsequent 7.2
+x Avoid orphan subsections like 7.1 (i.e., there's no subsequent 7.2
   subsection).
 
-* The bibliography is quite nicely put together.  The URLs are very
+x The bibliography is quite nicely put together.  The URLs are very
   handy, though for conference submission you would often omit them
   (or turn them into shortened URLs) to save space.
