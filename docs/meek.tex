@@ -678,7 +678,7 @@ The second POST request is an empty polling request.
 The messages shown here is encrypted inside HTTPS until after
 it has been fronted,
 so the censor cannot use the
-Host and X-Session-Id headers for classification.
+Host and \mbox{X-Session-Id} headers for classification.
 }
 \label{fig:protocol}
 \end{figure}
@@ -698,7 +698,7 @@ and a logical stream is chopped into multiple independent HTTP requests,
 so the source port is always changing.
 Instead, each client generates a random 256-bit session ID for each new Tor stream,
 which it sends with its requests in a special
-X-Session-Id HTTP header.
+\mbox{X-Session-Id} HTTP header.
 \meekserver, when it sees a session ID for the first time,
 opens up a new connection to the local Tor process
 and associates the connection and ID in a cache.
