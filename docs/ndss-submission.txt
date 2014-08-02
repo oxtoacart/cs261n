@@ -1,0 +1,75 @@
+== Submission ==
+
+"Submitted paper #291."
+1 Aug 2014 23:02:55 EDT  |  SHA-1 4144be5936e1d3c43a15370159943905b42c6d46
+
+https://ndss2015.ccs.neu.edu/paper/291?cap=0291a-wCJLImNffk
+
+== Abstract ==
+
+We describe "domain fronting," an application-layer technique for HTTPS that hides the remote endpoint of a communication for the purpose of censorship circumvention. Domain fronting enables communication that is apparently with an allowed domain, but actually with a forbidden domain. The key idea is the use of different domain names at different layers of communication. One domain is used on the "outside" of an HTTPS request---in the DNS request and TLS Server Name Indication---while another is used on the "inside"---in the HTTP Host header, invisible to the censor under HTTPS encryption. We identify a number of hard-to-block web services, like content delivery networks and Google, that support fronting because they ignore the outside of an HTTPS request and dispatch it internally according to the Host header. If a censor is unable to distinguish fronted circumvention traffic and non-fronted ordinary traffic, then blocking fronted traffic means blocking an entire web service, with resulting expensive collateral damage.
+
+We have implemented domain fronting in a system called meek, a pluggable transport for Tor. meek combines fronting with an HTTP-based tunneling proxy. The meek server's external interface is that of an ordinary web server. Domain fronting enables a client to reach the server, which is presumed blocked by the censor. The server receives HTTP requests, decodes them, and feeds their payloads into a Tor relay, returning downstream data in the HTTP response. A censor watching the communication sees only a sequence of HTTPS requests to an allowed domain. We describe the results of an initial deployment. meek, or something based on it, has been adopted by other circumvention systems.
+
+Hiding the endpoint and obscuring byte patterns are important parts of blocking-resistant communication, but there are other, more subtle considerations. We describe what we have done to disguise other traffic "tells" in meek, such as using a real web browser as a tool for making fronted HTTPS requests, in order to disguise meek's TLS fingerprint. We argue that these measures, combined with domain fronting, increase the censor's effort beyond simple one-shot blocking techniques such as IP address blocking, and into the realm of more expensive, less reliable statistical tests.
+
+
+== Topics ==
+
+Privacy and anonymity technologies
+Security for peer-to-peer and overlay network systems
+
+
+== PC ==
+
+Admad Sadeghi
+Alina Oprea
+Apu Kapadia
+Ari Juels
+Ben Livshits
+Christian Kreibich
+Christopher Kruegel
+David Brumley
+David Wagner
+Davide Balzarotti
+Dongyan Xu
+Engin Kirda
+Georgios Portakalidis
+Gianluca Stringhini
+Guo Fei
+Hayawardh Vijayakumar
+Heng Yin
+Ivan Martinovic
+Juan Caballero
+Long Lu
+Michael Bailey
+Nicolas Cristin
+Patrick Traynor
+Prateek Mittal
+Roberto Perdisci
+Robin Sommer
+Somesh Jha
+Srdjan Capkun
+Stelios Sidiroglou-Douskos
+Stephen McCamant
+Tim Leek
+Ting-Fang Yen
+Venkat Venkatakrishnan
+Wenke Lee
+William Enck
+William Robertson
+Xiao-Feng Wang
+Yongdae Kim
+Zhenkai Liang
+Zhichun Li
+Zhiqiang Lin
+
+
+== Conflicts ==
+
+"...past advisors and students, people with the same affiliation, and any
+recent (~2 years) coauthors and collaborators."
+
+Christian Kreibich - ICSI
+David Wagner - Berkeley
+Robin Sommer - ICSI
