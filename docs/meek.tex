@@ -41,30 +41,26 @@ that hides the remote endpoint of a communication
 for the purpose of censorship circumvention.
 Domain fronting enables communication that is apparently with an allowed domain,
 but actually with a forbidden domain.
-The key idea is the use of different domain names at different communication layers.
+The key idea is the use of different domain names at different layers of communication.
 One domain is used on the ``outside'' of an HTTPS request---in the DNS request and
 TLS Server Name Indication---while another is used
-on the ``inside''---the HTTP Host header, invisible to the
+on the ``inside''---in the HTTP Host header, invisible to the
 censor under HTTPS encryption.
 We identify a number of hard-to-block web services,
 like content delivery networks and Google,
-that enable fronting by ignoring the outside of an HTTPS request
-and dispatching it internally according to the Host header.
-The effect of fronting is that a user may communicate with one domain,
-even one forbidden by the censor,
-while appearing to communicate with another.
-If a censor is unable otherwise to distinguish fronted and non-fronted traffic,
-then blocking circumvention traffic means blocking the whole web service,
+that support fronting because they ignore the outside of an HTTPS request
+and dispatch it internally according to the Host header.
+If a censor is unable to distinguish fronted circumvention traffic and non-fronted ordinary traffic,
+then blocking fronted traffic means blocking an entire web service,
 with resulting expensive collateral damage.
 
 We have implemented domain fronting in a system called \meek,
 a pluggable transport for Tor.
-\meek\ combines fronting with a proxy server that encodes a TCP stream
-as a sequence of HTTP requests and responses.
+\meek\ combines fronting with an HTTP-based tunneling proxy.
 The \meek\ server's external interface is that of an ordinary web server.
-Domain fronting enables a client to reach the server.
-The server receives requests, decodes them, and feeds their payloads into a Tor relay,
-and returns downstream data in the HTTP response.
+Domain fronting enables a client to reach the server, which is presumed blocked by the censor.
+The server receives HTTP requests, decodes them, and feeds their payloads into a Tor relay,
+returning downstream data in the HTTP response.
 A censor watching the communication sees only a sequence of HTTPS requests to an allowed domain.
 We describe the results of an initial deployment.
 \meek, or something based on it,
@@ -76,9 +72,9 @@ has been adopted by other circumvention systems including
 Hiding the endpoint and obscuring byte patterns are important parts of blocking-resistant communication,
 but there are other, more subtle considerations.
 We describe what we have done to disguise other traffic ``tells'' in \meek,
-such as using a real web browser to make HTTPS requests
-for a believable TLS fingerprint.
-We argue that these measures increase the censor's effort
+such as using a real web browser as a tool for making fronted HTTPS requests,
+in order to disguise meek's TLS fingerprint.
+We argue that these measures, combined with domain fronting, increase the censor's effort
 beyond simple one-shot blocking techniques such as IP address blocking, and into
 the realm of more expensive, less reliable statistical tests.
 \end{abstract}
@@ -100,9 +96,9 @@ What we as circumventors have in our favor is the censor's
 distaste for ``collateral damage,''
 accidental overblocking committed in the course of trying to censor something else.
 One way to win against censorship is to entangle circumvention traffic
-with ordinary Internet traffic in a way that either both must be blocked together,
+with ordinary Internet traffic in a way that both must be blocked together,
 or not at all.
-If the ordinary traffic is important enough,
+If the ordinary traffic is valuable enough,
 above the censor's tolerance for overblocking,
 then the circumvention traffic will get through.
 
@@ -117,20 +113,20 @@ and Google's panoply of services---a nontrivial fraction of the web.
 See Section~\ref{sec:survey} for a list of suitable services.
 Domain fronting can be used to tunnel traffic
 to a general-purpose proxy,
-so that circumvention is not limited to HTTPS, nor to the domains of any specific web service.
+so that circumvention is not limited only to HTTPS, nor to the domains of any specific web service.
 
 The key idea of domain fronting is the use of
 different domain names at different layers of communication.
 In an HTTPS request, the destination domain name appears
 in three places relevant to the discussion:
 in the DNS query,
-the TLS Server Name Indication (SNI) extension~\cite[Section~3]{rfc6066},
-and the HTTP Host header~\cite[Section~14.23]{rfc2616}.
+in the TLS Server Name Indication (SNI) extension~\cite[Section~3]{rfc6066},
+and in the HTTP Host header~\cite[Section~14.23]{rfc2616}.
 Usually, the same domain name appears in all three places.
 But in a domain-fronted request,
 the DNS query and SNI carry one name (the ``front domain''),
 while the HTTP Host header,
-which is hidden from censor by HTTPS encryption,
+which is hidden from the censor by HTTPS encryption,
 carries another (the actual destination).
 
 \begin{figure}[ht]
@@ -147,7 +143,7 @@ is the actual destination \mbox{\textbf{forbidden.example}}.
 \label{fig:fronting}
 \end{figure}
 
-Neither the DNS request nor the SNI can be blocked without
+The censor may block neither the DNS request nor the SNI without
 collaterally blocking the front domain.
 The Host header is invisible to the censor,
 but visible to the server receiving the HTTPS request,
@@ -159,7 +155,7 @@ domain fronting can be understood as
 ``decoy routing at the application layer.''
 A fuller comparison with decoy routing appears in Section~\ref{sec:related-work}.
 
-A Wget command shows domain fronting in action
+This Wget command shows domain fronting in action
 on Google's infrastructure.
 Here, an HTTPS request for \urll{www.google.com} has a Host header for
 \urll{maps.google.com}. The HTML in the response is that of Google Maps.
@@ -176,7 +172,7 @@ Here, an HTTPS request for \urll{www.google.com} has a Host header for
 Domain fronting works with CDNs because a CDN's frontend server
 (called an ``edge server''),
 on receiving a request for a resource not already cached,
-forwards the request to the domain in the Host header
+forwards the request to the domain found in the Host header
 (the ``origin server'').
 (There are other ways for CDNs to work, but this ``origin pull''
 configuration is common.)
@@ -184,22 +180,22 @@ configuration is common.)
 % or may be a generic shared domain.~\cite{httpsincdn}
 Fronting works with Google because Google App Engine, a web application platform,
 can host a simple ``reflector'' application that emulates
-an origin-pull CDN, simply forwarding every request to an origin server.
-In both cases, the intermediate web service does not forward requests just anywhere---it
+an origin-pull CDN, simply forwarding every request to another server.
+In both cases, the intermediate web service does not forward requests to just anywhere---it
 has to be to the domain of a customer.
 In order to run a fronting backend,
-one has to create an account and pay for bandwidth.
+one generally has to create an account with the web service and pay for bandwidth.
 
 A variation on fronting is ``domainless'' fronting,
-in which there is no DNS request and no SNI extension.
+in which there is no DNS request and no SNI.
 It looks to the censor
 like the user is browsing an HTTPS site by its IP address,
 or using a web client that doesn't support SNI.
-Domainless fronting can be useful when there is no front domain
-known to have sufficiently high collateral damage.
-The censor is faced with the choice of blocking an entire IP address,
-blocking requests without SNI,
-or finding some other, presumably more expensive, test to try to distinguish
+Domainless fronting can be useful when there is no known front domain
+with sufficiently high collateral damage.
+The censor is faced with the choice of blocking an entire IP address, not only a domain;
+blocking requests without SNI;
+or trying to find some other, presumably more expensive, test to distinguish
 circumvention traffic.
 
 We have developed domain fronting into a full-fledged circumvention system called \meek,
@@ -209,8 +205,8 @@ upstream data are transformed into a sequence of HTTP requests,
 which are fronted in order to reach a proxy server.
 The server decodes the requests and feeds their payloads
 into the Tor network.
-Downstream data received from Tor
-are returned to the client as HTTP responses.
+Downstream data received by the server from Tor
+are returned to the client within HTTP responses.
 \meek's architecture appears in Figure~\ref{fig:architecture}.
 Section~\ref{sec:architecture} describes how it works in detail.
 
@@ -231,13 +227,14 @@ The host actually at allowed.example does not participate in the communication.
 \label{fig:architecture}
 \end{figure*}
 
-\meek\ has been built into an alpha version of Tor Browser,
+\meek\ has been built into an experimental release of Tor Browser,
 and has a small number of users.
-Our deployment so far uses Google App Engine and Amazon CloudFront.
+Our deployment so far uses Google App Engine and Amazon CloudFront
+as intermediate web service backends.
 % with the hidden actual domain \urll{meek-reflect.appspot.com}
 % hidden by the front \urll{www.google.com}.
-Section~\ref{sec:deployment} discusses other fronting-capable services
-and deployment scenarios.
+Section~\ref{sec:survey} names other fronting-capable services
+and Section~\ref{sec:discussion} describes other possible deployments.
 In addition to the Tor pluggable transport,
 systems based on \meek\ are now used by other circumvention systems including
 [blinded for anonymous submission].
@@ -259,18 +256,17 @@ For example, the plaintext handshake is a fingerprintable part of TLS.
 Section~\ref{sec:browserextension} describes how we use a web browser extension as an instrument for making HTTPS requests,
 to make \meek's TLS and HTTPS characteristics
 match those of a browser as closely as possible.
-One of our goals is to force the censor
+Our goal is to force the censor
 to employ more sophisticated, expensive, and error-prone statistical tests
 to classify traffic as allowed or prohibited,
-rather than simple domain blacklists or deep packet inspection;
-to force the practice of censorship to exist in a world
+rather than domain blacklists or deep packet inspection---to
+force the practice of censorship to exist in a world
 not of simple packet filters,
 but of probabilities and false positives.
-A preliminary analysis of \meek's resistance to detection
-based on traffic characteristics like packet length distribution
+A preliminary analysis of \meek's resistance to traffic analysis
 appears in Section~\ref{sec:trafficanalysis}.
 The analysis is based on comparing traffic traces of \meek\
-with samples of HTTPS traffic at an Internet router.
+to samples of HTTPS traffic at a network router.
 
 To our knowledge,
 the earliest application of domain fronting to circumvention
@@ -280,7 +276,7 @@ once widely used in China.
 Fronting has also been used with success since 2013
 for the rendezvous component of another transport called flash proxy~\cite{flashproxy}.
 GoAgent and flash proxy are the systems that most directly
-inspire this work.
+inspire ours.
 
 % We measure the performance...
 
@@ -304,12 +300,12 @@ An active-probing censor does not merely passively observe traffic:
 it injects its own traffic,
 acting as if it were an ordinary client and connecting to suspected
 proxy servers to see how they respond.
-If the connection is successful, the server may be blacklisted.
+Then a connection is successful, the server can be blacklisted.
 Active probing is a precise means of identifying whether a server belongs to a circumvention system,
-even when a protocol is hard to classify on the wire.
+even when a protocol is hard to detect on the wire.
 Winter and Lindskog~\cite{foci12-winter} confirmed an earlier discovery of
 Wilde~\cite{wilde} that China's Great Firewall identifies Tor bridges
-by issuing scans that follow up observed client connections, to discover
+by issuing scans that follow up on observed client connections, to discover
 whether a server speaks the Tor protocol.
 The discovery of active probing was the motivation for probing resistance in ScrambleSuit~\cite{scramblesuit}
 and obfs4~\cite{obfs4},
@@ -321,8 +317,8 @@ The first is to make traffic look unlike
 anything forbidden by the censor; that is, fail to match a blacklist. The second is
 to resemble a protocol that is explicitly allowed by the censor; that is, match a whitelist.
 Following the first strategy are the so-called ``look-like-nothing'' transports whose
-payloads are indistinguishable from a uniformly random byte stream,
-good examples of which are
+payloads are indistinguishable from a uniformly random byte stream.
+Good examples of look-like-nothing transports are
 obfs2~\cite{obfs2} and its successor obfs3~\cite{obfs3},
 Tor's go-to pluggable transports since early 2012~\cite{obfsproxy-arms-race}.
 Both obfs2 and obfs3 work by superenciphering an underlying stream,
@@ -337,11 +333,10 @@ obfs4~\cite{obfs4}
 builds on ScrambleSuit with more efficient cryptography and an authenticated handshake.
 
 The other strategy against DPI is the steganographic one: look like
-something the censor doesn't block.
+something the censor does not block.
 fteproxy~\cite{fte} uses format-transforming encryption to encode data into strings
 that match a given regular expression,
-for example a regular-expression approximation of HTTP,
-in order to match a firewall's whitelist.
+for example a regular-expression approximation of HTTP.
 StegoTorus~\cite{stegotorus}
 transforms traffic to look like a cover protocol
 using a variety of special-purpose encoders.
@@ -371,7 +366,7 @@ in order to disrupt a covert channel, without much harming ordinary VoIP calls.
 
 
 The other grand challenge of proxy-based circumvention is address-based blocking.
-Tor has long faced the problem of the blocking of its entry relays,
+Tor has long faced the problem of the blocking of its relays,
 the addresses of which appear in a public directory.
 In response, Tor began to reserve a portion of its
 new relays as secret ``bridges''~\cite{tor-blocking}
@@ -382,7 +377,7 @@ so that anyone can learn a few bridges, but it is hard to learn all of them.
 BridgeDB uses captchas and other rate-limiting measures,
 and over short time periods,
 always returns the same set of bridges to the same requester,
-preventing enumeration by simple repeated querying.
+preventing enumeration by simple repeated queries.
 BridgeDB is also capable of distributing the addresses
 of obfuscated bridges (obfs3 or ScrambleSuit);
 the combination
@@ -400,12 +395,12 @@ spoofing its source address so the packets appear to originate from some other `
 The censor has no IP address to block, because the proxy's true address never appears on the wire.
 Client and server have the challenge of agreeing on a dependable covert upstream channel
 that must remain unblocked,
-and the client must carry on a believable UDP conversation with the dummy host
-(the authors suggest a VoIP call).
+and the client must carry on a believable UDP conversation with the dummy host---a
+VoIP call, for example.
 
 Flash proxy~\cite{flashproxy} resists address blocking by
 conscripting web users as temporary proxies.
-Each proxy lasts only as long as a
+Each JavaScript-based proxy lasts only as long as a
 user stays on a web page, so the pool of proxies is constantly changing.
 If one of them is blocked, there is soon another to replace it.
 Flash proxy's approach to address blocking is in a sense
@@ -478,12 +473,12 @@ CloudTransport has much in common with domain fronting:
 it hides the true endpoint of a communication with HTTPS,
 and sends traffic through a domain with high collateral damage.
 In CloudTransport, the hidden destination, which is a storage bucket name rather than a domain,
-is hidden in the path component of the URL.
-For example, in an example S3 URL
+is hidden in the path component of a URL.
+For example, in the S3 URL
 \urll{https://s3.amazonaws.com/bucketname/filename},
-the censor only gets to ``see'' the generic domain part, \urll{s3.amazonaws.com}.
-The path component \urll{/bucketname/filename},
-which would reveal that CloudTransport is being used,
+the censor only gets to ``see'' the generic domain part, ``\urll{s3.amazonaws.com}''.
+The path component ``\urll{/bucketname/filename}'',
+which would reveal the use of CloudTransport,
 cannot be used for blocking because it is encrypted inside HTTPS.
 
 GoAgent~\cite{goagent} is a direct inspiration for \meek\ in its use of
@@ -513,7 +508,7 @@ in order to support protocols other than HTTP and HTTPS.
 Cloud-Entry has the same problem with NAT that flash proxy does,
 because the proxy tries to connect back to the client with a socket.
 App Engine kills web requests (and their associated socket connections)
-that take longer than 60~seconds,
+when they take longer than 60~seconds,
 so users must reconnect at least that often.
 
 Psiphon~\cite{psiphon} is a network of many one-hop proxies,
@@ -549,7 +544,7 @@ The intermediate web service does not need to cooperate with either,
 except to the extent that it doesn't collude with the censor.
 % The censor's goal is to prevent circumvention.
 
-The censor controls a network and the into and within it.
+The censor controls a network and the links into and within it.
 The censor is able to inspect traffic flowing across all links under its control
 and may block or allow any packet.
 The censor may inject and replay traffic, and
@@ -590,26 +585,24 @@ and when the censor controls a certificate authority.
 The components of the system are shown in Figure~\ref{fig:architecture}.
 The parts that are new in \meek\
 are the programs \meekclient and \meekserver,
-which are the pluggable-transports~\cite{pt} interface with Tor.
+which are \meek's interface with Tor.
 
 \meekclient is essentially a web client that knows how to front HTTPS requests.
-When \meekclient receives outgoing data from a client Tor process, it bundles them up into a POST request
+When \meekclient receives an outgoing chunk of data from a client Tor process, it bundles it up into a POST request
 and fronts the request through the web service,
-which in turn forwards the request to \meekserver on the bridge.
-If the response contains any HTTP body, \meekclient decodes it and returns it back to Tor.
+which in turn forwards it to \meekserver on the bridge.
+If the response returned by \meekserver contains any HTTP body,
+\meekclient decodes the body and sends it back to the Tor client.
 \meekclient takes pains to make its TLS fingerprint
 look like that of a browser; see Section~\ref{sec:browserextension}.
 
 \meekserver is a special-purpose web server.
 When \meekserver receives a request, it extracts the body and feeds it into
-a local Tor process running as a bridge.
-If there are any data pending to be sent back to the client from Tor,
+the Tor network.
+If there is anything pending to be sent back to the client from Tor,
 \meekserver includes it in the body of the HTTP response.
 \meekserver also handles session management:
-because there may be many clients using the service at once,
-the server must determine which client session each incoming request belongs to.
-% It does this by means of an X-Session-Id header,
-% described in this section.
+keeping track of which requests correspond to which active Tor connection.
 
 When \meek\ is used with Google App Engine, one other component is needed:
 a small ``reflector'' web app that simply copies any request
@@ -620,22 +613,20 @@ The reflector app emulates the behavior of an origin-pull CDN,
 which also simply copies and forwards requests
 when the response is not already cached.
 
-The main technical challenge of the protocol is splitting up a TCP stream
+The main technical challenge of the protocol is splitting a TCP stream up
 into a sequence of HTTP requests and responses.
-The underlying TCP stream is broken into chunks so that
-it can be sent over HTTP.
 The body of each HTTP request and HTTP response carries
 a small chunk of upstream or downstream communication.
 There must therefore be some way of making sure that chunks
 are correctly reassembled at the other end,
-in order and without gaps and duplicates.
+in order and without gaps or duplicates.
 \meek\ takes a naive approach: requests and responses are strictly serialized.
 The client doesn't send a second chunk of data
 (i.e, make another HTTPS request) until it has
 received the response to its first.
 The reconstructed stream is simply the concatenation
 of bodies in the order they arrive.
-Doing it this way is simple and guarantees correctness,
+Handling stream reconstruction this way is simple and guarantees correctness,
 but has performance drawbacks because there is a full round-trip
 between every send.
 Section~\ref{sec:discussion} proposes a more efficient encoding
@@ -693,7 +684,7 @@ Host and X-Session-Id headers for classification.
 \end{figure}
 
 \meekserver must handle many clients at once,
-and therefore maintains many open connections to the local Tor process,
+and therefore maintains many open connections to a local Tor process,
 one for each active client.
 When a new request arrives, the server must determine which
 open session it belongs to
@@ -702,11 +693,11 @@ In TCP, different streams are distinguished by their
 (source~IP, source port, dest~IP, dest~port) tuple,
 but that doesn't work for \meek, for two reasons:
 the source IP of the requests is that of the intermediate web service,
-not that of the client;
+not of the actual client;
 and a logical stream is chopped into multiple independent HTTP requests,
 so the source port is always changing.
 Instead, each client generates a random 256-bit session ID for each new Tor stream,
-which it sends with each of its requests in a special
+which it sends with its requests in a special
 X-Session-Id HTTP header.
 \meekserver, when it sees a session ID for the first time,
 opens up a new connection to the local Tor process
@@ -724,18 +715,18 @@ In order to enable the server to send back data,
 The first is polling:
 every so often the client sends a request with an empty payload
 if it has nothing else to send,
-simply to give the server an opportunity to reply.
+simply to give the server an opportunity to send something back.
 The polling interval starts short (100~ms) and grows exponentially
 up to a maximum of 5~s.
 % ANON
 % The other technique,
 % implemented in Psiphon's version of \meek,
 The other technique
-uses long-lived persistent HTTP connections.
+uses streaming HTTP responses over persistent HTTP connections.
 When the server sends a response, it keeps the connection open,
 continually appending data to the response body while it has anything to send.
 When the server receives a new request from the same client,
-it closes any response stream it has open to the client and starts a new one.
+it closes any response stream it has open to that client and starts a new one.
 This second technique is especially beneficial for bulk downloads,
 but doesn't work on all services:
 notably Google App Engine doesn't support streaming of this kind.
@@ -748,12 +739,12 @@ Tor uses fixed-size cells of 514 bytes~\cite[Section~0.2]{tor-spec}.
 Each cell is wrapped in a TLS Application Data record, which adds 29 bytes
 when using a GCM ciphersuite (the default in current versions of Tor).
 % (in Tor version~0.2.4.22 using a GCM ciphersuite).
-This 543-byte record is what is received by \meekclient,
+This 543-byte record is received by \meekclient,
 which adds an HTTP header whose length is about 400 bytes
 (varying slightly depending on the length of the Host field).
-The HTTP request goes into its own TLS Application Data record,
-which adds about 50~bytes
-(depending on how much padding is used by the ciphersuite selected by the web service).
+The HTTP request goes into its own TLS Application Data record when it becomes HTTPS,
+adding about 50~bytes
+depending on how much padding is used by the ciphersuite in use.
 
 % 514 → 543 → 956 → 1013
 
@@ -776,19 +767,19 @@ $\approx$ &   1000 & total
 % 1.276243093922652
 \noindent
 The total overhead varies according to the length
-of the Host field and the specifics of the intermediate web service's TLS,
+of the Host field in the header and the specifics of the intermediate web service's TLS configuration,
 but is somewhere in the neighborhood of $(543+450)/543-1\approx83$\%.
 This is the worst case, when Tor sends a single cell.
 Tor can bunch multiple cells into one transmission;
 if two cells are sent at once, the overhead drops to
 ${\approx}41$\%; if three, it is ${\approx}28$\%.
 Bulk uploads and downloads tend to have less overhead, bunching many cells at once.
-Persistent HTTP connections, when they are possible, reduce overhead further,
+Streaming HTTP responses, when they are possible, reduce overhead further,
 % ANON
 % Persistent HTTP connections as used by Psiphon reduce overhead further,
 because only one HTTP header is needed for a large number of transmissions.
 Empty polling requests also use bandwidth,
-but they are sent only when the connection is idle
+but they are sent only when the connection is idle,
 so they don't affect upload or download speed.
 As is discussed in Section~\ref{sec:trafficanalysis},
 \meekclient reuses the same TLS connection for many requests,
@@ -806,6 +797,7 @@ Strict serialization of requests and responses
 becomes a problem with large round-trip times,
 as throughput becomes limited by latency.
 Section~\ref{sec:discussion} describes ways to improve
+performance with high latencies.
 % ANON
 % performance with high latencies;
 % Psiphon's use of persistent connections as described in this section is one of them.
@@ -828,7 +820,7 @@ The TLS handshake is largely plaintext~\cite[Section~7.4]{rfc5246}, and leaves
 enough room for variation, for example in
 the client's lists of ciphersuites and extensions,
 that it is possible to fingerprint different client TLS implementations~\cite{ssl-p0f}
-based on the handshake.
+based on their handshake.
 (We are only concerned with fingerprinting the client,
 because the server's TLS
 comes from the intermediate web service;
@@ -842,8 +834,9 @@ which has a custom TLS library~\cite{golang-crypto/tls};
 Figure~\ref{fig:ciphersuites:golang}
 shows how it would appear on the network with no TLS camouflage.
 Figures~\ref{fig:ciphersuites:firefox} and~\ref{fig:ciphersuites:chrome},
-which are browsers, are different from Go's TLS; the browsers are also unlike each other.
-A censor could block an uncamouflaged \meek\ using Go's fingerprint,
+shows two browsers which have TLS fingerprints different from Go's
+and different from each other's.
+A censor could block an uncamouflaged \meek\ using Go's TLS fingerprint,
 if it considered the collateral damage resulting from blocking other Go programs to be slight enough.
 
 \begin{figure*}
@@ -1007,21 +1000,21 @@ This figure is a zoomed-in view of the ``Client's PC'' component of Figure~\ref{
 
 Figure~\ref{fig:browser-architecture} shows the interaction of components
 on the client's computer.
-The local Tor process starts a helper process that starts both \meekclient
+The local Tor process runs a helper process that starts both \meekclient
 and the headless browser,
 then configures \meekclient to proxy its requests through the browser extension.
 The user's browser proxies through Tor;
-Tor proxies through \meekclient,
+Tor proxies through \meekclient;
 and \meekclient proxies through the headless browser.
 The headless browser is the only part that ever actually touches the network.
 It should be emphasized that the URLs requested by the headless browser extension
-have no relation to the URLs the user actually browses;
+have no relation to the URLs the user browses;
 the extension only ever makes requests to the front domain.
 
 The use of a browser extension brings benefits beyond TLS camouflage.
 It means \meek's HTTP tunnel inherits other characteristics of the browser:
 for instance
-how often it resolves DNS names,
+how often it resolves DNS,
 its connection reuse,
 and its HTTP keepalive behavior.
 The Firefox extension has special advantages
@@ -1031,7 +1024,7 @@ is a modified version of Firefox:
 we can use the same browser executable for both the browser the user interacts with (Tor Browser)
 and the one providing TLS camouflage (headless Firefox),
 saving space in distribution packages
-and sparing the user from having to separately configure a browser to run the extension.
+and sparing the user the chore of having to separately configure a browser to run the extension.
 In Tor Browser,
 the headless Firefox is started and stopped transparently
 when \meek\ is activated and deactivated.
@@ -1053,7 +1046,7 @@ because that portion of the communication flow is not observed by the censor.
 Appropriate TLS camouflage may differ depending on circumstances.
 On a traditional desktop PC, using a browser is probably the right choice.
 When
-[blinded circumcention tool]
+[blinded circumvention tool]
 % ANON
 % Psiphon
 ported \meekclient to Android,
@@ -1074,7 +1067,7 @@ only on Google App Engine and Amazon CloudFront.
 For the others, we have only checked that fronting works.
 Recall that even web services that support fronting
 will front only for their own customers,
-so new each deployment typically means becoming a customer and an investment of time and money.
+so new each deployment typically requires an investment of time and money.
 
 Google App Engine~\cite{googleappengine}
 is a web application platform.
@@ -1113,10 +1106,11 @@ denial-of-service attacks.
 It appears that any domain name on CloudFlare
 can front for any other, even custom user-selected domains;
 however it is not obvious which one is best to use as a front.
-The front domain needs to be popular
+The front domain needs to be a popular one
 (causing high collateral damage if blocked),
-or else the censor may simply block the domain entirely.
-It is doubly bad when a domain is blocked, because not only is circumvention foiled,
+or the censor may simply block it entirely.
+It is doubly bad when a domain is blocked in this way,
+because not only is circumvention foiled,
 but some unsuspecting third party has just had their web site blocked.
 A solution may be to round-robin through
 a pool of popular domain names;
@@ -1147,12 +1141,12 @@ is a cloud computing platform that features a CDN.
 Similarly to CloudFront, users get automatically generated subdomains
 of \urll{vo.msecnd.net},
 all of which can front for each other.
-There are other fronting domain names, like \urll{ajax.aspnetcdn.com},
+There are other front domain names, like \urll{ajax.aspnetcdn.com},
 that may offer high collateral damage.
 
 Fastly~\cite{fastly} is a CDN.
-It is unique among the the services we tested in that
-it is the only one that appears to enforce the SNI:
+It is the only one of the services we tested in that
+that appears to enforce SNI:
 if the SNI and Host do not match,
 the Fastly edge server returns an HTTP 400 (``Bad Request'') error.
 However, if the TLS ClientHello omits SNI, then the Host may be any Fastly domain.
@@ -1169,7 +1163,7 @@ We believe \meek\ is resistant to the ``easy''
 forms of blocking, namely IP address and DNS blocking,
 simple pattern-based DPI,
 and active probing.
-We hope that the censor will have to resort to measuring
+We hope to force the censor to resort to measuring
 more subtle features of the communication.
 In this section we provide a preliminary analysis
 of \meek's resistance to such attacks.
@@ -1199,7 +1193,7 @@ Our representative of ordinary HTTPS traffic
 is a sanitized 10-minute trace
 from 
 %Lawrence Berkeley National Laboratory (\lbl)
-a research lab (anonymized as \lbl for blind submission),
+a research lab [blinded as \lbl for anonymous submission],
 comprising data to and from TCP port 443 on any Google server.
 % Mention the non-google if it appears in a figure.
 The \lbl trace consists 313~megabytes of packet headers,
@@ -1248,7 +1242,7 @@ Protocols vary in their packet lengths;
 a censor may block a circumvention protocol if its length distribution
 is distinct enough.
 Figure~\ref{fig:datalen}
-compares the packet length distributions of both sample traffic traces.
+compares the packet length distributions of the sample traffic traces.
 In both cases, about 38\% of packets have an empty payload, mostly ACKs.
 There is a small peak in both traces at the usual TCP Maximum Segment Size
 of 1460 bytes.
@@ -1257,9 +1251,9 @@ may be caused by Google servers' sizing of TLS records so they fit within TCP se
 % https://github.com/joyent/node/issues/6889
 % http://mailman.nginx.org/pipermail/nginx-devel/2013-December/004703.html
 Conspicuous in the \meek\ trace are a small number of
-frequent packet sizes,
-and the lack of a cluster of small payload lengths of around 50 bytes.
-Both of these characteristics are probably artifacts
+discrete frequent packet sizes,
+and the lack of a cluster of short payloads of around 50 bytes.
+Both of these characteristics are probably reflections
 of Tor's fixed cell size and the nearly fixed-size HTTP headers
 added by \meekclient and \meekserver.
 % In this trace, packets of 1024 bytes are probably single
@@ -1329,10 +1323,10 @@ which keep the connection from becoming idle.
 The traffic trace represents the browsing of hundreds of web sites
 and thousands of HTTPS transactions, but they all
 occurred over just a few TCP/TLS connections.
-60\% of \meek\ connections lasts five minutes or longer,
-while only 13\% of those of ordinary traffic do.
+60\% of \meek\ connections lasted five minutes or longer,
+while only 13\% of those of ordinary traffic did.
 \meek\ has essentially no connections lasting less than 24 seconds,
-but such short connections account for over 42\% of the \lbl HTTPS connections.
+but such short connections account for over 42\% of the \lbl trace.
 30\% (3 out of 10) of \meek's connections lasted almost exactly one hour,
 evidently reflecting a built-in time limit in either the client browser extension
 or in App Engine.
@@ -1341,7 +1335,7 @@ In light of these findings,
 the censor may decide to block any long-lived HTTPS connections between
 a client and a web service.
 According to our traffic trace, doing so will not disrupt more than 8\% of ordinary connections;
-whether that is an acceptable cost depends on the censor's
+whether that is an acceptable cost depends on the time threshold and the censor's
 tolerance for collateral damage.
 The censor can lower the timing threshold, at the cost of more false positives.
 Duration-based blocking is favorable for the circumventor,
@@ -1418,8 +1412,8 @@ Google's traffic is different than Akamai's.
 For the purposes of censorship circumvention,
 one doesn't need to match exactly a ``typical'' traffic profile;
 only not to deviate from it too much.
-Circumvention traffic must only be difficult enough to distinguish from ordinary traffic,
-that blocking requires a number of false positives unacceptable to the censor.
+Circumvention traffic must only be difficult enough to distinguish from ordinary traffic
+that blocking it requires an amount of false positives unacceptable to the censor.
 Even 1\% of Google traffic accidentally blocked may exceed the collateral damage tolerance of some censors.
 Further, it is hard to characterize what normal use is of, say, a CDN:
 they provide access to ordinary web sites,
@@ -1435,7 +1429,7 @@ By removing the easy ways, we increase the censor's cost.
 \label{sec:deployment}
 
 Development on \meek\ as a Tor pluggable transport~\cite{pt} began in January~2014.
-Most users who use Tor, use it with Tor Browser~\cite{torbrowser},
+Most users who use Tor use it with Tor Browser~\cite{torbrowser},
 a customized version of Firefox that is
 preconfigured to use a built-in Tor client.
 % and patched to defend against application-layer privacy and anonymity threats
@@ -1477,6 +1471,8 @@ was caused by an unblocking event that made \meek\ unnecessary for some users.
 
 Figure~\ref{fig:clients-tor} shows the average number of concurrent users of \meek\ with Tor
 since close to the beginning of development.
+A measurement of 5, for example, means that there were on average five
+simultaneous users of the system at any time during the day.
 The measurements come from the Tor Metrics Portal~\cite{metrics-meek},
 which aggregates statistics reported by Tor relays.
 The number of users is estimated by counting the number
@@ -1505,7 +1501,7 @@ it is clear that meek-with-%
 with its thousands of daily users,
 is much more widely used than meek-with-Tor, which has not yet seen a formal release.
 
-The experimental Tor Browser releases have all been based on Google with App Engine.
+Our experimental Tor Browser releases have all been based on Google with App Engine.
 Support for CloudFront was not realized until late July.
 We are running the backends on paid accounts of these services for use by the public.
 The cost for bandwidth on App Engine is \$0.12 per gigabyte,
@@ -1523,7 +1519,7 @@ we believe that an organization operating a backend for the use of the public
 has compelling usability advantages.
 With client software configured to use the public backend by default,
 there is nothing for the user to upload and no out-of-band communication is needed before getting
-started---when everything works it offers no-configure circumvention.
+started---when everything works it offers circumvention without configuration.
 
 % The number of parties able to analyze users' traffic patterns is somewhat increased:
 % the path from user to Tor bridge now includes App Engine and the web app operators,
@@ -1540,7 +1536,7 @@ Fronting through \urll{www.google.com} to App Engine, for example,
 is making a bet that the censor will lack the temerity to block Google.
 The Great Firewall of China called our bluff in June of 2014,
 when it blocked access to all Google services~\cite{cn-google-block}.
-In 2012, the government of Pakistan blocked to all of YouTube
+In 2012, the government of Pakistan blocked all of YouTube
 in order to restrict access to one video,
 and in 2011, the government of Egypt briefly ``turned off the net'' completely.
 % http://www.washingtonpost.com/business/economy/youtube-blocked-in-pakistan/2012/09/17/30081fa2-00ea-11e2-b257-e1c2b3548a4a_story.html
@@ -1573,8 +1569,10 @@ when the service is blocked.
 % most powerful censor in order to be successful.
 % What doesn't work in one place may work in another.
 
-Domain fronting shares a potential weakness with decoy routing,
-which is that the overt and covert destinations lie at the ends of different
+% Discuss TLS throttling as an attack.
+
+Domain fronting shares a potential weakness with decoy routing:
+the overt and covert destinations lie at the ends of different
 network paths.
 The difference in paths may create side channels---latency measurements for instance---that
 enable the censor to
@@ -1600,15 +1598,15 @@ For this reason, domain fronting should be combined with another
 layer, for example Tor, that prevents the web service from
 observing the contents and destination of messages.
 There is additional risk when the client is browsing a web site
-controlled by the same service as that they are fronting through,
+controlled by the same service as the one they are fronting through,
 for example browsing YouTube while fronting through \urll{www.google.com}.
 Even with Tor, when this happens the web service gets to see
 both entry and exit traffic, and is in a position to
 perform traffic correlation attacks.
 The problem seems hard to counter, because the front domain needs
 to be popular in order to have high collateral damage,
-but popular domains are also the ones people tend to want to go to.
-A possible mitigation is traffic padding that lasts until
+but popular domains are also the ones that people tend to want to go to.
+A possible mitigation is padding that lasts until
 the second hop of a three-hop Tor circuit,
 which would reduce the correlation between entry and exit traffic.
 % like what mjuarez is working on, mostly orthogonal to circumvention.
@@ -1696,7 +1694,7 @@ and trust model.
 The browser running the HTTPS camouflage extension (Section~\ref{sec:browserextension})
 has a list of trusted certificate authorities.
 A censor that controls a certificate authority trusted by the browser
-would be able to do a man-in-the-middle attack
+is able to perform a man-in-the-middle attack
 between the client and the intermediate web service,
 and detect fronting by decrypting TLS and checking for specific Host headers.
 Such a censor would be able to detect circumvention,
@@ -1724,7 +1722,7 @@ The request-reflecting role of a CDN can
 be played by a PHP script, for example,
 or a special web server configuration.
 Their URLs unprotected by domain fronting,
-each reflector would be easily individually blockable,
+each reflector would be easily blockable individually,
 so there would need to be sufficiently many that
 a censor could not block them all.
 This deployment model is essentially the same as with
@@ -1750,6 +1748,7 @@ We discuss the results of an initial deployment.
 % ANON
 % in both Tor and Psiphon.
 
+[Links to source code omitted for anonymous submission.]
 % ANON
 % \meek\ has a home page at
 % \url{https://trac.torproject.org/projects/tor/wiki/doc/meek}.
