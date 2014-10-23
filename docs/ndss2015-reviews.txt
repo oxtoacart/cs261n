@@ -1,0 +1,186 @@
+Dear fifield@eecs.berkeley.edu,
+
+Here are the reviews for your paper
+
+#291 Blocking-resistant communication through domain fronting
+
+===========================================================================
+                             NDSS Review #291A
+                     Updated 15 Sep 2014 13:44:40 EDT
+---------------------------------------------------------------------------
+   Paper #291: Blocking-resistant communication through domain fronting
+---------------------------------------------------------------------------
+
+                      Overall merit: 5. Accept
+                 Reviewer expertise: 2. Some familiarity
+
+                         ===== Paper summary =====
+
+The paper proposes meek, a scheme for circumvention of censorship on the 
+web. The idea is to have an allowed domain in the DNS query and the TLS SNI, 
+while encapsulating the actual address of the target using HTTPS encryption. 
+The censor only sees the allowed domain, which allows packets to avoid 
+censorship. The request is forwarded by an intermediate web service to reach 
+its actual target. The system is evaluated by comparing traffic with 
+ordinary HTTPS traffic. Packet length, connection lifetime and the number of 
+concurrent connections are compared. It appears that meek traffic is not 
+substantially different from regular HTTPS traffic, which means that censors 
+cannot easily block it.
+
+                      ===== Comments for author =====
+
+This paper tackles a timely problem and it seems that the proposed scheme 
+accomplishes effective censorship circumvention, as suggested by deployment 
+statistics. The paper is well written and generally easy to read. It is 
+rather self-contained, which is a good thing.
+
+There are a couple of limitations to the paper. First, while the description 
+of the related work is quite detailed and relatively easy to follow, it does 
+not make it clear how meek differs from existing schemes. For example, the 
+text says that â€œOSS shares certain similarities with domain frontingâ€, but 
+it does not say what the differences are.
+
+The second limitation is that the evaluation is not very 
+convincing. The comparison of traffic patterns is interesting, but not very 
+strong. I think that before claiming that there are no meaningful statistical 
+pattern differences, it would be good to use statistical models that are more 
+elaborate than simple averages. For example, in Figure 8 it seems that the variance 
+in numbers of concurrent connections would be different between the two 
+traces. Presumably, more elaborate models would also show stronger 
+differences. I am aware that the introduction announces that these results are 
+preliminary, but having a convincing evaluation is important. I also acknowledge 
+the difficulty of defining what normal traffic is, and I am aware that the 
+authors cannot anticipate what tools censors will use. However it is safe to 
+assume that they will use more sophisticated means than what is presented in 
+the paper.
+
+In the evaluation section, I am surprised that there is no comparison to other 
+existing schemes. There are several schemes to choose from, so the evaluation 
+would be a lot stronger if the authors could show the benefits of their scheme 
+over existing work. Finally, I would suggest adding throughput measurements or 
+at the very least simulations. Especially since it seems that the sequential 
+nature of messages would have a strong negative impact on throughput.
+
+===========================================================================
+                             NDSS Review #291B
+                     Updated 16 Oct 2014 16:39:48 EDT
+---------------------------------------------------------------------------
+   Paper #291: Blocking-resistant communication through domain fronting
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Weak reject
+                 Reviewer expertise: 3. Knowledgeable
+
+                         ===== Paper summary =====
+
+The paper presents the idea of circumventing censorship through domain
+fronting. This is a  trick that relies on using encrypted connection
+with popular web services like Google, Amazon, or CDNs like
+CloudFlare. A web site on the other side of these services can then
+forward the connection to TOR. The motivation is that it is too
+expensive and disruptive for the censor to block services like Google,
+Amazon or other CDNs all out.
+
+The paper demonstrate this idea using Meek and discuss Meek's threat
+model, architecture, and how they can camouflage the Meek protocol
+under TLS.  They also survey web services that could support Meek and
+whether Meek can be easily detected by statistical techniques. They
+also discussed deploying Meek to real users as part of TOR and also as
+a separate application.
+
+                      ===== Comments for author =====
+
+The core of the idea is pretty simple and well known. GoAgent has been
+using a similar idea for quite some time, as the paper acknowledges.
+Additionally, the Chinese great firewall recently started MITM'ing all
+Google connections, so it does seem like some censors will take this
+step of blocking web services.
+
+None the less, even if the idea is not very new, an academic enquiry
+into its use/security is very much appreciated and I am happy to see
+such a paper. The key contribution of the paper is the lessons learnt
+from real world deployments, the investigation of camouflaging and
+performance impact, and the survey of web services. These
+contributions (more than the actual idea) are what would make the
+paper a great contribution to the literature.
+
+Unfortunately, the paper does not discuss too much about lessons
+learnt from real world deployments. It has some basic information
+about how many users they deployed too, but no discussion on lessons
+learnt or feedback from users or comparison to TOR or anything like
+that. A longer discussion and some insights for the rest of the
+community (I am personally not quite sure what) would be really
+helpful.
+
+The paper does do a pretty reasonable job of discussing how to
+camouflage by discussing performance impact, the importance of using a
+real browser, and the comparison against the network flows seen on the
+wire. They discuss how their inability as a defender to easily find a
+model to distinguish real traffic from meek traffic also translates to
+a difficulty for the censor. I was confused by the discussion on
+traffic analysis though. A lot of the discussion seemed focused on the
+totality of the traffic instead of discussing details about what the
+trace for a typical single user vs. a user relying on Meek  would look
+like. Further, the paper claims that protecting against statistical
+traffic analysis is a more general problem. While I agree, there has
+been some literature in the past about ideas to mitigate traffic
+analysis; the paper lacks any discussion on how Meek impacts those
+research directions. I would have also appreciated a discussion of
+previous attacks using traffic analysis and how Meek would make them
+easier/harder. Instead, the paper draws a bunch of graphs and shows us
+that it is hard to do traffic analysis. It would have been nice to
+discuss concretely previous attacks and why they would succeed or
+fail. I was also surprised to note no discussion on the actual
+protocol being used: for example, a substantial chunk of the traffic
+to Google is likely SPDY; whereas that is not something that would
+work for cloudfront or akamai. How does traffic analysis change when
+the traffic is broken down by HTTPS, SPDY, HTTP/2?
+
+The paper also presents a survey of fronting capable web services. I
+think this was a great contribution---while the community knows that
+this is a possibility, a proper survey was missing. Unfortunately,
+this survey was too short. For example, it is clear that the using
+Google as a fronting mechanism means censor might have to block Google
+services. But, who else uses cloudfront? Who else uses Fastly and who
+else uses cloudflare? Some sites use Cloudfront directly: for example,
+bigpopularsite-static.com could actually just be pointing to
+CloudFront. Would using these as a fronting domain be possible?
+
+None of these are critical issues: rather, they are suggestions for
+improvement. But, since the core idea of the paper is relatively known
+and understood, I think these are the places where the key
+contribution of the paper lies. Given the questions that I had when
+reading it, I am inclined to give a "borderline"---a more thorough
+investigation and a rewrite to stress on these contributions would
+make this a better paper to accept. Right now, I am afraid the paper
+stresses too much on the idea of domain fronting as the key
+contribution, which I don't find a major contribution.
+
+===========================================================================
+                             NDSS Review #291C
+                     Updated 11 Oct 2014 16:59:34 EDT
+---------------------------------------------------------------------------
+   Paper #291: Blocking-resistant communication through domain fronting
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Borderline
+                 Reviewer expertise: 2. Some familiarity
+
+                         ===== Paper summary =====
+
+This paper proposes the use of domain fronting as a means for bypassing censorship.  Domain fronting takes advantage of CDNs that allow HTTP Host values to differ from the TLS SNI field, where the CDN will forward HTTP traffic to the domain specified in the Host header.  This allows domain-fronted traffic to appear to be destined to the CDN, when in fact it will be routed to a forbidden domain.  Here, a tool called meek is described that uses this technique to forward arbitrary traffic over domain-fronted HTTPS into the Tor overlay via a number of CDNs.  The fundamental assumption is that many censoring organizations will be reluctant to block access to these CDNs wholesale due to the collateral damage that would result, and would instead be forced to turn to less reliable statistical means to in order to filter traffic using domain-fronting.
+
+                      ===== Comments for author =====
+
+The technique presented here is quite clever, and seems to already be in use by a number of people to bypass censorship systems.  The trick of using the disparity between TLS SNI and HTTP Host values was already known, having been used by GoAgent, and it seems that the remainder of meek is mostly engineering to integrate domain fronting into Tor.  But, at least this is prominently disclosed.  I do find value in the discussion of how resistant domain fronting would be to statistical classification, however, and I would tentatively agree with the assertion that even defining "normal traffic" could be a difficult problem for attackers.
+
+On the other hand, organizations engaged in censorship tend to have a lot of data to build such models, and a lot of motivation to do so, so I'm not convinced that statistical classification would be impossible.  In addition, I would guess that such an organization is probably also not as concerned as others would be about false positives.
+
+The other mitigation, that of calling domain fronting's bluff by blocking access to CDNs used for that purpose, seems a little shaky as well.  The obvious example is China's censorship of Google in June 2014 -- clearly, the threat of collateral damage is sometimes not enough to dissuade some organizations.  As with much of security, censorship and its circumvention is an arms race.  Whether this raises the bar substantially remains to be seen.
+
+
+
+Best regards,
+
+E.Kirda and S.Capkun
+
