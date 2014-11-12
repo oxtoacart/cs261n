@@ -14,7 +14,7 @@
    height="160.30943"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.48.5 r10040"
    sodipodi:docname="architecture.svg"
    inkscape:export-xdpi="99.987129"
    inkscape:export-ydpi="99.987129">
@@ -51,7 +51,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.2142651"
-     inkscape:cx="224.93987"
+     inkscape:cx="-14.399826"
      inkscape:cy="27.529696"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -60,10 +60,10 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1593"
-     inkscape:window-height="1539"
+     inkscape:window-width="763"
+     inkscape:window-height="614"
      inkscape:window-x="0"
-     inkscape:window-y="30"
+     inkscape:window-y="0"
      inkscape:window-maximized="0"
      showguides="true"
      inkscape:guide-bbox="true"
@@ -75,12 +75,7 @@
      inkscape:snap-bbox="true"
      inkscape:snap-object-midpoints="false"
      inkscape:bbox-nodes="true"
-     inkscape:snap-bbox-edge-midpoints="true">
-    <sodipodi:guide
-       orientation="0,1"
-       position="3.8939883,85.36133"
-       id="guide4491" />
-  </sodipodi:namedview>
+     inkscape:snap-bbox-edge-midpoints="true" />
   <metadata
      id="metadata7">
     <rdf:RDF>
