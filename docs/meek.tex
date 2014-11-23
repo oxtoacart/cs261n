@@ -1,4 +1,4 @@
-\documentclass[conference]{IEEEtran}
+\documentclass{acm_proc_article-sp}
 \usepackage[utf8]{inputenc}
 \usepackage{array}
 \usepackage{graphicx}
@@ -8,6 +8,8 @@
 \usepackage{hyperref}
 \usepackage{textcomp}
 \usepackage{xspace}
+
+\urlstyle{same}
 
 % Avoid line breaks in program names.
 \newcommand{\meekclient}{\mbox{meek-client}\xspace}
@@ -579,7 +581,7 @@ specifically what happens
 when the intermediate web service's frontend server is inside the censor's network
 and when the censor controls a certificate authority.
 
-\section{Architecture and protocol of \meek}
+\section{Architecture and protocol of meek}
 \label{sec:architecture}
 
 The components of the system are shown in Figure~\ref{fig:architecture}.
@@ -873,7 +875,7 @@ Extensions:
 %
 \begin{subfigure}[t]{0.30\textwidth}
 \caption{Firefox 24}
-\begin{minipage}[t][57ex][t]{\textwidth}
+\begin{minipage}[t][65ex][t]{\textwidth}
 \tiny
 \begin{verbatim}
 Ciphersuites:
@@ -1055,7 +1057,7 @@ but rather made all HTTPS requests with the standard Android HTTP API.
 This decision makes sense because other Android applications
 also use the standard API and share the same TLS fingerprint.
 
-\section{A survey of fronting-capable web services}
+\section{A survey of fronting-capable\\web services}
 \label{sec:survey}
 
 This section contains a brief survey of fronting-capable
@@ -1787,7 +1789,7 @@ We discuss the results of an initial deployment.
 % HTTPS obscures session ids, equivalent to obscuring TCP connections in other transports.
 % Increases latency a lot: \approx 100 ms increased to \approx 350 ms when I tried it in March 2014.
 
-\bibliographystyle{IEEEtran}
+\bibliographystyle{abbrv}
 \bibliography{meek}
 
 \end{document}
