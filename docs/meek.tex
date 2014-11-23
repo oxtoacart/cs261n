@@ -965,6 +965,17 @@ of which support HTTPS through a wildcard certificate.
 CloudFront has a usage tier that is free of charge for a year,
 subject to a bandwidth limit of 50 gigabytes per month.
 
+Microsoft Azure~\cite{azure}
+is a cloud computing platform that features a CDN.
+Similarly to CloudFront, users get automatically generated subdomains
+of \urll{vo.msecnd.net},
+all of which can front for each other.
+The CDN works only for Azure domains, however,
+so as with App Engine, it is necessary to run a trivial reflector app
+that merely forwards requests out of Azure toward an external proxy.
+There are other front domain names, like \urll{ajax.aspnetcdn.com},
+that may offer high collateral damage.
+
 CloudFlare~\cite{cloudflare},
 not to be confused with CloudFront,
 is a CDN also marketed as protection against
@@ -1001,14 +1012,6 @@ in 2010 it carried 15--20\% of all web traffic~\cite{akamai}.
 Akamai costs more than other CDNs;
 it would likely require institutional support
 to keep a circumvention system running on it in the long term.
-
-Microsoft Azure~\cite{azure}
-is a cloud computing platform that features a CDN.
-Similarly to CloudFront, users get automatically generated subdomains
-of \urll{vo.msecnd.net},
-all of which can front for each other.
-There are other front domain names, like \urll{ajax.aspnetcdn.com},
-that may offer high collateral damage.
 
 Fastly~\cite{fastly} is a CDN.
 It is the only one of the services we tested in that
@@ -1295,16 +1298,16 @@ By removing the easy ways, we increase the censor's cost.
 \label{sec:deployment}
 
 Development on \meek\ as a Tor pluggable transport~\cite{pt} began in January~2014.
-Most users who use Tor use it with Tor Browser~\cite{torbrowser},
+Our target for deployment is Tor Browser~\cite{torbrowser},
 a customized version of Firefox that is
 preconfigured to use a built-in Tor client.
 % and patched to defend against application-layer privacy and anonymity threats
 % like tracking cookies and web browser fingerprinting.
 Tor Browser has an easy interface for selecting pluggable transports.
-We made a series of experimental releases of Tor Browser featuring \meek,
-releasing the first one on February~18.
-[Some details of deployment are omitted for anonymous submission.]
 % ANON
+% [Some details of deployment are omitted for anonymous submission.]
+% We made a series of experimental releases of Tor Browser featuring \meek,
+% releasing the first one on February~18.
 % On April~18 we made the first release featuring the browser camouflage
 % that is the subject of Section~\ref{sec:browserextension}.
 % We announced our releases on Tor development mailing lists,
@@ -1313,10 +1316,55 @@ releasing the first one on February~18.
 % in June and is scheduled for an alpha release,
 % still pending as of this writing.
 
+We have so far deployed on three backends:
+Google App Engine,
+Amazon CloudFront,
+and Microsoft Azure.
+Figure~\ref{fig:clients-tor} shows the daily average number of concurrent users of \meek.
+(A measurement of 500, for example, means that there were on average 500
+users of the system at any given time during the day.)
+The App Engine backend was established in February;
+CloudFront in July;
+and Azure in October.
+Also in Figure~\ref{fig:clients-tor} is a table of monthly costs for each web service.
+The pricing for cloud services is complicated,
+depending not only on bandwidth but also on geographical region and other factors.
+For example CloudFront charges per request as well as per gigabyte,
+and about 54\% of the CloudFront bill for October was for requests.
+App Engine charges extra when it has to run multiple instances
+of an app's code to cope with load;
+about 15\% of October's App Engine bill was for such ``instance hours.''
+% These and other cost details are summarized in a mailing list post~\cite{meek-costs-201410}.
+The App Engine and CloudFront backends are running on accounts
+that provide a limited amount of free bandwidth,
+but current use greatly exceeds the free thresholds.
+Azure service is being donated and so has not yet cost anything.
+The total cost so far has been \$187.13,
+but this number is expected to more than double in November and continue to increase.
+
 \begin{figure}
+\centering
 \includegraphics[width=\linewidth]{clients-meek}
+\begin{tabular}{l r r r}
+       &App Engine &CloudFront&  Azure \\
+\hline
+Jan--Jul &  \$2.72 &   \$0.00 & \$0.00 \\
+Aug      &  \$1.56 &   \$3.10 & \$0.00 \\
+Sep      &  \$4.02 &   \$4.59 & \$0.00 \\
+Oct      & \$40.85 & \$130.29 & \$0.00 \\
+\hline
+total    & \$49.15 & \$137.98 & \$0.00 \\
+\end{tabular}
 \caption{
-Concurrent users of the \meek\ pluggable transport for Tor.
+Concurrent users of the \meek\ pluggable transport
+and month-by-month operational costs.
+The total cost to date is \$187.13.
+% ANON
+% The large increase of users on October~15 coincides with
+% the release of Tor Browser~4.0,
+% the first release to make meek easily available.
+Azure CDN service is currently being donated as part of a research grant.
+The user estimates come from the Tor Metrics Portal~\cite{metrics-meek,counting-daily-bridge-users}.
 }
 \label{fig:clients-tor}
 \end{figure}
@@ -1335,15 +1383,11 @@ Concurrent users of the \meek\ pluggable transport for Tor.
 % \label{fig:clients-psiphon3}
 % \end{figure}
 
-Figure~\ref{fig:clients-tor} shows the average number of concurrent users of \meek\ with Tor
-since close to the beginning of development.
-A measurement of 500, for example, means that there were on average 500
-users of the system at any given time during the day.
-The measurements come from the Tor Metrics Portal~\cite{metrics-meek},
-which aggregates statistics reported by Tor relays.
-The number of users is estimated by counting the number
-of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
-% The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by \meek.
+%  &\$49.15 & \$137.98 & \$0.00 & \$187.13 &  \\
+
+% which aggregates statistics reported by Tor relays.
+% The number of users is estimated by counting the number
+% of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
 
 % [Blinded circumvention tool]
 % % ANON
@@ -1367,25 +1411,15 @@ of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
 % with its thousands of daily users,
 % is much more widely used than meek-with-Tor, which has not yet seen a formal release.
 
-Our experimental Tor Browser releases have all been based on Google with App Engine.
-Support for CloudFront was not realized until late July.
-We are running the backends on paid accounts of these services for use by the public.
-The cost for bandwidth on App Engine is \$0.12 per gigabyte,
-with one gigabyte free each day.
-The total App Engine bill so far has been \$2.07,
-with most days' usage being below the billable threshold.
-There has not yet been enough use of CloudFront to cost anything.
-
-A longer-term goal is to find a way to fund continued operation
-if \meek\ becomes popular.
+As users increase, it becomes more pressing
+to find a way to sustain continued operation.
 Although some of the systems listed in Section~\ref{sec:survey}
-are inexpensive enough that some users could upload their own fronting backend,
-thereby diffusing costs,
-we believe that an organization operating a backend for the use of the public
-has compelling usability advantages.
-With client software configured to use the public backend by default,
-there is nothing for the user to upload and no out-of-band communication is needed before getting
-started---when everything works it offers circumvention without configuration.
+are inexpensive enough that some users could upload their own fronting backend
+and bear their own costs,
+we believe that there are compelling usability advantages
+to operating a centralized backends for the use of the public.
+Client software can ship with preconfigured domain names.
+There is nothing for the user to upload and no out-of-band bootstrapping communication is needed.
 
 % The number of parties able to analyze users' traffic patterns is somewhat increased:
 % the path from user to Tor bridge now includes App Engine and the web app operators,
