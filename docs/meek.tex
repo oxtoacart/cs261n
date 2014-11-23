@@ -62,26 +62,23 @@ with resulting expensive collateral damage.
 
 We have implemented domain fronting in a system called \meek,
 a pluggable transport for Tor.
-\meek\ combines fronting with an HTTP-based tunneling proxy.
-The \meek\ server's external interface is that of an ordinary web server.
-Domain fronting enables a client to reach the server, which is presumed blocked by the censor.
-The server receives HTTP requests, decodes them, and feeds their payloads into a Tor relay,
-returning downstream data in the HTTP response.
-A censor watching the communication sees only a sequence of HTTPS requests to an allowed domain.
-We describe the results of an initial deployment.
-\meek, or something based on it,
-has been adopted by other circumvention systems including
-[blinded for anonymous submission].
+\meek\ combines fronting with an HTTP-based tunneling proxy
+that decodes a sequence of HTTP requests and feeds their contents into Tor.
+A censor sees only a sequence of HTTPS requests to an allowed domain.
+We describe our experience with deploying \meek.
+% \meek, or something based on it,
+% has been adopted by other circumvention systems including
+% [blinded for anonymous submission].
 % ANON
 % Lantern and Psiphon.
 
-Hiding the endpoint and obscuring byte patterns are important parts of blocking-resistant communication,
+Hiding the endpoint and obscuring byte patterns are important parts of blockinging resistance,
 but there are other, more subtle considerations.
-We describe what we have done to disguise other traffic ``tells'' in \meek,
-such as using a real web browser as a tool for making fronted HTTPS requests,
-in order to disguise meek's TLS fingerprint.
+We describe what we have done to disguise traffic ``tells'' in \meek,
+including using a real web browser to make fronted HTTPS requests
+in order to disguise the TLS fingerprint.
 We argue that these measures, combined with domain fronting, increase the censor's effort
-beyond simple one-shot blocking techniques such as IP address blocking, and into
+beyond simple one-shot blocking techniques such as IP address blacklisting, and into
 the realm of more expensive, less reliable statistical tests.
 \end{abstract}
 
