@@ -1430,25 +1430,35 @@ There is nothing for the user to upload and no out-of-band bootstrapping communi
 \section{Discussion}
 \label{sec:discussion}
 
-Domain fronting derives part of its unblockability from the
+Domain fronting derives its strength from the
 high collateral damage of blocking the fronted-through domain.
-Fronting through \urll{www.google.com} to App Engine, for example,
-is making a bet that the censor will lack the temerity to block Google.
-The Great Firewall of China called our bluff in June of 2014,
-when it blocked access to all Google services~\cite{cn-google-block}.
+To front through \urll{www.google.com} to App Engine, for example,
+is to make a bet that the censor will lack the temerity to block Google.
+Different censors will differ in their aversion to collateral damage;
+blocking an important service is a costly measure
+that harms users not involved in circumvention and perhaps a society's economic well-being,
+and not all censors can afford to do it.
+The Great Firewall of China took the unprecendented step
+of blocking all Google services in June 2014~\cite{cn-google-block,cn-google-block-greatfire},
+and has since blocked certain CDN domains that were used to host
+mirrors of censored web sites, even at the cost of damaging other unrelated sites~\cite{cn-edgecast-block-greatfire}.
 In 2012, the government of Pakistan blocked all of YouTube
 in order to restrict access to one video,
-and in 2011, the government of Egypt briefly ``turned off the net'' completely.
+and in 2011, the government of Egypt briefly completely ``turned off the net.''
 % http://www.washingtonpost.com/business/economy/youtube-blocked-in-pakistan/2012/09/17/30081fa2-00ea-11e2-b257-e1c2b3548a4a_story.html
 % https://en.wikipedia.org/wiki/Internet_censorship_in_Egypt#2011_Internet_shutdown
 These examples show that blocking resistance is not an absolute,
 black-and-white security property;
 it can only be discussed in an economic context, relative to the costs borne
 by the censor and by users of a system.
-To be sure, blocking Google is an extreme measure,
-probably out of the reach of most censors.
-Blocking all of the fronting-capable services listed in
-Section~\ref{sec:survey} would be even harder.
+We can at least roughly quantify the cost of blocking a domain-fronting system:
+it is the minimum cost of
+blocking the front domain with resultant collateral damage,
+conducting a traffic-analysis attack to distinguish
+circumvention from ordinary traffic, or
+conducting some other unconsidered attack, for example physical surveillance of Internet users.
+As long as all these costs are high,
+domain fronting is difficult to block.
 
 A censor could attack domain fronting by
 going directly to the operators of the intermediate web service
