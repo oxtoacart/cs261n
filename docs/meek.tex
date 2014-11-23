@@ -1321,51 +1321,51 @@ Concurrent users of the \meek\ pluggable transport for Tor.
 \label{fig:clients-tor}
 \end{figure}
 
-\begin{figure}
-\includegraphics[width=\linewidth]{clients-psiphon3}
-\caption{
-Daily unique users of \meek\ with
-[blinded circumvention tool]
-% ANON
-% Psiphon
-(note vertical axis).
-The decrease at the end of June
-was caused by an unblocking event that made \meek\ unnecessary for some users.
-}
-\label{fig:clients-psiphon3}
-\end{figure}
+% \begin{figure}
+% \includegraphics[width=\linewidth]{clients-psiphon3}
+% \caption{
+% Daily unique users of \meek\ with
+% [blinded circumvention tool]
+% % ANON
+% % Psiphon
+% (note vertical axis).
+% The decrease at the end of June
+% was caused by an unblocking event that made \meek\ unnecessary for some users.
+% }
+% \label{fig:clients-psiphon3}
+% \end{figure}
 
 Figure~\ref{fig:clients-tor} shows the average number of concurrent users of \meek\ with Tor
 since close to the beginning of development.
-A measurement of 5, for example, means that there were on average five
-simultaneous users of the system at any time during the day.
+A measurement of 500, for example, means that there were on average 500
+users of the system at any given time during the day.
 The measurements come from the Tor Metrics Portal~\cite{metrics-meek},
 which aggregates statistics reported by Tor relays.
 The number of users is estimated by counting the number
 of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
 % The drop to zero on May~8 coincides with the reinstallation of the Tor bridge used by \meek.
 
-[Blinded circumvention tool]
-% ANON
-% Psiphon
-began their independent deployment of \meek\ in June~2014.
-Figure~\ref{fig:clients-psiphon3} shows the number
-of unique daily users of \meek%
-,
-% ANON
-% with Psiphon,
-estimated through clients' self-reporting of their most recent connection date.
-The developers tell us that the drop that occurs
-in the middle of June was not caused by a blocking event,
-but rather an unblocking event that made \meek\ unnecessary for some users.
-Although Figures~\ref{fig:clients-tor} and~\ref{fig:clients-psiphon3}
-are not directly comparable because they count slightly different things,
-it is clear that meek-with-%
-[blinded circumvention tool],
-% ANON
-% Psiphon,
-with its thousands of daily users,
-is much more widely used than meek-with-Tor, which has not yet seen a formal release.
+% [Blinded circumvention tool]
+% % ANON
+% % Psiphon
+% began their independent deployment of \meek\ in June~2014.
+% Figure~\ref{fig:clients-psiphon3} shows the number
+% of unique daily users of \meek%
+% ,
+% % ANON
+% % with Psiphon,
+% estimated through clients' self-reporting of their most recent connection date.
+% The developers tell us that the drop that occurs
+% in the middle of June was not caused by a blocking event,
+% but rather an unblocking event that made \meek\ unnecessary for some users.
+% Although Figures~\ref{fig:clients-tor} and~\ref{fig:clients-psiphon3}
+% are not directly comparable because they count slightly different things,
+% it is clear that meek-with-%
+% [blinded circumvention tool],
+% % ANON
+% % Psiphon,
+% with its thousands of daily users,
+% is much more widely used than meek-with-Tor, which has not yet seen a formal release.
 
 Our experimental Tor Browser releases have all been based on Google with App Engine.
 Support for CloudFront was not realized until late July.
@@ -1661,11 +1661,6 @@ We discuss the results of an initial deployment.
 \section{Sample TLS fingerprints}
 \label{sec:ciphersuites}
 
-Figure~\ref{fig:ciphersuites} illustrates the need for camouflage at the TLS layer.
-Even though the TLS application data is effectively hidden by encryption,
-the plaintext parts of TLS reveal information about the implementation.
-The TLS must not be easily identified as belonging to a circumvention tool.
-
 \begin{figure*}
 \centering
 \begin{subfigure}[t]{0.30\textwidth}
@@ -1796,6 +1791,10 @@ Extensions:
 
 \caption{
 Selected differences in ClientHello messages in three different TLS implementations.
+This figure illustrates the need for camouflage at the TLS layer.
+Even though the TLS application data is effectively hidden by encryption,
+the plaintext parts of TLS reveal information about the implementation.
+The TLS must not be easily identified as belonging to a circumvention tool.
 }
 \label{fig:ciphersuites}
 \end{figure*}
