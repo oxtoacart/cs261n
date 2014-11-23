@@ -7,11 +7,12 @@ data <- read.csv("clients-meek.csv", colClasses=colClasses)
 # https://stackoverflow.com/questions/6058677/how-to-create-na-for-missing-data-in-a-time-series/6059113#6059113
 daterange <- seq(min(data$date), max(data$date), "1 day")
 data <- data.frame(date=daterange, clients=data$clients[match(daterange, data$date)])
-p <- ggplot(data, aes(x=date, y=clients))
-# p <- p + geom_vline(xintercept=as.numeric(as.Date(c("2014-02-18", "2014-04-11", "2014-04-18", "2014-04-25", "2014-05-07", "2014-05-08"))), color="red")
-p <- p + geom_bar(stat="identity", width=1.1) + xlab(NULL) + ylab("Mean concurrent users") + scale_x_date(labels=date_format("%b %Y")) + scale_y_continuous(breaks=0:10, minor_breaks=NULL) + theme(axis.text=element_text(size=7), axis.title=element_text(size=8), axis.title.x=element_blank())
+# Exclude today, because it reflects a not-yet-settled value.
+p <- ggplot(data[data$date >= as.Date("2014-08-01") & data$date < Sys.Date(), ], aes(x=date, y=clients))
+p <- p + geom_bar(stat="identity", width=1.1) + xlab(NULL) + ylab("Mean concurrent users") + scale_x_date(labels=date_format("%b %Y")) + theme(axis.text=element_text(size=7), axis.title=element_text(size=8), axis.title.x=element_blank())
 ggsave("clients-meek.pdf", width=4, height=1.4, units="in")
 
+# p <- p + geom_vline(xintercept=as.numeric(as.Date(c("2014-02-18", "2014-04-11", "2014-04-18", "2014-04-25", "2014-05-07", "2014-05-08"))), color="red")
 # 2014-02-18 [tor-qa] Please test experimental bundles with meek transport (3.5.2.1-meek-1)
 # https://lists.torproject.org/pipermail/tor-qa/2014-February/000340.html
 # 2014-04-11 [tor-qa] 3.5.4-meek-1 (meek bundles with browser TLS camouflage)
