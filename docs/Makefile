@@ -2,6 +2,8 @@ INKSCAPE = inkscape
 
 all: meek.pdf
 
+# Doesn't include {datalen,concurrent,flowduration}.pdf to avoid
+# requiring access to traces.
 FIGURES = \
 	clients-meek.pdf \
 	clients-psiphon3.pdf \
@@ -9,10 +11,7 @@ FIGURES = \
 	architecture.pdf \
 	browser-architecture.pdf \
 	wire-sequential.pdf \
-	wire-parallel.pdf \
-	datalen.pdf \
-	concurrent.pdf \
-	flowduration.pdf
+	wire-parallel.pdf
 
 meek.pdf: meek.tex meek.bib $(FIGURES)
 
