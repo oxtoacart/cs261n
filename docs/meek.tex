@@ -826,6 +826,10 @@ Tor can bunch multiple cells into one transmission;
 if two cells are sent at once, the overhead drops to
 ${\approx}41$\%; if three, it is ${\approx}28$\%.
 Bulk uploads and downloads tend to have less overhead, bunching many cells at once.
+% We can tell exactly how much overhead exists in practice by looking at our CDN invoices.
+% According to https://lists.torproject.org/pipermail/tor-dev/2014-December/007916.html,
+% In November 2014 meek-amazon had 167M requests and 1269 GB, or 8153 bytes per request.
+% If each request header is 500 bytes, that's about 6%.
 \vp{It might be helpful to have a table showing upload/download size/efficiency}
 Streaming HTTP responses, when they are possible, reduce overhead further,
 % ANON
