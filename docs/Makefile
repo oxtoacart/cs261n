@@ -1,6 +1,6 @@
 INKSCAPE = inkscape
 
-all: meek.pdf
+all: fronting.pdf
 
 # Doesn't include {datalen,concurrent,flowduration}.pdf to avoid
 # requiring access to traces.
@@ -13,7 +13,7 @@ FIGURES = \
 	wire-sequential.pdf \
 	wire-parallel.pdf
 
-meek.pdf: meek.tex meek.bib $(FIGURES)
+fronting.pdf: fronting.tex fronting.bib $(FIGURES)
 
 %.pdf: %.tex %.bib
 	pdflatex $*
@@ -37,6 +37,6 @@ flowduration.pdf: flowduration.R ../traces/lbl.https.goog.dpriv.conn.log ../trac
 	Rscript flowduration.R
 
 clean:
-	rm -f meek.pdf *.aux *.bbl *.log *.blg
+	rm -f fronting.pdf *.aux *.bbl *.log *.blg
 
 .PHONY: all clean
