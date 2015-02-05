@@ -7,7 +7,7 @@ all: fronting.pdf
 FIGURES = \
 	clients-meek.pdf \
 	clients-psiphon3.pdf \
-	fronting.pdf \
+	fronting-diagram.pdf \
 	architecture.pdf \
 	browser-architecture.pdf \
 	wire-sequential.pdf \
