@@ -1,9 +1,12 @@
 /traces/*.gz
 /traces/*.pcap
+/traces/*.dpriv
+/traces/*.log
 /meek.dat
 /*.log
 
 /diagrams/*.eps
+/docs/figs/*-eps-converted-to.pdf
 
 # R stuff
 /.RData
