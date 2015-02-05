@@ -5,7 +5,6 @@
 /meek.dat
 /*.log
 
-/diagrams/*.eps
 /docs/figs/*-eps-converted-to.pdf
 
 # R stuff
