@@ -132,7 +132,7 @@ At the plaintext layers visible to the censor---the DNS request and the
 TLS Server Name Indication---appears
 the front domain \mbox{\textbf{allowed.example}}.
 At the HTTP layer, unreadable to the censor,
-is the actual destination \mbox{\textbf{forbidden.example}}.
+is the actual, covert destination \mbox{\textbf{forbidden.example}}.
 }
 \label{fig:fronting}
 \end{figure}
@@ -163,119 +163,148 @@ The response comes from \urll{maps.google.com}.
 <title>Google Maps</title>
 \end{quote}
 
+A variation is ``domainless'' fronting,
+in which there is no DNS request and no SNI.
+It appears to the censor
+that the user is browsing an HTTPS site by its IP address,
+or using a web client that does not support SNI.
+Domainless fronting can be useful when there is no known front domain
+with sufficiently high collateral damage;
+it leaves the censor the choice of blocking an entire IP address
+(or blocking SNI-less requests entirely),
+rather than blocking only a single domain.
+
 Domain fronting works with CDNs because a CDN's frontend server
 (called an ``edge server''),
 on receiving a request for a resource not already cached,
 forwards the request to the domain found in the Host header
 (the ``origin server'').
-(There are other ways for CDNs to work, but this ``origin pull''
+(There are other ways CDNs may work, but this ``origin pull''
 configuration is common.)
-% The certificate you get may be that of the front domain,
-% or may be a generic shared domain.~\cite{httpsincdn}
-Fronting works with Google because Google App Engine, a web application platform,
-can host a simple ``reflector'' application that emulates
-an origin-pull CDN, simply forwarding every request to another server.
-In both cases, the intermediate web service does not forward requests to just anywhere---it
-has to be to the domain of a customer.
-In order to run a fronting backend,
-one generally has to create an account with the web service and pay for bandwidth.
+The client issues a request that appears to be destined for
+an unrelated front domain, which may be any of the CDN's domains
+that resolve to an edge server; this fronted request is what the censor sees.
+The edge server decrypts the request,
+reads the Host header and
+forwards the request to the specified origin,
+which in the circumvention scenario is a general-purpose proxy.
+The origin server, being a general-purpose proxy, would be blocked by the censor if accessed directly.
+Fronting hides its address from the censor.
 
-A variation on fronting is ``domainless'' fronting,
-in which there is no DNS request and no SNI.
-It looks to the censor
-like the user is browsing an HTTPS site by its IP address,
-or using a web client that does not support SNI.
-Domainless fronting can be useful when there is no known front domain
-with sufficiently high collateral damage.
-The censor is faced with the choice of blocking an entire IP address, not only a domain;
-blocking requests without SNI;
-or trying to find some other, presumably more expensive, test to distinguish
-circumvention traffic.
+On services that do not automatically forward requests,
+it is usually possible to install a trivial ``reflector'' web application
+that emulates an origin-pull CDN.
+In this case, fronting does not protect the address of the origin per se;
+rather it protects the address of the reflector application,
+which in turn forwards requests to the origin.
+Google App Engine is an example of such a service:
+against a censor that blocks the App Engine domain \urll{appspot.com}
+but allows other Google domains,
+domain fronting provides access to a reflector running on \urll{appspot.com}.
 
-We have developed domain fronting into a full-fledged circumvention system called \meek,
-implemented as a pluggable transport~\cite{pt} for Tor.
-\meek combines fronting with an HTTP-based tunneling proxy:
-upstream data are transformed into a sequence of HTTP requests,
-which are fronted in order to reach a proxy server.
-The server decodes the requests and feeds their payloads
-into the Tor network.
-Downstream data received by the server from Tor
-are returned to the client within HTTP responses.
-\meek's architecture appears in Figure~\ref{fig:meek-architecture}.
-Section~\ref{sec:architecture} describes how it works in detail.
+No matter the specifics of particular web services,
+as a general rule they do not forward requests to arbitrary domains---only to domains
+belonging to their customers.
+In order to deploy a domain-fronting proxy,
+one must become a customer of the CDN (or Google, etc.)
+and pay for bandwidth.
+It is the owner of the covert domain who pays the bandwidth bills,
+not the owner of the front domain,
+which need not have any relation to the covert domain beyond
+using the same web service.
 
-\begin{figure*}
-\centering
-\includegraphics[width=\linewidth]{meek-architecture}
-\caption{
-Architecture of \meek.
-The client sends an HTTP request to the Tor bridge by way of an intermediate web service such as a CDN.
-The client protects the bridge's domain name \textbf{forbidden.example} from the censor
-by fronting it with another name, here \textbf{allowed.example}.
-The intermediate web server decrypts the TLS layer and forwards the request to the bridge
-according to the Host header.
-The bridge sends data back to the client in the HTTP response.
-\meekclient and \meekserver are transport plugins, the interface between Tor and \meek.
-The host actually at allowed.example does not participate in the communication.
-}
-\label{fig:meek-architecture}
-\end{figure*}
+The remainder of this paper is devoted to a deep exploration of
+domain fronting as we have deployed it in practice.
+Section~\ref{sec:threatmodel} explains our threat model and assumptions.
+Section~\ref{sec:related-work} gives general background on the circumvention problem
+and outlines its three grand challenges:
+address-based blocking, content-based blocking, and active probing.
+Domain-fronting systems are capable of meeting all three challenges,
+forcing censors to use more expensive, less reliable censorship techniques
+that have heretofore not been seen in practice.
+Section~\ref{sec:survey} is a summary of CDNs and other services
+that are usable for fronting,
+identifying general principles as well as
+individual idiosyncrasies that affect implementation.
+The following sections are case studies of deployment:
+Section~\ref{sec:deploy-tor} for Tor,
+Section~\ref{sec:deploy-lantern} for Lantern, and
+Section~\ref{sec:deploy-psiphon} for Psiphon.
+Section~\ref{sec:trafficanalysis} analyzes domain fronting's resistance
+to statistical traffic analysis attacks.
+Section~\ref{sec:discussion} has general discussion and
+Section~\ref{sec:summary} summarizes.
 
-\meek has been built into an experimental release of Tor Browser,
-and has a small number of users.
-Our deployment so far uses Google App Engine and Amazon CloudFront
-as intermediate web service backends.
-% with the hidden actual domain \urll{meek-reflect.appspot.com}
-% hidden by the front \urll{www.google.com}.
-Section~\ref{sec:survey} names other fronting-capable services
-and Section~\ref{sec:discussion} describes other possible deployments.
-\vp{It's confusing here having out-of-order references to sections.  This
-also occurs below}
-In addition to the Tor pluggable transport,
-systems based on \meek are now used by other circumvention systems including
-[blinded for anonymous submission].
-% ANON
-% including Psiphon~\cite{psiphon} and Lantern~\cite{lantern}.
+% Circumvention is often presented as an arms race,
+% evaders racing to set up proxies before the censor finds and blocks them,
+% the censor racing to reverse-engineer the evader's latest technique.
+% We submit that a system that comprehensively addresses
+% address blocking, content blocking, and active probing---one that
+% remains accessible even after the censor knows how it works---occasions
+% a qualitative change in the nature of the arms race.
+% Deprived of easy DPI, cheap address enumeration, and port scanning for proxies,
+% the censor is forced to fall back to more expensive,
+% less reliable statistical analysis on traffic flows.
+% The domain-fronting systems we describe are the result
+% of years of experience with operational
+% censorship circumvention systems.
+% They are complete, start-to-finish systems designed to defeat
+% the capabilities of real-world censors known today.
 
-% \meek is designed to have features attractive in a circumvention transport.
-% It is easy to use, not requiring the configuration of any bridge addresses.
-% In Tor Browser, users need only select ``meek''
-% from a pulldown menu in order to use it.
-% It resists blocking by address and by content,
-% Section~\ref{sec:discussion}
 
-Domain fronting and HTTPS address two major circumvention challenges,
-those of hiding the destination and of obscuring the contents of a message.
-There remain other, more subtle, attributes of communication
-that could serve as a basis for blocking.
-For example, the plaintext handshake is a fingerprintable part of TLS.
-Section~\ref{sec:browserextension} describes how we use a web browser extension as an instrument for making HTTPS requests,
-to make \meek's TLS and HTTPS characteristics
-match those of a browser as closely as possible.
-Our goal is to force the censor
-to employ more sophisticated, expensive, and error-prone statistical tests
-to classify traffic as allowed or prohibited,
-rather than domain blacklists or deep packet inspection---to
-force the practice of censorship to exist in a world
-not of simple packet filters,
-but of probabilities and false positives.
-A preliminary analysis of \meek's resistance to traffic analysis
-appears in Section~\ref{sec:trafficanalysis}.
-The analysis is based on comparing traffic traces of \meek
-to samples of HTTPS traffic at a network router.
+\section{Threat model}
+\label{sec:threatmodel}
 
-\vp{Seems this should go in the next section instead}
-To our knowledge,
-the earliest application of domain fronting to circumvention
-was by GoAgent~\cite{goagent},
-a tool based on App Engine and
-once widely used in China.
-Fronting has also been used with success since 2013
-for the rendezvous component of another transport called flash proxy~\cite{flashproxy}.
-GoAgent and flash proxy are the systems that most directly
-inspire ours.
+Our threat model includes four actors:
+the censor,
+the censored client,
+the intermediate web service,
+and the covert destination (some kind of proxy).
+We achieve
+circumvention when the client evades the censor to reach
+the bridge,
+because the bridge can then proxy to anywhere.
+The client and bridge cooperate with each other.
+The intermediate web service does not need to cooperate with either,
+except to the extent that it does not collude with the censor.
+% The censor's goal is to prevent circumvention.
 
-% We measure the performance...
+The censor controls a (generally national)
+network and the links into and within it.
+The censor can inspect traffic flowing across all links under its control
+and can block or allow any packet.
+The censor can inject and replay traffic, and
+operate its own clients and servers.
+The client lies within the censor's network,
+while the intermediate web service and bridge lie outside.
+The censor blocks direct communication between the client and the bridge,
+but allows HTTPS between the client and at least one front domain or IP address
+on the intermediate web service.
+% In examples, we will use the \textbf{allowed.example} as the front domain
+% and \textbf{forbidden.example} as the domain name of the Tor bridge.
+
+% The censor must operate at line rate; that is,
+% it must not delay traffic unduly while deciding whether to allow it.
+% This consideration is one facet of the censor's sensitivity to
+% collateral damage caused by false positives:
+% mistakenly blocking or degrading non-circumvention traffic causes the censor
+% to incur some penalty, just as mistakenly allowing circumvention traffic does.
+
+The client,
+intermediate web service,
+and destination proxy
+are uncontrolled by the censor.
+The censor does not control a trusted TLS certificate authority;
+specifically it cannot man-in-the-middle an HTTPS session
+without being caught by ordinary certificate verification.
+The client has a way to get a copy of the necessary client programs.
+
+Section~\ref{sec:discussion} analyzes what happens when some
+of the threat model's assumptions are violated;
+specifically what happens
+when the intermediate web service's frontend server is inside the censor's network
+and when the censor controls a trusted certificate authority.
+
 
 \section{Background and related work}
 \label{sec:related-work}
@@ -305,10 +334,6 @@ Winter and Lindskog~\cite{foci12-winter} confirmed an earlier discovery of
 Wilde~\cite{wilde} that China's Great Firewall identifies Tor bridges
 by issuing scans that follow up on observed client connections, to discover
 whether a server speaks the Tor protocol.
-The discovery of active probing was the motivation for probing resistance in ScrambleSuit~\cite{scramblesuit}
-and obfs4~\cite{obfs4},
-described in this section.
-
 
 There are two general strategies for countering content-based blocking.
 The first is to make traffic look unlike
@@ -406,7 +431,7 @@ conscripting web users as temporary proxies.
 Each JavaScript-based proxy lasts only as long as a
 user stays on a web page, so the pool of proxies is constantly changing.
 If one of them is blocked, there is soon another to replace it.
-Flash proxy's approach to address blocking is in a sense
+Flash proxy's approach to address blocking is
 the opposite of \meek's:
 where flash proxy uses many cheap, disposable, individually blockable proxies,
 \meek uses just a few high-value front domains on hard-to-block network infrastructure.
@@ -485,10 +510,11 @@ The path component ``/\textsl{bucketname}/\textsl{filename}'',
 which would reveal the use of CloudTransport,
 cannot be used for blocking because it is encrypted inside HTTPS.
 
-GoAgent~\cite{goagent} is a direct inspiration for \meek in its use of
-domain fronting with App Engine.
-\vp{Was it literally an inspiration, or was it concurrent development?
-I thought it was more the latter.}
+To our knowledge,
+the earliest use of domain fronting for circumvention
+was by GoAgent~\cite{goagent},
+a tool based on App Engine and
+once widely used in China.
 Traffic is fronted by the Google frontend server,
 using the ``domainless'' fronting model without SNI,
 and delivered to its destination by a specialized app running on App Engine.
@@ -496,8 +522,7 @@ GoAgent does not use an additional general-purpose proxy after fronting;
 rather, HTTP and HTTPS URLs are fetched directly from the App Engine servers.
 Because of that, GoAgent is limited to carrying HTTP and HTTPS traffic only,
 and the contents of all communications are revealed to Google.
-Users of GoAgent generally upload
-\vp{``generally'' upload---what's their practical alternative?}
+Users of GoAgent upload
 their own personal copy of the proxy code to App Engine,
 which is free of charge to use as long as they do not exceed a bandwidth quota.
 According to a May 2013 survey~\cite{collateral-freedom},
@@ -506,7 +531,7 @@ China, with 35\% of survey respondents having used it in the previous month.
 This figure is higher than that of paid~(29\%) and free VPNs~(18\%), and far
 above that of other special-purpose tools like Tor~(2.9\%) and Psiphon~(2.5\%).
 Use of GoAgent in China was disrupted starting in the beginning of June~2014,
-when all Google services (including GoAgent's front domains) were blocked~\cite{cn-google-block}.
+when all Google services were blocked~\cite{cn-google-block}.
 \meek over App Engine was similarly affected.
 \vp{Add mention of what \meek platforms still worked.}
 % Users identified reliability, speed, and ease of installation as the most important features of a circumvention tool.
@@ -520,16 +545,6 @@ App Engine kills web requests (and their associated socket connections)
 when they take longer than 60~seconds,
 so users must reconnect at least that often.
 
-Psiphon~\cite{psiphon} is a network of many one-hop proxies,
-with encryption and traffic obfuscation between client and server.
-% ANON
-% Psiphon uses domain fronting based on \meek as one of its blocking defenses since June~2014~\cite{psiphon-meek-merge}.
-Lantern~\cite{lantern} uses a network of proxies running on volunteer computers;
-proxy addresses are shared only with trusted friends in order to make them difficult to enumerate.
-% ANON
-% Lantern~1.4 is planned to use domain fronting inspired by \meek~\cite{lantern-1.3.1}.
-\vp{Explain Pisphon's relevance to meek}
-
 % Infranet
 % Freegate
 % Ultrasurf
@@ -539,62 +554,132 @@ proxy addresses are shared only with trusted friends in order to make them diffi
 % Section~\ref{sec:browserextension}, JumpBox
 % http://securecomm.org/2014/show/tutorials
 
-\section{Threat model}
 
-Our threat model includes four actors:
-the censor,
-the censored client,
-the intermediate web service,
-and the destination Tor bridge.
-\vp{Update this when considering more general services than just
-Tor bridges.}
-We achieve
-circumvention when the client evades the censor to reach
-the bridge,
-because the bridge can then proxy to anywhere.
-The client and bridge cooperate with each other.
-The intermediate web service does not need to cooperate with either,
-except to the extent that it does not collude with the censor.
-% The censor's goal is to prevent circumvention.
+\section{Fronting-capable web services}
+\label{sec:survey}
 
-The censor controls a (generally national)
-network and the links into and within it.
-The censor can inspect traffic flowing across all links under its control
-and can block or allow any packet.
-The censor can inject and replay traffic, and
-operate its own clients and servers.
-The client lies within the censor's network,
-while the intermediate web service and bridge lie outside.
-The censor blocks direct communication between the client and the bridge,
-but allows HTTPS between the client and at least one front domain or IP address
-on the intermediate web service.
-% In examples, we will use the \textbf{allowed.example} as the front domain
-% and \textbf{forbidden.example} as the domain name of the Tor bridge.
+\vp{This whole section should be beefed up with a deeper assessment.  Along
+these lines, it would help to include a summary table.}
+This section contains a brief survey of fronting-capable
+web services we have found, each with its pros and cons.
+The list is not exhaustive and is meant to illustrate the broad
+support for fronting that exists.
+Of the services listed, we have so far deployed \meek
+only on Google App Engine and Amazon CloudFront.
+For the others, we have only checked that fronting works.
+Recall that even web services that support fronting
+will front only for their own customers,
+so new each deployment typically requires an investment of time and money.
 
-% The censor must operate at line rate; that is,
-% it must not delay traffic unduly while deciding whether to allow it.
-% This consideration is one facet of the censor's sensitivity to
-% collateral damage caused by false positives:
-% mistakenly blocking or degrading non-circumvention traffic causes the censor
-% to incur some penalty, just as mistakenly allowing circumvention traffic does.
+Google App Engine~\cite{googleappengine}
+is a web application platform.
+Each application gets a user-specified subdomain of \urll{appspot.com},
+which can be fronted through almost any Google domain,
+including google.com, gmail.com, googleapis.com, and many others.
+App Engine can run only web applications,
+not a full Tor bridge;
+for that reason we use a tiny ``reflector'' application
+that merely copies incoming requests to a Tor bridge hosted elsewhere.
+Fronting through App Engine is attractive in the case where even though
+the censor blocks
+\urll{appspot.com}---which could well occur,
+because of the ease of building a proxy there---at least one
+other Google service remains reachable.
+Applications that use $< 1$~GB of bandwidth daily
+are free of charge,
+making possible an upload-your-own-app model
+à la GoAgent.
 
-The client,
-intermediate web service,
-and destination proxy
-are uncontrolled by the censor.
-The censor does not control a trusted TLS certificate authority;
-specifically it cannot man-in-the-middle an HTTPS session
-without being caught by ordinary certificate verification.
-The client has a way to get a copy of the necessary client programs.
+Amazon CloudFront~\cite{cloudfront}
+(not to be confused with CloudFlare; see below)
+is the CDN of Amazon Web Services.
+A CloudFront ``distribution'' associates
+an automatically generated subdomain of \urll{cloudfront.net}
+with an origin server,
+which in our case is an instance of \meekserver.
+The front domain may be any other of CloudFront's automatically generated subdomains, all
+of which support HTTPS through a wildcard certificate.
+CloudFront has a usage tier that is free of charge for a year,
+subject to a bandwidth limit of 50~GB/month.
 
-Section~\ref{sec:discussion} analyzes what happens when some
-of the threat model's assumptions are violated;
-specifically what happens
-when the intermediate web service's frontend server is inside the censor's network
-and when the censor controls a trusted certificate authority.
+Microsoft Azure~\cite{azure}
+is a cloud computing platform that features a CDN.
+Similarly to CloudFront, users get automatically generated subdomains
+of \urll{vo.msecnd.net},
+all of which can front for each other.
+The CDN works only for Azure domains, however,
+so as with App Engine, it is necessary to run a trivial reflector app
+that merely forwards requests out of Azure toward an external proxy.
+There are other front domain names, like \urll{ajax.aspnetcdn.com},
+that may provide entangling with high collateral damage.
 
-\section{Architecture and protocol of meek}
-\label{sec:architecture}
+CloudFlare~\cite{cloudflare}
+is a CDN also marketed as protection against
+denial-of-service attacks.
+It appears that any domain name on CloudFlare
+can front for any other, even custom user-selected domains;
+however it is not obvious which one is best to use as a front.
+The front domain needs to be a popular one
+(causing high collateral damage if blocked),
+or the censor may simply block it entirely.
+It is doubly bad when a domain is blocked in this way,
+because not only is circumvention foiled,
+but some unsuspecting third party has just had their web site blocked.
+A solution may be to round-robin through
+a pool of popular domain names;
+or to use ``domainless'' fronting that does not send SNI.
+\vp{Would be quite valuable to more broadly assess the viability
+of using domainless fronting}
+% Though CloudFlare supports domain fronting,
+% its terms of service~\cite{cloudflare-terms}
+% seem to prohibit the kind of tunneled proxying that \meek does:
+% \begin{quote}
+% \textsc{Section 10: Limitation on non-HTML caching}\\
+% You acknowledge that CloudFlare's Service is offered as a platform to cache and
+% serve web pages and websites and is not offered for other purposes
+% \ldots\ you understand and agree to use the Service solely
+% for the purpose of hosting and serving web pages\ldots
+% \end{quote}
+
+Akamai~\cite{akamai-site} is a large CDN.
+Requests may be fronted through the special HTTPS domain
+\urll{a248.e.akamai.net},
+which serves a certificate also good for \urll{*.akamaihd.net}.
+The collateral damage of blocking Akamai is enormous:
+in 2010 it carried 15--20\% of all web traffic~\cite{akamai}.
+Akamai costs more than other CDNs;
+it would likely require institutional support
+to keep a circumvention system running on it in the long term.
+
+Fastly~\cite{fastly} is a CDN.
+It is the only one of the services we tested that
+appears to enforce SNI consistency:
+if the SNI and Host do not match,
+the Fastly edge server returns an HTTP 400 (``Bad Request'') error.
+However, if the TLS ClientHello omits SNI, then the Host may be any Fastly domain.
+It is the only service we have found
+that requires the ``domainless'' fronting style.
+
+
+\section{Deployment on Tor: meek}
+\label{sec:deploy-tor}
+
+\begin{figure*}
+\centering
+\includegraphics[width=\linewidth]{meek-architecture}
+\caption{
+Architecture of \meek.
+The client sends an HTTP request to the Tor bridge by way of an intermediate web service such as a CDN.
+The client protects the bridge's domain name \textbf{forbidden.example} from the censor
+by fronting it with another name, here \textbf{allowed.example}.
+The intermediate web server decrypts the TLS layer and forwards the request to the bridge
+according to the Host header.
+The bridge sends data back to the client in the HTTP response.
+\meekclient and \meekserver are transport plugins, the interface between Tor and \meek.
+The host actually at allowed.example does not participate in the communication.
+}
+\label{fig:meek-architecture}
+\end{figure*}
 
 We show the components of the system in Figure~\ref{fig:meek-architecture}.
 The parts that are new in \meek
@@ -687,8 +772,8 @@ Content-Length: 75
 Requests and responses in the \meek HTTP protocol.
 The session ID is randomly generated by the client.
 Request/response bodies contain successive chunks of a Tor TLS stream
-(\texttt{\textbackslash{}x16\textbackslash{}x03\textbackslash{}x01\textbackslash{}x02}
-is the beginning of a TLS ClientHello message).
+(\texttt{\textbackslash{}x16\textbackslash{}x03\textbackslash{}x01}
+is the beginning of a TLSv1.0 ClientHello message).
 The second POST request is an empty polling request.
 The messages shown here is encrypted inside HTTPS until after
 it has been fronted,
@@ -712,7 +797,6 @@ not of the actual client;
 and a logical stream is chopped into multiple independent HTTP requests,
 so the source port is always changing.
 Instead, each client generates a random 256-bit
-\vp{it seems like overkill to use 256 bits for this $\ldots$}
 session ID for each new Tor stream,
 which it sends with its requests in a special
 \mbox{X-Session-Id} HTTP header.
@@ -759,7 +843,6 @@ when using a GCM ciphersuite (the default in current versions of Tor).
 % (in Tor version~0.2.4.22 using a GCM ciphersuite).
 This 543-byte record is received by \meekclient,
 which adds an HTTP header whose length is about 400 bytes
-\vp{yikes, that's a lot of overhead $\ldots$}
 (varying slightly depending on the length of the Host
 \vp{It would help to put textual protocol elements in another typeface,
 such as \texttt{Host}; you could define a backslash-header macro for this}
@@ -832,7 +915,82 @@ performance with high latencies.
 % performance with high latencies;
 % Psiphon's use of persistent connections as described in this section is one of them.
 
-\section{Camouflage for the TLS layer}
+Development on \meek as a Tor pluggable transport~\cite{pt} began in January~2014.
+For deployment we target
+the Tor Browser~\cite{torbrowser},
+a customized version of Firefox that is
+preconfigured to use a built-in Tor client.
+% and patched to defend against application-layer privacy and anonymity threats
+% like tracking cookies and web browser fingerprinting.
+Tor Browser has an easy interface for selecting pluggable transports.
+% ANON
+% [Some details of deployment are omitted for anonymous submission.]
+% We made a series of experimental releases of Tor Browser featuring \meek,
+% releasing the first one on February~18.
+% On April~18 we made the first release featuring the browser camouflage
+% that is the subject of Section~\ref{sec:browserextension}.
+% We announced our releases on Tor development mailing lists,
+% whence they were picked up by Tor Weekly News on the Tor blog.
+% Our code was merged by the Tor Browser maintainers
+% in June and is scheduled for an alpha release,
+% still pending as of this writing.
+
+We have so far deployed on three backends:
+Google App Engine,
+Amazon CloudFront,
+and Microsoft Azure.
+Figure~\ref{fig:clients-tor} shows the daily average number of concurrent users of \meek.
+(A measurement of 500, for example, means that there were on average 500
+users of the system at any given time during the day.)
+The App Engine backend was established in February;
+CloudFront in July;
+and Azure in October.
+Also in Figure~\ref{fig:clients-tor} is a table of monthly costs for each web service.
+The pricing for cloud services is complicated,
+depending not only on bandwidth but also on geographical region and other factors.
+For example CloudFront charges per request as well as per GB,
+and about 54\% of the CloudFront bill for October was for requests.
+App Engine charges extra when it has to run multiple instances
+of an app's code to cope with load;
+about 15\% of October's App Engine bill was for such ``instance hours.''
+% These and other cost details are summarized in a mailing list post~\cite{meek-costs-201410}.
+The App Engine and CloudFront backends are running on accounts
+that provide a limited amount of free bandwidth,
+but current use greatly exceeds the free thresholds.
+Azure service is being donated and so has not yet cost anything.
+The total cost so far has been \$187.13,
+but this number is expected to more than double in November and continue to increase.
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{clients-meek}
+\begin{tabular}{l r r r}
+       &App Engine &CloudFront&  Azure \\
+\hline
+Jan--Jul &  \$2.72 &   \$0.00 & \$0.00 \\
+Aug      &  \$1.56 &   \$3.10 & \$0.00 \\
+Sep      &  \$4.02 &   \$4.59 & \$0.00 \\
+Oct      & \$40.85 & \$130.29 & \$0.00 \\
+\hline
+total    & \$49.15 & \$137.98 & \$0.00 \\
+\end{tabular}
+\caption{
+Concurrent users of the \meek pluggable transport
+and month-by-month operational costs.
+The total cost to date is \$187.13.
+% ANON
+% The large increase of users on October~15 coincides with
+% the release of Tor Browser~4.0,
+% the first release to make meek easily available.
+Azure CDN service is currently being donated as part of a research grant.
+\vp{It would be valuable to build up some sort of estimate of what it
+would cost if you didn't have the grant.}
+The user estimates come from the Tor Metrics Portal~\cite{metrics-meek,counting-daily-bridge-users}.
+}
+\label{fig:clients-tor}
+\end{figure}
+
+\subsection{Camouflage for the TLS layer}
 \label{sec:browserextension}
 
 Domain fronting defeats address-based blocking and active probing.
@@ -941,123 +1099,54 @@ when \meek is activated and deactivated.
 No TLS camouflage is needed between the intermediate web service and \meekserver,
 because that portion of the communication flow is not observed by the censor.
 
-Appropriate TLS camouflage may differ depending on circumstances.
-On a traditional desktop PC, using a browser is probably the right choice.
-When
-[blinded circumvention tool]
-\vp{does this need to be blinded?}
-% ANON
-% Psiphon
-ported \meekclient to Android,
-they did not use a browser as camouflage,
-but rather made all HTTPS requests with the standard Android HTTP API.
-This decision makes sense because other Android applications
-also use the standard API and share the same TLS fingerprint.
 
-\section{A survey of fronting-capable web services}
-\label{sec:survey}
+\section{Deployment on Lantern}
+\label{sec:deploy-lantern}
 
-\vp{This whole section should be beefed up with a deeper assessment.  Along
-these lines, it would help to include a summary table.}
-This section contains a brief survey of fronting-capable
-web services we have found, each with its pros and cons.
-The list is not exhaustive and is meant to illustrate the broad
-support for fronting that exists.
-Of the services listed, we have so far deployed \meek
-only on Google App Engine and Amazon CloudFront.
-For the others, we have only checked that fronting works.
-Recall that even web services that support fronting
-will front only for their own customers,
-so new each deployment typically requires an investment of time and money.
+Lantern~\cite{lantern} uses a network of proxies running on volunteer computers;
+proxy addresses are shared only with trusted friends in order to make them difficult to enumerate.
 
-Google App Engine~\cite{googleappengine}
-is a web application platform.
-Each application gets a user-specified subdomain of \urll{appspot.com},
-which can be fronted through almost any Google domain,
-including google.com, gmail.com, googleapis.com, and many others.
-App Engine can run only web applications,
-not a full Tor bridge;
-for that reason we use a tiny ``reflector'' application
-that merely copies incoming requests to a Tor bridge hosted elsewhere.
-Fronting through App Engine is attractive in the case where even though
-the censor blocks
-\urll{appspot.com}---which could well occur,
-because of the ease of building a proxy there---at least one
-other Google service remains reachable.
-Applications that use $< 1$~GB of bandwidth daily
-are free of charge,
-making possible an upload-your-own-app model
-à la GoAgent.
+Lantern~1.4 is planned to use domain fronting inspired by \meek~\cite{lantern-1.3.1}.
 
-Amazon CloudFront~\cite{cloudfront}
-(not to be confused with CloudFlare; see below)
-is the CDN of Amazon Web Services.
-A CloudFront ``distribution'' associates
-an automatically generated subdomain of \urll{cloudfront.net}
-with an origin server,
-which in our case is an instance of \meekserver.
-The front domain may be any other of CloudFront's automatically generated subdomains, all
-of which support HTTPS through a wildcard certificate.
-CloudFront has a usage tier that is free of charge for a year,
-subject to a bandwidth limit of 50~GB/month.
+enproxy
 
-Microsoft Azure~\cite{azure}
-is a cloud computing platform that features a CDN.
-Similarly to CloudFront, users get automatically generated subdomains
-of \urll{vo.msecnd.net},
-all of which can front for each other.
-The CDN works only for Azure domains, however,
-so as with App Engine, it is necessary to run a trivial reflector app
-that merely forwards requests out of Azure toward an external proxy.
-There are other front domain names, like \urll{ajax.aspnetcdn.com},
-that may provide entangling with high collateral damage.
+automated scanner
 
-CloudFlare~\cite{cloudflare}
-is a CDN also marketed as protection against
-denial-of-service attacks.
-It appears that any domain name on CloudFlare
-can front for any other, even custom user-selected domains;
-however it is not obvious which one is best to use as a front.
-The front domain needs to be a popular one
-(causing high collateral damage if blocked),
-or the censor may simply block it entirely.
-It is doubly bad when a domain is blocked in this way,
-because not only is circumvention foiled,
-but some unsuspecting third party has just had their web site blocked.
-A solution may be to round-robin through
-a pool of popular domain names;
-or to use ``domainless'' fronting that does not send SNI.
-\vp{Would be quite valuable to more broadly assess the viability
-of using domainless fronting}
-% Though CloudFlare supports domain fronting,
-% its terms of service~\cite{cloudflare-terms}
-% seem to prohibit the kind of tunneled proxying that \meek does:
-% \begin{quote}
-% \textsc{Section 10: Limitation on non-HTML caching}\\
-% You acknowledge that CloudFlare's Service is offered as a platform to cache and
-% serve web pages and websites and is not offered for other purposes
-% \ldots\ you understand and agree to use the Service solely
-% for the purpose of hosting and serving web pages\ldots
-% \end{quote}
 
-Akamai~\cite{akamai-site} is a large CDN.
-Requests may be fronted through the special HTTPS domain
-\urll{a248.e.akamai.net},
-which serves a certificate also good for \urll{*.akamaihd.net}.
-The collateral damage of blocking Akamai is enormous:
-in 2010 it carried 15--20\% of all web traffic~\cite{akamai}.
-Akamai costs more than other CDNs;
-it would likely require institutional support
-to keep a circumvention system running on it in the long term.
+\section{Deployment on Psiphon}
+\label{sec:deploy-psiphon}
 
-Fastly~\cite{fastly} is a CDN.
-It is the only one of the services we tested that
-appears to enforce SNI consistency:
-if the SNI and Host do not match,
-the Fastly edge server returns an HTTP 400 (``Bad Request'') error.
-However, if the TLS ClientHello omits SNI, then the Host may be any Fastly domain.
-It is the only service we have found
-that requires the ``domainless'' fronting style.
+Psiphon~\cite{psiphon} is a network of many one-hop proxies,
+with encryption and traffic obfuscation between client and server.
+
+Psiphon uses domain fronting based on \meek as one of its blocking defenses since June~2014~\cite{psiphon-meek-merge}.
+
+\begin{figure}
+\includegraphics[width=\linewidth]{clients-psiphon3}
+\caption{
+Daily unique users of \meek with
+Psiphon
+The decrease at the end of June
+was caused by an unblocking event that made \meek unnecessary for some users.
+}
+\label{fig:clients-psiphon3}
+\end{figure}
+
+how clients choose a technique
+
+unfronted mode
+
+users: Figure~\ref{fig:clients-psiphon3}
+
+% Appropriate TLS camouflage may differ depending on circumstances.
+% On a traditional desktop PC, using a browser is probably the right choice.
+% When Psiphon
+% ported \meekclient to Android,
+% they did not use a browser as camouflage,
+% but rather made all HTTPS requests with the standard Android HTTP API.
+% This decision makes sense because other Android applications
+% also use the standard API and share the same TLS fingerprint.
+
 
 \section{Traffic analysis}
 \label{sec:trafficanalysis}
@@ -1349,104 +1438,6 @@ it is also difficult for the censor.
 We have seen that censors prefer to use easy classifiers when they exist.
 \vp{This observation isn't backed up in the paper [or by citation].}
 By removing the easy ways, we increase the censor's cost.
-
-\section{Deployment}
-\label{sec:deployment}
-
-Development on \meek as a Tor pluggable transport~\cite{pt} began in January~2014.
-For deployment we target
-the Tor Browser~\cite{torbrowser},
-a customized version of Firefox that is
-preconfigured to use a built-in Tor client.
-% and patched to defend against application-layer privacy and anonymity threats
-% like tracking cookies and web browser fingerprinting.
-Tor Browser has an easy interface for selecting pluggable transports.
-% ANON
-% [Some details of deployment are omitted for anonymous submission.]
-% We made a series of experimental releases of Tor Browser featuring \meek,
-% releasing the first one on February~18.
-% On April~18 we made the first release featuring the browser camouflage
-% that is the subject of Section~\ref{sec:browserextension}.
-% We announced our releases on Tor development mailing lists,
-% whence they were picked up by Tor Weekly News on the Tor blog.
-% Our code was merged by the Tor Browser maintainers
-% in June and is scheduled for an alpha release,
-% still pending as of this writing.
-
-We have so far deployed on three backends:
-Google App Engine,
-Amazon CloudFront,
-and Microsoft Azure.
-Figure~\ref{fig:clients-tor} shows the daily average number of concurrent users of \meek.
-(A measurement of 500, for example, means that there were on average 500
-users of the system at any given time during the day.)
-The App Engine backend was established in February;
-CloudFront in July;
-and Azure in October.
-Also in Figure~\ref{fig:clients-tor} is a table of monthly costs for each web service.
-The pricing for cloud services is complicated,
-depending not only on bandwidth but also on geographical region and other factors.
-For example CloudFront charges per request as well as per GB,
-and about 54\% of the CloudFront bill for October was for requests.
-App Engine charges extra when it has to run multiple instances
-of an app's code to cope with load;
-about 15\% of October's App Engine bill was for such ``instance hours.''
-% These and other cost details are summarized in a mailing list post~\cite{meek-costs-201410}.
-The App Engine and CloudFront backends are running on accounts
-that provide a limited amount of free bandwidth,
-but current use greatly exceeds the free thresholds.
-Azure service is being donated and so has not yet cost anything.
-The total cost so far has been \$187.13,
-but this number is expected to more than double in November and continue to increase.
-
-\begin{figure}
-\centering
-\includegraphics[width=\linewidth]{clients-meek}
-\begin{tabular}{l r r r}
-       &App Engine &CloudFront&  Azure \\
-\hline
-Jan--Jul &  \$2.72 &   \$0.00 & \$0.00 \\
-Aug      &  \$1.56 &   \$3.10 & \$0.00 \\
-Sep      &  \$4.02 &   \$4.59 & \$0.00 \\
-Oct      & \$40.85 & \$130.29 & \$0.00 \\
-\hline
-total    & \$49.15 & \$137.98 & \$0.00 \\
-\end{tabular}
-\caption{
-Concurrent users of the \meek pluggable transport
-and month-by-month operational costs.
-The total cost to date is \$187.13.
-% ANON
-% The large increase of users on October~15 coincides with
-% the release of Tor Browser~4.0,
-% the first release to make meek easily available.
-Azure CDN service is currently being donated as part of a research grant.
-\vp{It would be valuable to build up some sort of estimate of what it
-would cost if you didn't have the grant.}
-The user estimates come from the Tor Metrics Portal~\cite{metrics-meek,counting-daily-bridge-users}.
-}
-\label{fig:clients-tor}
-\end{figure}
-
-% \begin{figure}
-% \includegraphics[width=\linewidth]{clients-psiphon3}
-% \caption{
-% Daily unique users of \meek with
-% [blinded circumvention tool]
-% % ANON
-% % Psiphon
-% (note vertical axis).
-% The decrease at the end of June
-% was caused by an unblocking event that made \meek unnecessary for some users.
-% }
-% \label{fig:clients-psiphon3}
-% \end{figure}
-
-%  &\$49.15 & \$137.98 & \$0.00 & \$187.13 &  \\
-
-% which aggregates statistics reported by Tor relays.
-% The number of users is estimated by counting the number
-% of Tor directory requests made by clients~\cite{counting-daily-bridge-users}.
 
 % [Blinded circumvention tool]
 % % ANON
