@@ -315,24 +315,22 @@ to resemble a protocol that is explicitly allowed by the censor; that is, match 
 Following the first strategy are the so-called ``look-like-nothing'' transports whose
 payloads are indistinguishable from a uniformly random byte stream.
 Examples of look-like-nothing transports are
-obfs2~\cite{obfs2} and its successor obfs3~\cite{obfs3},
-Tor's go-to pluggable transports since early 2012~\cite{obfsproxy-arms-race}.
-Both obfs2 and obfs3 work by superenciphering
-\vp{not clear here what superenciphering means; presumably, it's a reference
-to encrypting a stream that's already encrypted, but the reader has to pause
-and work that out}
-an underlying stream,
-using a key exchange that has no plaintext components.
-ScrambleSuit~\cite{scramblesuit} is like obfs3 in its
-payload obfuscation, but additionally obscures its traffic signature
-(packet lengths and timing), and is designed to resist active probing.
-A ScrambleSuit server will accept a TCP connection but not send a reply
-until the client proves knowledge of a shared secret.
-\vp{Say, has there been any work on using port-knocking to resist active
-probing?}
-obfs4~\cite{obfs4}
-(which despite the name has more in common with ScrambleSuit than with obfs2 and obfs3)
-builds on ScrambleSuit with more efficient cryptography and an authenticated handshake.
+obfuscated-openssh~\cite{obfuscated-openssh} and its string of successors:
+obfs2~\cite{obfs2}, obfs3~\cite{obfs3}, ScrambleSuit~\cite{scramblesuit}, and obfs4~\cite{obfs4}.
+They all work by re-encrypting
+an underlying stream so that there remains no plaintext components,
+not even in the handshake and key exchange.
+obfs2, introduced in early 2012~\cite{obfsproxy-arms-race},
+used a fairly weak key exchange that can be detected passively;
+it is now deprecated and little used.
+obfs3 is currently Tor's most-used transport~\cite{metrics-obfs3}.
+It improves on obfs2 with a Diffie--Hellman key exchange,
+public keys being encoded so as to be indistinguishable from random binary strings.
+ScrambleSuit and obfs4 add resistance to active probing:
+the server accepts a TCP connection but does not send a reply
+until the client proves knowledge of a secret shared out of band.
+They additionally additionally obscure the traffic signature of the underlying stream
+by modifying packet lengths and timing.
 
 The other strategy against DPI is the steganographic one: look like
 something the censor does not block.
