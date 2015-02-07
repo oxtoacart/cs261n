@@ -429,8 +429,8 @@ A technique known as OSS~\cite{oss} (for
 ``online scanning service'') bounces messages
 through web services that are capable of making HTTP requests.
 For example, a censored client may ask an HTTPS-based online translation service to
-translate the web page at \urll{http://forbidden.example/}\textsl{data...},
-where ``\textsl{data...}'' is the URL-embedded message the client wants to send.
+translate the web page at \urll{http://forbidden.example/}\textsl{data},
+where ``\textsl{data}'' is the URL-embedded message the client wants to send.
 The translation service requests the URL,
 unwittingly sending the message on behalf of the client.
 OSS shares certain similarities with domain fronting:
@@ -477,11 +477,9 @@ and sends traffic through a domain with high collateral damage.
 In CloudTransport, the hidden destination, which is a storage bucket name rather than a domain,
 is hidden in the path component of a URL.
 For example, in the S3 URL
-\urll{https://s3.amazonaws.com/bucketname/filename},
-\vp{should ``filename'' in the URL be italicized?  It sounds like it's
-a generic placeholder, not a literal}
+\urll{https://s3.amazonaws.com/}\textsl{bucketname}/\textsl{filename},
 the censor only gets to ``see'' the generic domain part, ``\urll{s3.amazonaws.com}''.
-The path component ``\urll{/bucketname/filename}'',
+The path component ``/\textsl{bucketname}/\textsl{filename}'',
 which would reveal the use of CloudTransport,
 cannot be used for blocking because it is encrypted inside HTTPS.
 
