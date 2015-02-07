@@ -45,7 +45,7 @@ to communicate with a forbidden host
 while appearing to communicate with some other host,
 permitted by the censor.
 The key idea is the use of different domain names at different layers of communication.
-One domain appears on the ``outside'' of the HTTPS request---in the DNS request and
+One domain appears on the ``outside'' of an HTTPS request---in the DNS request and
 TLS Server Name Indication---while another domain appears
 on the ``inside''---in the HTTP Host header, invisible to the
 censor under HTTPS encryption.
@@ -78,42 +78,48 @@ We have seen
 an ongoing conflict emerge between censor and censored,
 with advances on both sides, more subtle evasion being countered by more powerful detection.
 
-We as circumventors have in our favor the censor's
-distaste for ``collateral damage'':
-accidental overblocking committed in the course of trying to censor something else.
+Circumventors,
+at a natural disadvantage because the censor controls the network,
+have one point working in their favor:
+the censor's distaste for ``collateral damage,''
+accidental overblocking committed in the course of censorship.
+Collateral damage is harmful to the censor,
+because the overblocked content is economically or socially beneficial,
+so the censor avoids it when possible.
+(Any censor not willing to turn off the Internet completely
+must derive \emph{some} benefit from allowing access,
+which overblocking harms.)
 One way to win against censorship is to entangle circumvention traffic
-with ordinary Internet traffic such that both must be blocked together,
-or not at all.
-If the ordinary traffic is valuable enough,
-above the censor's tolerance for overblocking,
-then the circumvention traffic will get through.
+with other traffic, which is valuable enough to
+exceed the censor's tolerance for overblocking.
 
-In this paper we describe ``domain fronting,'' a general-purpose technique
+In this paper we describe ``domain fronting,'' a general-purpose circumvention technique
 based on HTTPS that hides the true destination of a communication
 from a censor.
 Fronting works with many web services that host multiple domain names
-behind an HTTPS frontend server.
-These include such high-collateral-damage infrastructure as
-big content delivery networks (CDNs)
+behind a frontend server.
+These include such important infrastructure as
+content delivery networks (CDNs)
 and Google's panoply of services---a nontrivial fraction of the web.
-(See Section~\ref{sec:survey} for a list of suitable services.)
-Domain fronting can be used to tunnel traffic
-to a general-purpose proxy,
-so that circumvention is not limited only to HTTPS, nor to the domains of any specific web service.
+(Section~\ref{sec:survey} is a survey of suitable services.)
+The utility of domain fronting is not limited to HTTPS communication,
+nor to accessing only the domains of a specific web service:
+it works well as a domain-hiding component of a larger circumvention system,
+an HTTPS tunnel leading to a general-purpose proxy.
 
 The key idea of domain fronting is the use of
 different domain names at different layers of communication.
 In an HTTPS request, the destination domain name appears
-in three places relevant to the discussion:
+in three relevant places:
 in the DNS query,
 in the TLS Server Name Indication (SNI) extension~\cite[\S 3]{rfc6066},
 and in the HTTP Host header~\cite[\S 14.23]{rfc2616}.
-Usually, the same domain name appears in all three places.
+Ordinarily, the same domain name appears in all three places.
 In a domain-fronted request, however,
 the DNS query and SNI carry one name (the ``front domain''),
 while the HTTP Host header,
-which is hidden from the censor by HTTPS encryption,
-carries another (the actual destination).
+hidden from the censor by HTTPS encryption,
+carries another (the covert, forbidden destination).
 
 \begin{figure}[ht]
 \centering
@@ -129,30 +135,28 @@ is the actual destination \mbox{\textbf{forbidden.example}}.
 \label{fig:fronting}
 \end{figure}
 
-The censor can block neither the DNS request nor the SNI without
+The censor cannot block on the contents of the DNS request nor the SNI without
 collaterally blocking the front domain.
 The Host header is invisible to the censor,
-but visible to the server receiving the HTTPS request,
-which uses the header to internally route the request to its destination.
-No traffic ever reaches the front domain,
-which may be oblivious to the circumvention.
-For those familiar with decoy routing~\cite{decoyrouting,telex,cirripede,tapdance},
-domain fronting can be understood as
+but visible to the frontend server receiving the HTTPS request.
+The frontend server uses the Host header internally to route the request
+to its covert destination; no traffic ever reaches the putative front domain.
+Domain fronting has many similarities with decoy routing~\cite{decoyrouting,telex,cirripede,tapdance};
+it may be understood as
 ``decoy routing at the application layer.''
 A fuller comparison with decoy routing appears in Section~\ref{sec:related-work}.
 
-This Wget command shows domain fronting in action
-on Google's infrastructure.
-Here, an HTTPS request for \urll{www.google.com} has a Host header for
-\urll{maps.google.com}, even though the SNI in the TLS handshake specifies
-\texttt{www.google.com}.
-The HTML in the response is that of Google Maps.
+This Wget command demonstrates domain fronting
+on Google, one of many fronting-capable services.
+Here, the HTTPS request has a Host header for \urll{maps.google.com},
+even though the DNS query and the SNI in the TLS handshake specify \urll{www.google.com}.
+The response comes from \urll{maps.google.com}.
 
 \noindent
 \begin{quote}
 \usefont{U}{cmtt}{m}{n}%
 \$ wget -q -O - https://www.google.com/ \char`\\\\
-\strut~~~~--header \textquotesingle{}Host: maps.google.com\textquotesingle{} | \char`\\\\
+\strut~~~~--header \textquotesingle{}Host:~maps.google.com\textquotesingle{} | \char`\\\\
 \strut~~~~grep -o \textquotesingle{}<title>.*</title>\textquotesingle{}\\
 <title>Google Maps</title>
 \end{quote}
