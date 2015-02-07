@@ -309,36 +309,35 @@ and when the censor controls a trusted certificate authority.
 \section{Background and related work}
 \label{sec:related-work}
 
-Broadly speaking, there are two main challenges in circumvention:
-blocking by content and blocking by address.
+Broadly speaking, there are three main challenges in proxy-based circumvention:
+blocking by content, blocking by address, and active probing.
 Blocking by content is based on \emph{what you say},
-and blocking by address is based on \emph{whom you talk to}.
+blocking by address is based on \emph{whom you talk to},
+and active probing means \emph{the censor acts as a client}.
+A savvy censor will employ all these techniques, and
+effective circumvention requires countering them all.
+
 A content-blocking censor inspects packets and payloads,
 looking, for example, for forbidden protocols or keywords.
 Content-based blocking is sometimes called deep packet inspection (DPI).
 An address-blocking censor forbids all communication with certain
 addresses, for example IP addresses and domain names, regardless of
 the contents of the communication.
-A savvy censor will use both means of censorship, and
-effective circumvention requires countering both.
-
-To the above challenges we add a related one, active probing.
-An active-probing censor does not merely passively observe traffic:
-it injects its own traffic,
-acting as if it were an ordinary client and connecting to suspected
-proxy servers to see how they respond.
-Then a connection is successful, the server can be blacklisted.
+An active-probing censor does not limit itself to observation and manipulation
+only of user-induced traffic.
+It sends its own proxy requests (active probes),
+either proactively or on demand in response to observed traffic,
+and blacklists any proxies it finds thereby.
 Active probing is a precise means of identifying whether a server belongs to a circumvention system,
-even when a protocol is hard to detect on the wire.
+even when a protocol is hard to detect on the wire---in this way it can
+regarded as a way of reducing accidental overblocking.
 Winter and Lindskog~\cite{foci12-winter} confirmed an earlier discovery of
-Wilde~\cite{wilde} that China's Great Firewall identifies Tor bridges
-by issuing scans that follow up on observed client connections, to discover
-whether a server speaks the Tor protocol.
+Wilde~\cite{wilde} that China's Great Firewall discovers secret Tor bridges
+by issuing its own followup scans after observing a suspected Tor connection.
 
 There are two general strategies for countering content-based blocking.
-The first is to make traffic look unlike
-anything forbidden by the censor; that is, fail to match a blacklist. The second is
-to resemble a protocol that is explicitly allowed by the censor; that is, match a whitelist.
+The first is to look unlike anything the censor blocks;
+the second is to look like something the censor allows.
 Following the first strategy are the so-called ``look-like-nothing'' transports whose
 payloads are indistinguishable from a uniformly random byte stream.
 Examples of look-like-nothing transports are
@@ -360,7 +359,7 @@ They additionally additionally obscure the traffic signature of the underlying s
 by modifying packet lengths and timing.
 
 The other strategy against DPI is the steganographic one: look like
-something the censor does not block.
+something allowed by the censor.
 fteproxy~\cite{fte} uses format-transforming encryption to encode data into strings
 that match a given regular expression,
 for example a regular-expression approximation of HTTP.
@@ -390,30 +389,28 @@ Their examination includes VoIP protocols,
 in which packet loss and duplication are acceptable.
 The censor may, for example, strategically drop certain packets
 in order to disrupt a covert channel, without much harming ordinary VoIP calls.
-\vp{The above could be compressed somewhat to save room}
 
 
-The other grand challenge of proxy-based circumvention is address-based blocking.
+The challenge of address-based blocking is a difficult one
+that has inspired various creative circumvention ideas.
 Tor has long faced the problem of the blocking of its relays,
 the addresses of which appear in a public directory.
 In response, Tor began to reserve a portion of its
-new relays as secret ``bridges''~\cite{tor-blocking}
+relays as secret ``bridges''~\cite{tor-blocking}
 whose addresses are not publicly known.
 BridgeDB, the database of secret bridges,
-carefully distributes bridge addresses
-so that anyone can learn a few bridges, but it is hard to learn all of them.
+carefully distributes addresses
+so that anyone may learn a few bridges, but it is hard to enumerate all of them.
 BridgeDB uses CAPTCHAs and other rate-limiting measures,
 and over short time periods,
-always returns the same set of bridges to the same requester,
+always returns the same bridges to the same requester,
 preventing enumeration by simple repeated queries.
 BridgeDB is also capable of distributing the addresses
-of obfuscated bridges (obfs3 or ScrambleSuit);
-the combination
-of careful bridge address distribution and obfuscated protocols
-gives Tor's system a realistic claim to addressing both main challenges of circumvention.
-Address distribution appears to be the weaker side of the defense,
-as evidenced by real-world censors' apparent preference for
-blocking bridge addresses over real-time DPI-based blocking~\cite{foci12-winter}.
+of obfuscated bridges (currently obfs3, obfs4, ScrambleSuit, and fteproxy),
+granting some address-blocking resistance to those systems that otherwise lack it.
+% Address distribution appears to be the weaker side of the defense,
+% as evidenced by real-world censors' apparent preference for
+% blocking bridge addresses over real-time DPI-based blocking~\cite{foci12-winter}.
 
 CensorSpoofer~\cite{censorspoofer}
 decouples upstream and downstream data channels.
@@ -432,19 +429,19 @@ Each JavaScript-based proxy lasts only as long as a
 user stays on a web page, so the pool of proxies is constantly changing.
 If one of them is blocked, there is soon another to replace it.
 Flash proxy's approach to address blocking is
-the opposite of \meek's:
+the opposite of domain fronting's:
 where flash proxy uses many cheap, disposable, individually blockable proxies,
-\meek uses just a few high-value front domains on hard-to-block network infrastructure.
+domain fronting uses just a few high-value front domains on hard-to-block network infrastructure.
 A drawback with flash proxy's use of the browser is that
 the client must be able to receive a TCP connection; in particular it
 must not be behind network address translation~(NAT), which limits flash proxy's usefulness.
 Part of the flash proxy protocol requires the client to send
 a small amount of unblockable data in a process called rendezvous.
-The default rendezvous mechanism has used domain fronting through App Engine since 2013~\cite{flashproxy-reg-appspot}.
+The default rendezvous mechanism has been domain fronting through Google App Engine since 2013~\cite{flashproxy-reg-appspot}.
 Flash proxy itself does nothing to defend against DPI.
 Connections between censored clients and browser-based proxies use
 WebSocket, a meta-protocol running on HTTP,
-but inside the WebSocket framing is the ordinary Tor protocol.
+but inside the WebSocket framing is the ordinary TLS-based Tor protocol.
 % There exists a prototype transport that attempts to get both
 % content-based and address-based blocking resistance by obfuscating traffic
 % with obfsproxy before sending it through flash proxy~\cite{obfs-flash}.
@@ -461,10 +458,11 @@ where ``\textsl{data}'' is the URL-embedded message the client wants to send.
 The translation service requests the URL,
 unwittingly sending the message on behalf of the client.
 OSS shares certain similarities with domain fronting:
-an unblockable web service takes the place of the front domain,
-and the destination of the communication is embedded somewhere in an HTTPS query
+a hard-to-block web service takes the place of the front domain,
+and the destination is embedded somewhere in an HTTPS query
 rather than in the Host header.
-\vp{Sketch the limitations of this approach}
+OSS has high overhead and low capacity,
+and suffers the same limitations with NAT on the client that flash proxy has.
 
 Decoy routing~\cite{decoyrouting}
 is a technique that puts
@@ -485,7 +483,7 @@ in place of the overt destination is the front domain.
 Both systems tag flows in a way that is invisible to the censor:
 decoy routing uses, for example, a hash embedded in a client nonce,
 while fronting uses the HTTP Host header, encrypted within HTTPS.
-Fronting has the advantage that it does not require active cooperation by network intermediaries.
+Fronting has the advantage that it does not require cooperation by network intermediaries.
 
 Schuhard et~al.~\cite{ccs2012-decoys}
 introduce the idea of a \emph{routing adversary} against decoy routing,
@@ -513,28 +511,30 @@ cannot be used for blocking because it is encrypted inside HTTPS.
 To our knowledge,
 the earliest use of domain fronting for circumvention
 was by GoAgent~\cite{goagent},
-a tool based on App Engine and
+a tool based on Google App Engine and
 once widely used in China.
-Traffic is fronted by the Google frontend server,
-using the ``domainless'' fronting model without SNI,
-and delivered to its destination by a specialized app running on App Engine.
-GoAgent does not use an additional general-purpose proxy after fronting;
-rather, HTTP and HTTPS URLs are fetched directly from the App Engine servers.
-Because of that, GoAgent is limited to carrying HTTP and HTTPS traffic only,
-and the contents of all communications are revealed to Google.
 Users of GoAgent upload
-their own personal copy of the proxy code to App Engine,
-which is free of charge to use as long as they do not exceed a bandwidth quota.
+a personal copy of the proxy code to App Engine,
+where it runs on a subdomain of \urll{appspot.com}.
+In order to reach \urll{appspot.com},
+GoAgent fronts through a Google IP address,
+using the ``domainless'' model without SNI.
+GoAgent does not use an additional general-purpose proxy after fronting;
+rather, it fetches URLs directly from the App Engine servers.
+Because of that, GoAgent does not support protocols other than HTTP and HTTPS,
+and the end-to-end security of HTTPS is lost,
+as web pages exist in plaintext on the App Engine servers before being re-encrypted back to the client.
+App Engine is free to use under a daily bandwidth quota of 1~GB.
 According to a May 2013 survey~\cite{collateral-freedom},
-GoAgent was the circumvention tool most used in
+GoAgent was the most-used circumvention tool in
 China, with 35\% of survey respondents having used it in the previous month.
-This figure is higher than that of paid~(29\%) and free VPNs~(18\%), and far
-above that of other special-purpose tools like Tor~(2.9\%) and Psiphon~(2.5\%).
+It ranked higher than paid~(29\%) and free VPNs~(18\%), and far
+above special-purpose tools like Tor~(2.9\%) and Psiphon~(2.5\%).
 Use of GoAgent in China was disrupted starting in the beginning of June~2014,
 when all Google services were blocked~\cite{cn-google-block}.
-\meek over App Engine was similarly affected.
-\vp{Add mention of what \meek platforms still worked.}
-% Users identified reliability, speed, and ease of installation as the most important features of a circumvention tool.
+The block also affected meek, the subject of Section~\ref{sec:deploy-tor},
+when used with App Engine, though it continued to work in China over the alternate backends
+Amazon CloudFront and Microsoft Azure.
 
 % Cloud-Entry~\cite{cloud-entry} is somewhat similar to GoAgent.
 % It also uses App Engine, but via a socket API rather than a URL fetch API,
