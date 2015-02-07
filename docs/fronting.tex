@@ -38,53 +38,36 @@
 \maketitle
 
 \begin{abstract}
-\vp{This abstract is quite long}
-We describe ``domain fronting,'' an application-layer technique
-for HTTPS
-that hides the remote endpoint of a communication
-for the purpose of censorship circumvention.
-Domain fronting enables communication that is apparently with an allowed domain,
-but actually with a forbidden domain.
+We describe ``domain fronting,'' a versatile censorship circumvention technique
+that hides the remote endpoint of a communication.
+Domain fronting works at the application layer, using HTTPS,
+to communicate with a forbidden host
+while appearing to communicate with some other host,
+permitted by the censor.
 The key idea is the use of different domain names at different layers of communication.
-One domain is used on the ``outside'' of an HTTPS request---in the DNS request and
-TLS Server Name Indication---while another is used
+One domain appears on the ``outside'' of the HTTPS request---in the DNS request and
+TLS Server Name Indication---while another domain appears
 on the ``inside''---in the HTTP Host header, invisible to the
 censor under HTTPS encryption.
+A censor, unable to distinguish fronted and non-fronted traffic to a domain,
+must choose between allowing circumvention traffic
+and blocking the entire domain,
+which results in expensive collateral damage.
+
+Domain fronting is easy to deploy and use and does not require
+special cooperation by network intermediaries.
 We identify a number of hard-to-block web services,
-like content delivery networks and Google,
-that support fronting because they ignore the outside of an HTTPS request
-and dispatch it internally according to the Host header.
-If a censor is unable to distinguish fronted circumvention traffic and non-fronted ordinary traffic,
-then blocking fronted traffic means blocking an entire web service,
-resulting in expensive collateral damage.
-
-We have implemented domain fronting in a system called \meek,
-a pluggable transport for Tor.
-\meek combines
-fronting with an HTTP-based tunneling proxy
-that decodes a sequence of HTTP requests and feeds their contents into Tor.
-A censor sees only a sequence of HTTPS requests to an allowed domain.
-We describe our experience with deploying \meek.
-% \meek, or something based on it,
-% has been adopted by other circumvention systems including
-% [blinded for anonymous submission].
-% ANON
-% Lantern and Psiphon.
-
-Hiding the endpoint and obscuring byte patterns are important parts of blocking resistance,
-but there are other, more subtle considerations.
-We describe what we have done to disguise traffic ``tells'' in \meek,
-including using a real web browser to make fronted HTTPS requests
-in order to disguise the TLS fingerprint.
-We argue that these measures, combined with domain fronting, increase the censor's effort
-beyond simple one-shot blocking techniques such as IP address blacklisting, and into
-the realm of more expensive, less reliable statistical tests.
+such as content delivery networks,
+that support domain-fronted connections
+and are useful for censorship circumvention.
+Domain fronting in various forms is now a circumvention workhorse.
+We describe several months of deployment experience
+in the Tor, Lantern, and Psiphon circumvention systems,
+including user adoption, performance,
+ongoing cost of operation, and lessons learned.
 \end{abstract}
 
 \section{Introduction}
-
-% VPN arms race We seek to build a system that remains difficult to block even
-% after it has many users.
 
 Censorship is a daily reality for many Internet users.
 Workplaces, schools, and governments use technical and social means
