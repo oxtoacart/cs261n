@@ -199,12 +199,12 @@ The server decodes the requests and feeds their payloads
 into the Tor network.
 Downstream data received by the server from Tor
 are returned to the client within HTTP responses.
-\meek's architecture appears in Figure~\ref{fig:architecture}.
+\meek's architecture appears in Figure~\ref{fig:meek-architecture}.
 Section~\ref{sec:architecture} describes how it works in detail.
 
 \begin{figure*}
 \centering
-\includegraphics[width=\linewidth]{architecture}
+\includegraphics[width=\linewidth]{meek-architecture}
 \caption{
 Architecture of \meek.
 The client sends an HTTP request to the Tor bridge by way of an intermediate web service such as a CDN.
@@ -216,7 +216,7 @@ The bridge sends data back to the client in the HTTP response.
 \meekclient and \meekserver are transport plugins, the interface between Tor and \meek.
 The host actually at allowed.example does not participate in the communication.
 }
-\label{fig:architecture}
+\label{fig:meek-architecture}
 \end{figure*}
 
 \meek has been built into an experimental release of Tor Browser,
@@ -594,7 +594,7 @@ and when the censor controls a trusted certificate authority.
 \section{Architecture and protocol of meek}
 \label{sec:architecture}
 
-We show the components of the system in Figure~\ref{fig:architecture}.
+We show the components of the system in Figure~\ref{fig:meek-architecture}.
 The parts that are new in \meek
 are the programs \meekclient and \meekserver,
 \vp{It would help to use a different typeface for \meekserver, etc.}
@@ -883,18 +883,18 @@ and shares no state with the user's browser.
 
 \begin{figure}
 \centering
-\includegraphics[height=1.5in]{browser-architecture}
+\includegraphics[height=1.5in]{meek-browser-architecture}
 \caption{
 Client architecture including a browser extension for TLS camouflage.
 Dashed lines show the process hierarchy.
 Solid lines show the flow of outgoing communication.
 The headless browser runs in the background and is invisible to the user.
-This figure is a zoomed-in view of the ``Client's PC'' component of Figure~\ref{fig:architecture}.
+This figure is a zoomed-in view of the ``Client's PC'' component of Figure~\ref{fig:meek-architecture}.
 }
-\label{fig:browser-architecture}
+\label{fig:meek-browser-architecture}
 \end{figure}
 
-Figure~\ref{fig:browser-architecture} shows the interaction of components
+Figure~\ref{fig:meek-browser-architecture} shows the interaction of components
 on the client's computer.
 The local Tor process runs a helper process that starts both \meekclient
 and the headless browser,

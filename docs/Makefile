@@ -8,8 +8,8 @@ FIGURES = \
 	clients-meek.pdf \
 	clients-psiphon3.pdf \
 	fronting-diagram.pdf \
-	architecture.pdf \
-	browser-architecture.pdf \
+	meek-architecture.pdf \
+	meek-browser-architecture.pdf \
 	wire-sequential.pdf \
 	wire-parallel.pdf
 
