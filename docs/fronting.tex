@@ -10,6 +10,7 @@
 \usepackage{textcomp}
 \usepackage{xspace}
 \usepackage{color}
+\usepackage{threeparttable}
 
 \hyphenation{Client-Hello Go-Agent}
 
@@ -27,6 +28,8 @@
 
 \newcommand{\note}[1]{{\textcolor{red}{[\textit{#1}]}}}
 \newcommand{\vp}[1]{\note{#1 --VP}}
+
+\newcommand{\yes}\checkmark
 
 % https://tex.stackexchange.com/questions/113338/use-sans-serif-in-a-verbatim-environment/113339#113339
 \makeatletter
@@ -555,8 +558,46 @@ Amazon CloudFront and Microsoft Azure.
 \section{Fronting-capable web services}
 \label{sec:survey}
 
-\vp{This whole section should be beefed up with a deeper assessment.  Along
-these lines, it would help to include a summary table.}
+\begin{table*}[ht]
+\centering
+\begin{threeparttable}
+
+\caption{
+Summary of fronting-capable services.
+}
+\label{tab:survey}
+
+\begin{tabular}{l r r r r c}
+service                    &        \$/GB & \$/10K requests & \$/hour & \$/month & allows SNI$\ne$Host\tnote{1} \\
+\hline
+Google App Engine\tnote{2} &        0.120 &              -- &    0.05 &       -- & \yes \\
+Amazon CloudFront          & 0.085--0.250 &    0.010--0.022 &      -- &       -- & \yes \\
+Microsoft Azure            & 0.087--0.138 &              -- &      -- &       -- & \yes \\
+CloudFlare                 &           -- &              -- &      -- &      200 & \yes \\
+Akamai\tnote{3}            &           -- &              -- &      -- &      400 & \yes \\
+Fastly\tnote{4}            & 0.120--0.190 &    0.010--0.012 &      -- &       -- &      \\
+Level~3\tnote{5}           & 0.035--0.200 &              -- &      -- &       -- & \\
+% EdgeCast
+\noalign{\smallskip}
+\end{tabular}
+
+\begin{tablenotes}
+\item[1] A missing checkmark in the ``allows SNI$\ne$Host'' column means the service requires the ``domainless'' fronting style.
+\item[2] App Engine dynamically scales the number of ``instances'' of the application code in order to handle changing load. Roughly, every instance after the first costs \$0.05/hour.
+\item[3] Akamai does not publish pricing information; the prices here are from a reseller called Cache Simple, which quotes \$400/month for 1000~GB transfer, and \$0.50/GB beyond that.
+\item[4] Fastly has a minimum montly charge of \$50.
+\item[5] Level~3 does support domain fronting per se, but paths under the \urll{secure.footprint.net} domain can likely serve the same purpose. Level~3 does not publish pricing information; the prices here are from a reseller called VPS.NET, which quotes \$34.95 for the first 1000~GB and \$200 thereafter.
+\end{tablenotes}
+
+\end{threeparttable}
+\end{table*}
+
+In this section we survey a variety of web services and evaluate
+their suitability for domain fronting.
+Most of the services we evaluated support fronting in one form or another,
+but they each have their own quirks and performance characteristics.
+Table~\ref{tab:survey} summarizes the services.
+
 This section contains a brief survey of fronting-capable
 web services we have found, each with its pros and cons.
 The list is not exhaustive and is meant to illustrate the broad
