@@ -6,7 +6,7 @@ all: fronting.pdf
 # requiring access to traces.
 FIGURES = \
 	clients-meek.pdf \
-	clients-psiphon3.pdf \
+	clients-psiphon.pdf \
 	fronting-diagram.pdf \
 	meek-architecture.pdf \
 	meek-browser-architecture.pdf \
@@ -27,8 +27,8 @@ fronting.pdf: fronting.tex fronting.bib $(FIGURES)
 # wget -q -O - https://metrics.torproject.org/stats/clients.csv | sed -n -e '1p;/meek/p' > clients-meek.csv
 clients-meek.pdf: clients-meek.R clients-meek.csv
 	Rscript clients-meek.R
-clients-psiphon3.pdf: clients-psiphon3.R psiphon3-fronted-meek-unique-users-all-regions.csv
-	Rscript clients-psiphon3.R
+clients-psiphon.pdf: clients-psiphon.R clients-psiphon.csv
+	Rscript clients-psiphon.R
 datalen.pdf: datalen.R ../traces/lbl.https.goog.dpriv.tcp.log ../traces/lbl.https.non-goog.dpriv.tcp.log ../traces/meek_tbb_extension_tcp.pcap.tcp.log
 	Rscript datalen.R
 concurrent.pdf: concurrent.R ../traces/lbl.https.goog.dpriv.conn.log ../traces/lbl.https.non-goog.dpriv.conn.log ../traces/meek_tbb_extension_tcp.pcap.conn.log
