@@ -557,7 +557,7 @@ Amazon CloudFront and Microsoft Azure.
 \section{Fronting-capable web services}
 \label{sec:survey}
 
-\begin{table*}[ht]
+\begin{table}
 \centering
 \begin{threeparttable}
 
@@ -565,34 +565,34 @@ Amazon CloudFront and Microsoft Azure.
 Summary of fronting-capable services.
 Does not include some general classes of services (such as shared web hosting)
 that may work for domain fronting.
-Pricing is accurate as of February~2015.
-A ``no'' in the ``allows SNI$\ne$Host'' means that the service requires the ``domainless'' fronting style.
+Prices are current as of February~2015 and are
+rounded to the nearest cent.
 }
 \label{tab:survey}
 
-\begin{tabular}{l r r r r c}
-service                    &        \$/GB & \$/10K requests & \$/hour & \$/month & allows SNI$\ne$Host \\
+\begin{tabular*}{\linewidth}{l r r r r}
+service             &        \$/GB & \$/10K reqs. & \$/hour & \$/month \\
 \hline
-Google App Engine\tnote{1} &        0.120 &              -- &    0.05 &       -- & yes \\
-Amazon CloudFront          & 0.085--0.250 &    0.010--0.022 &      -- &       -- & yes \\
-Microsoft Azure            & 0.087--0.138 &              -- &      -- &       -- & yes \\
-CloudFlare                 &           -- &              -- &      -- &      200 & yes \\
-Fastly\tnote{2}            & 0.120--0.190 &    0.010--0.012 &      -- &       -- & no  \\
-Akamai\tnote{3}            &           -- &              -- &      -- &      400 & yes \\
-Level~3\tnote{4}           & 0.035--0.200 &              -- &      -- &       -- & no  \\
+App Engine\tnote{1} &       0.12 &              -- &    0.05 &       -- \\
+CloudFront          & 0.09--0.25 &      0.01--0.02 &      -- &       -- \\
+Azure               & 0.09--0.14 &              -- &      -- &       -- \\
+CloudFlare          &         -- &              -- &      -- &      200 \\
+Fastly\tnote{2}     & 0.12--0.19 &            0.01 &      -- &       -- \\
+Akamai\tnote{3}     &         -- &              -- &      -- &      400 \\
+Level~3\tnote{4}    & 0.03--0.20 &              -- &      -- &       -- \\
 % EdgeCast
 \noalign{\smallskip}
-\end{tabular}
+\end{tabular*}
 
 \begin{tablenotes}
 \item[1] App Engine dynamically scales the number of ``instances'' of the application code in order to handle changing load. Roughly, every instance after the first costs \$0.05/hour.
-\item[2] Fastly has a minimum monthly charge of \$50.
-\item[3] Akamai does not publish pricing information; the prices here are from a reseller called Cache Simple, which quotes \$400/month for 1000~GB transfer, and \$0.50/GB beyond that.
+\item[2] Fastly edge servers require that the SNI match the Host header, therefore it is necessary to use ``domainless'' fronting and omit SNI. There is a minimum monthly charge of \$50.
+\item[3] Akamai does not publish pricing information; the prices here are from a reseller called Cache Simple, which quotes \$400/month for 1000~GB transfer, and \$0.50/GB for overages.
 \item[4] Level~3 does support domain fronting per se, but paths under the \urll{secure.footprint.net} domain can likely serve the same purpose. Level~3 does not publish pricing information; the prices here are from a reseller called VPS.NET, which quotes \$34.95 for the first 1000~GB and \$200 thereafter.
 \end{tablenotes}
 
 \end{threeparttable}
-\end{table*}
+\end{table}
 
 In this section we survey a variety of web services and evaluate
 their suitability for domain fronting.
