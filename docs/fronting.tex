@@ -1210,14 +1210,211 @@ because that portion of the communication flow is not observed by the censor.
 \section{Deployment on Lantern}
 \label{sec:deploy-lantern}
 
-Lantern~\cite{lantern} uses a network of proxies running on volunteer computers;
-proxy addresses are shared only with trusted friends in order to make them difficult to enumerate.
+Lantern~\cite{lantern} is a free circumvention tool targeting casual web browsing.
+Lantern does not employ onion routing and in general does not provide the
+same level of anonymity guarantees as Tor.  Lantern primarily focuses on
+performance and availability.
 
-Lantern~1.4 is planned to use domain fronting inspired by \meek~\cite{lantern-1.3.1}.
+At its core, Lantern is a network of shared HTTPS proxy servers combined
+with a client application that allows censored users to find and use those
+proxy servers to proxy traffic from their existing web browsers.  This same
+client application also allows uncensored users to host such proxy servers
+on their own networks for use by other Lantern users. Lantern ultimately
+aims to provide a secure mechanism for distributing knowledge about both
+Lantern-hosted and peer-hosted proxy servers using a trust-network based
+distribution mechanism such as kaleidoscope~\cite{kaleidoscope}.  In the meantime, Lantern
+also randomly assigns users to Lantern-hosted proxy servers.
 
-enproxy
+Lantern uses a centralized infrastructure for authenticating users and
+assigning proxies to them.  Lantern's threat model assumes that this
+centralized infrastructure is or can be blocked by the censors.
+Consequently, users must have a priori access to a functioning proxy which
+they can use to bootstrap onto the Lantern network and learn about more
+proxies. Prior to Lantern adopting domain-fronting, we gave users access to
+such proxies (which we call fallbacks) by embedding their information in
+customized software installers that we distributed directly to users.  This
+prevented users from downloading Lantern directly and required them to
+request an email invitation from us with a link to their custom installer.
+Furthermore, since anyone could request an installer, the censors could
+theoretically learn about all of our proxies simply by continually
+requesting installers.
 
-automated scanner
+\subsection{Timeline for Deploying Domain-Fronting}
+
+\begin{figure}
+\centering
+\includegraphics[height=1.5in]{lantern}
+\caption{
+Megabytes per second served by domain-fronted Lantern proxies
+(Lantern-hosted and peers).
+}
+\label{fig:lantern-bandwidth}
+\end{figure}
+
+Lantern rolled out domain-fronting via CloudFlare in July 2014 in order to
+allow users to direct-download Lantern without an email invitation.  In
+this initial implementation, direct-downloaded Lantern clients proxied all
+their traffic using domain-fronting.  It worked, and we experienced steady
+growth in direct downloads and traffic from direct-downloaded clients.
+
+At the beginning of October 2014, we started randomly assigning direct
+HTTPS proxies to users who had direct-downloaded Lantern.  This diverted
+traffic from domain-fronted servers to more efficient direct servers.
+
+In December 2014 and January 2015, Lantern experienced a dramatic surge in
+domain-fronted traffic, jumping from 1 MB/s to 100 MB/s within those two
+months. At first we assumed that direct proxies had been blocked, but it
+turns out that the majority of this new traffic originated in the
+Philippines, which is not a heavily censored country. From what we're
+hearing, it looks like Philippine users are using Lantern to get around
+their ISPs bandwidth caps~\cite{needed}.
+
+\subsection{General Deployment Considerations}
+
+Unlike with meek, Lantern's equivalent of reflectors (which we call
+proxies) are also exit nodes.  So in our infrastructure, we have:
+
+user agent → Lantern client → CDN → Lantern proxy → destination.
+
+Lantern hosts dozens of such proxies on commodity VPS providers like
+Digital Ocean. In addition, uncensored users who run the Lantern client can
+register themselves as domain-fronted proxies as well, so overall there are
+theoretically a very large number of proxies in rotation at any one time.
+
+\subsection{Choice of CDN}
+In our initial implementation, we used Fastly as our CDN.  Fastly ended up
+being unsuitable because their infrastructure isn't meant to support a
+large number of backends, so we transitioned to CloudFlare.  CloudFlare has
+worked well so far because it supports a large number of backends, it has
+an API that we can use to manage those backends and it has cheap flat-rate
+pricing that doesn't charge based on bandwidth consumption. It also has
+a sufficient number of relatively high-profile domains through which we can
+front.
+
+\subsection{Implementation Components}
+Lantern's domain fronting is implemented in Go and made available through
+the flashlight~\cite{flashlight} application.
+The core of flashlight's domain fronting is encapsulated in two libraries,
+enproxy~\cite{enproxy} and fronted~\cite{fronted}.
+
+enproxy provides an implementation of Go's standard net.Conn interface that
+encapsulates reads and writes as a series of HTTP requests via a stateful
+enproxy proxy.  This allows flashlight to proxy any streaming-oriented
+traffic (e.g. TCP).  Unlike meek, enproxy supports full-duplex~\cite{beating-gfw-with-go} operation
+so that reads don't wait on writes, which can be handy for bidirectional
+protocols like XMPP.  Lantern actually uses XMPP as a signaling channel for
+peer-to-peer traffic, and tunnels XMPP via domain-fronted proxies.
+
+fronted uses domain-fronting to transmit enproxy's HTTP requests in a
+blocking-resistant manner. It provides a facility for configuring a number
+of different front domains (masquerade hosts) and includes the ability to
+connect to them directly by IP address rather than DNS. In practice,
+flashlight uses several hundred masquerade hosts when communicating via
+CloudFlare.
+
+\subsection{Sticky Routing}
+Domain-fronted Lantern requests go to one of two host names,
+fallbacks.getiantem.org and peers.getiantem.org.  Fallbacks is a pool of
+servers hosted by Lantern, and peers is the pool of servers constituted by
+online Lantern peers.  When using CloudFlare, a server is selected based by
+round robin.  Just like with meek, Lantern's domain-fronting protocol is
+stateful, so subsequent HTTP requests for the same connection need to find
+their way back to the same proxy that handled the original request.  We
+accomplish this by having the responding proxy return its specific hostname
+in a header which the client then users on subsequent requests, thereby
+bypassing the round robin.
+
+\subsection{Added Latency in Domain-fronted Encapsulated HTTP Transports and
+Mitigations for the Same}
+Encapsulating a streaming network connection in a series of HTTP requests
+introduces additional latency beyond TCP. In the case of flashlight and
+CloudFlare, there are several causes of this latency:
+
+Firstly, domain-fronting requires the establishment of additional TCP
+connections. In a best case scenario, the user agent can open a single TCP
+connection directly to the destination server.  With Lantern, the inclusion
+of the client, CloudFlare and the proxy introduce three additional TCP
+connections between the user agent and the destination.  This is mitigated
+somewhat by the fact that CloudFlare pools and reuses connections to the
+Lantern proxy.  Unfortunately, the Lantern client cannot do the same for
+connections to CloudFlare as CloudFlare seems to time out idle connections
+fairly aggressively.  We mitigate this somewhat by aggressively
+pre-connecting to CloudFlare when we detect activity~\cite{connpool}.
+
+Secondly, even though enproxy operates mostly in full-duplex, reads cannot
+begin until the first request and the response containing the
+sticky-routing header have been processed. There is no mitigation for this.
+
+Thirdly, enproxy does not pipeline http requests.  This means that even
+though reads and writes are full duplex, the flush of one set of writes
+cannot proceed until the previous flush of the previous set of writes has
+been acknowledged with an http response, meaning that a full round-trip is
+necessary between each flush. Implementing HTTP 2.0 would provide request
+pipelining and potentially improve on latency substantially.
+
+Fourthly, enproxy has no way of knowing when the user agent is done
+writing.  If the data were streaming directly from user agent through to
+the proxy, this wouldn't be a problem, but CDNs like CloudFlare buffer
+uploads fairly aggressively, so small uploads aren't actually forwarded to
+the proxy until the HTTP request is finished.  enproxy assumes that a
+writer is finished if it detects inactivity for more than 35 milliseconds,
+at which point it flushes the write by finishing the HTTP request.  This
+introduces at least 35 milliseconds of additional latency, and potentially
+more if we guessed wrong and the write wasn't actually finished, since we
+now have to wait for a full round trip before the next write can proceed.
+This latency is particularly noticeable when proxying TLS traffic, as the
+TLS handshake consists of several small messages sent back and forth
+between user agent and server.
+
+This fourth source of latency can be eliminated if enproxy can know for
+sure when a writer is finished. This could be achieved by changing the
+interface so that rather than implementing net.Conn and proxying generic
+streams of traffic, enproxy could actually proxy HTTP requests directly. It
+would be able to tell when the user agent is finished sending an HTTP
+request and when the destination is finished responding.  However, doing
+the same for HTTPS would require man-in-the-middling the TLS connection in
+order to expose the flow of requests.  Furthermore, this approach only
+works for HTTP clients.  Supporting other sorts of traffic like XMPP would
+require implementing support for those protocols as well.
+
+\subsection{Buffering versus Streaming Requests and Responses}
+HTTP supports both buffered requests/responses (fixed content-length) and
+streaming (chunked encoding). For large downloads and uploads in
+particular, streaming is attractive because it allows writes to stream
+through the proxy and CDN without blocking and as part of a single HTTP
+request/response.  Some CDNs support streaming requests and responses, some
+support only streaming responses, and some support neither streaming
+requests nor responses.  CloudFlare supports streaming in both directions.
+
+enproxy provides pluggable strategies to use either streaming or
+buffering.
+
+\subsection{Managing Proxy Rotations}
+Lantern hosted proxies are fairly stable, but peer proxies tend to come
+online and offline fairly frequently. The CDN (CloudFlare) configuration
+needs to be kept up-to-date based on which proxies are available at any
+given time. We achieve this using the peerscanner~\cite{peerscanner} application, which
+provides a REST API for proxies to register and unregister themselves.
+peerscanner does continual connectivity checking of registered proxies and
+maintains the CloudFlare configuration accordingly. This process is
+unfortunately not foolproof, because there is some latency in the
+connectivity checking and some further latency in the updating of
+CloudFlare's configuration and the propagation of those updates through
+CloudFlare's infrastructure (haven't measured this).  This means that there
+will be periods of time during which an offline proxy is still in rotation,
+which causes an error for any user that's unlucky enough to get routed to
+it.
+
+\subsection{Direct Domain Fronting}
+One of our services is a geolocation server. Rather than proxying traffic to it
+via our enproxy proxies, we actually have it registered on CloudFlare and
+domain-front to it directly.  This reduces latency and saves resources on our
+end.  We've talked about doing direct domain-fronting for popular sites by just
+registering their IPs in CloudFlare under special domains, for example
+\urll{facebook.direct.getiantem.org}.  To do this for anything that's HTTPS would
+require us to man-in-the-middle connections from the user agent.  The biggest
+problem with man-in-the-middling isn't that our client-side Lantern software
+sees the traffic in the clear, it's that the CDN also sees it in the clear.
 
 
 \section{Deployment on Psiphon}
