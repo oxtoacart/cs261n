@@ -1420,27 +1420,147 @@ sees the traffic in the clear, it's that the CDN also sees it in the clear.
 \section{Deployment on Psiphon}
 \label{sec:deploy-psiphon}
 
-Psiphon~\cite{psiphon} is a network of many one-hop proxies,
-with encryption and traffic obfuscation between client and server.
-
-Psiphon uses domain fronting based on \meek as one of its blocking defenses since June~2014~\cite{psiphon-meek-merge}.
-
 \begin{figure}
 \includegraphics[width=\linewidth]{clients-psiphon3}
 \caption{
 Daily unique users of \meek with
-Psiphon
-The decrease at the end of June
-was caused by an unblocking event that made \meek unnecessary for some users.
+Psiphon.
+We don't have user accounts or track users by e.g., IP address. We do
+count connection events. The unique user number is derived from a
+coarse-grained ``last connected'' timestamp sent by clients: if the last day
+connected is before day being counted, then that connected event is a
+unique user for that day.
 }
 \label{fig:clients-psiphon3}
 \end{figure}
 
-how clients choose a technique
+The Psiphon circumvention system~\cite{psiphon} is a centrally managed, geographically
+diverse network of thousands of proxy servers. Psiphon is a
+performance-oriented, ``one hop'' proxy architecture. Much of our server
+infrastructure is hosted with cloud providers. As of January 2015, Psiphon
+has over 2 million daily unique users.
 
-unfronted mode
+Psiphon deploys clients for popular platforms, including Windows and
+Android. Our clients are designed to tunnel a broad range of host traffic:
+web browsing, video streaming, and mobile app data transfer. Psiphon
+clients are designed for ease of use, and users are not asked to perform
+any manual configuration.
 
-users: Figure~\ref{fig:clients-psiphon3}
+As a circumvention system, Psiphon has faced threats including blocking by
+DPI---both blacklisting and whitelisting---and blocking by network
+end-points. For example, in 2013, Psiphon circumvented DPI which
+whitelisted HTTP by sending a ``HTTP prefix''---the first few bytes of an
+HTTP request---before the start of its regular upstream flow~\cite{information-controls}.
+
+Psiphon takes measures to distribute its server addresses in such a way
+that most clients discover enough servers to have several options in the
+case of a server being blocked, while making it difficult to enumerate all
+servers. In February 2014, Psiphon was specifically targeted for blocking
+by network end-point, and this blocking was sufficiently aggressive to have
+major impact on our user base, though not all users were blocked. As part
+of our response we integrated and deployed fronting with meek. We fully
+deployed this in June 2014. Our implementation is largely based on Tor's
+meek-client and meek-server, with some modifications.
+
+Psiphon employs meek as two distinct protocols: fronted meek, and what we
+call ``unfronted meek''. Fronted meek uses the domain fronting technique.
+
+In unfronted meek, we omit the TLS layer and the protocol on the wire is
+HTTP. As fully compliant HTTP, unfronted meek supersedes our HTTP prefix
+defense against HTTP whitelisting. Unfronted meek is not routed through
+CDNs, and as such is only a DPI whitelist defense and not a defense against
+enumeration of our network end-points. We envision a potential fronted HTTP
+protocol with both properties, which requires cooperating with CDNs to
+route our HTTP requests based on, for example, some obfuscated HTTP header
+element.
+
+\subsection{Implementation}
+
+Psiphon's core protocol is SSH. SSH provides an encryption layer for
+communication between Psiphon clients and servers; the primary purpose of
+this encryption is to frustrate DPI. On top of SSH, we add an obfuscation
+layer~\cite{obfuscated-openssh} that transforms the SSH handshake into a random stream; and
+random padding of packets in the SSH handshake sequence. Psiphon clients
+authenticate servers using SSH public keys obtained through out-of-band
+channels, a process that is bootstrapped with server keys embedded in the
+client binaries.
+
+Our obfuscated SSH is the payload for the meek transport. As such, the meek
+payload appears to be random data and lacks a trivial packet size signature
+in its initial requests and responses.
+
+In Psiphon's modified meek protocol, the session ID cookie contains
+additional payload: a protocol version number, and the destination Psiphon
+server address. As this cookie will be plaintext in unfronted meek, the
+payload is encrypted---with NaCl crypto\_box---using a public key
+associated with the destination meek-server; then obfuscated; then
+formatted as an innocuous-appearing cookie with a randomly selected key
+value. The protocol version number is used by meek-server to determine if
+the meek-client supports several enhancements we have added. The server
+address is the destination SSH server that meek-server forwards traffic to.
+
+We further modified the meek protocol so that the meek-clients only
+transmits its chosen session ID on the first meek HTTP request, after which
+the meek-server assigns a distinct ID to be used on subsequent requests.
+This allows meek-server to distinguish between new and existing sessions
+when a meek-client sends a request after a long delay, such as after an
+Android device awakes from sleeping, where the meek-server may have already
+expired and discarded its session.
+
+Psiphon ported meek-client to Java for our Android client. For Android, we
+make HTTP and HTTPS requests using the Apache HttpClient component, with
+the expectation that this will have characteristics similar to TLS sessions
+for other Android apps making web service requests.
+
+The Psiphon meek-server inspects CDN injected headers to determine user
+client IP address. The address is mapped to a region and the region is used
+to record usage statistics.
+
+\subsection{Server Selection}
+
+When a user starts a Psiphon client, the client initiates connections to up
+to 10 different servers simultaneously, keeping the first fully established
+connection. Candidate servers are chosen at random from cached lists of
+known servers and a mix of different protocols are used. The purpose of the
+simultaneous connections are to minimize user wait time in case certain
+protocols are blocked, certain servers are blocked by address, or certain
+servers are at capacity and rejecting new connections. This process also
+helps us with automatically using the lowest latency server for the user as
+it tends to pick the closest data center, and lowest cost as it tends to
+pick direct connections over fronted due to lower latency.
+
+We made two modifications to server selection to accommodate fronting.
+First, we changed the notion of an established connection from TCP
+connection completion to full SSH handshake completion. This ensures the
+full two hops are measured in the fronted case. Second, we adjusted our
+protocol selection schedule to ensure that, while we generally favor the
+fastest connection, we do not expose our system to an attack that forces us
+to always use a degraded protocol. For example, the adversary could
+implement a DPI attack that allows all connections to establish but then
+terminate or severely throttle non-whitelisted protocols after some short
+time period. If we detect such degraded conditions, we shift protocol
+selection in favor of unfronted and fronted protocols over the faster
+obfuscated SSH direct connections.
+
+\subsection{Performance}
+
+For clients, we identified a need to improve video streaming and download
+performance for traffic tunneled through meek. In addressing this, our
+considerations included a cost-per-HTTP-request for some candidate CDNs,
+lack of support for HTTP pipelining in our components, and a concern about
+the DPI signature of upstream-only or downstream-only HTTP connections. So,
+as a compromise, we made a tweak to the meek protocol: instead of sending
+at most 64K of payload in each HTTP response, response data will be
+streamed back, using chunked encoding, as long as there is data to send and
+for no longer than 200 milliseconds.
+
+This tweak yielded a significant performance improvement, with download
+speeds increasing by 4--5×, and 1080p video playback becoming smooth. Under
+heavy downstream conditions, we observe peak payloads of 1MB, with 300k on
+average, although the exact traffic signature is highly dependent on the
+tunneled application. We tuned the timeout parameter through subjective
+usability testing focusing on latency while web browsing and simultaneously
+downloading large files.
 
 % Appropriate TLS camouflage may differ depending on circumstances.
 % On a traditional desktop PC, using a browser is probably the right choice.
