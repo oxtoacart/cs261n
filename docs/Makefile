@@ -6,6 +6,7 @@ all: fronting.pdf
 # requiring access to traces.
 FIGURES = \
 	clients-meek.pdf \
+	bandwidth-lantern.pdf \
 	clients-psiphon.pdf \
 	fronting-diagram.pdf \
 	meek-architecture.pdf \
@@ -27,6 +28,8 @@ fronting.pdf: fronting.tex fronting.bib $(FIGURES)
 # wget -q -O - https://metrics.torproject.org/stats/clients.csv | sed -n -e '1p;/meek/p' > clients-meek.csv
 clients-meek.pdf: clients-meek.R clients-meek.csv
 	Rscript clients-meek.R
+bandwidth-lantern.pdf: bandwidth-lantern.R bandwidth-lantern.csv
+	Rscript bandwidth-lantern.R
 clients-psiphon.pdf: clients-psiphon.R clients-psiphon.csv
 	Rscript clients-psiphon.R
 datalen.pdf: datalen.R ../traces/lbl.https.goog.dpriv.tcp.log ../traces/lbl.https.non-goog.dpriv.tcp.log ../traces/meek_tbb_extension_tcp.pcap.tcp.log
