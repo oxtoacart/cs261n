@@ -527,7 +527,6 @@ rather, it fetches URLs directly from the App Engine servers.
 Because of that, GoAgent does not support protocols other than HTTP and HTTPS,
 and the end-to-end security of HTTPS is lost,
 as web pages exist in plaintext on the App Engine servers before being re-encrypted back to the client.
-App Engine is free to use under a daily bandwidth quota of 1~GB.
 According to a May 2013 survey~\cite{collateral-freedom},
 GoAgent was the most-used circumvention tool in
 China, with 35\% of survey respondents having used it in the previous month.
@@ -536,7 +535,7 @@ above special-purpose tools like Tor~(2.9\%) and Psiphon~(2.5\%).
 Use of GoAgent in China was disrupted starting in the beginning of June~2014,
 when all Google services were blocked~\cite{cn-google-block}.
 The block also affected meek, the subject of Section~\ref{sec:deploy-tor},
-when used with App Engine, though it continued to work in China over the alternate backends
+when used with App Engine, though it continued to work in China over alternate backends,
 Amazon CloudFront and Microsoft Azure.
 
 % Cloud-Entry~\cite{cloud-entry} is somewhat similar to GoAgent.
@@ -564,29 +563,32 @@ Amazon CloudFront and Microsoft Azure.
 
 \caption{
 Summary of fronting-capable services.
+Does not include some general classes of services (such as shared web hosting)
+that may work for domain fronting.
+Pricing is accurate as of February~2015.
+A ``no'' in the ``allows SNI$\ne$Host'' means that the service requires the ``domainless'' fronting style.
 }
 \label{tab:survey}
 
 \begin{tabular}{l r r r r c}
-service                    &        \$/GB & \$/10K requests & \$/hour & \$/month & allows SNI$\ne$Host\tnote{1} \\
+service                    &        \$/GB & \$/10K requests & \$/hour & \$/month & allows SNI$\ne$Host \\
 \hline
-Google App Engine\tnote{2} &        0.120 &              -- &    0.05 &       -- & \yes \\
-Amazon CloudFront          & 0.085--0.250 &    0.010--0.022 &      -- &       -- & \yes \\
-Microsoft Azure            & 0.087--0.138 &              -- &      -- &       -- & \yes \\
-CloudFlare                 &           -- &              -- &      -- &      200 & \yes \\
-Akamai\tnote{3}            &           -- &              -- &      -- &      400 & \yes \\
-Fastly\tnote{4}            & 0.120--0.190 &    0.010--0.012 &      -- &       -- &      \\
-Level~3\tnote{5}           & 0.035--0.200 &              -- &      -- &       -- & \\
+Google App Engine\tnote{1} &        0.120 &              -- &    0.05 &       -- & yes \\
+Amazon CloudFront          & 0.085--0.250 &    0.010--0.022 &      -- &       -- & yes \\
+Microsoft Azure            & 0.087--0.138 &              -- &      -- &       -- & yes \\
+CloudFlare                 &           -- &              -- &      -- &      200 & yes \\
+Fastly\tnote{2}            & 0.120--0.190 &    0.010--0.012 &      -- &       -- & no  \\
+Akamai\tnote{3}            &           -- &              -- &      -- &      400 & yes \\
+Level~3\tnote{4}           & 0.035--0.200 &              -- &      -- &       -- & no  \\
 % EdgeCast
 \noalign{\smallskip}
 \end{tabular}
 
 \begin{tablenotes}
-\item[1] A missing checkmark in the ``allows SNI$\ne$Host'' column means the service requires the ``domainless'' fronting style.
-\item[2] App Engine dynamically scales the number of ``instances'' of the application code in order to handle changing load. Roughly, every instance after the first costs \$0.05/hour.
+\item[1] App Engine dynamically scales the number of ``instances'' of the application code in order to handle changing load. Roughly, every instance after the first costs \$0.05/hour.
+\item[2] Fastly has a minimum monthly charge of \$50.
 \item[3] Akamai does not publish pricing information; the prices here are from a reseller called Cache Simple, which quotes \$400/month for 1000~GB transfer, and \$0.50/GB beyond that.
-\item[4] Fastly has a minimum montly charge of \$50.
-\item[5] Level~3 does support domain fronting per se, but paths under the \urll{secure.footprint.net} domain can likely serve the same purpose. Level~3 does not publish pricing information; the prices here are from a reseller called VPS.NET, which quotes \$34.95 for the first 1000~GB and \$200 thereafter.
+\item[4] Level~3 does support domain fronting per se, but paths under the \urll{secure.footprint.net} domain can likely serve the same purpose. Level~3 does not publish pricing information; the prices here are from a reseller called VPS.NET, which quotes \$34.95 for the first 1000~GB and \$200 thereafter.
 \end{tablenotes}
 
 \end{threeparttable}
@@ -596,107 +598,170 @@ In this section we survey a variety of web services and evaluate
 their suitability for domain fronting.
 Most of the services we evaluated support fronting in one form or another,
 but they each have their own quirks and performance characteristics.
-Table~\ref{tab:survey} summarizes the services.
+The survey is not exhaustive but it includes many of the most prominent
+content delivery networks.
+Table~\ref{tab:survey} is a summary.
 
-This section contains a brief survey of fronting-capable
-web services we have found, each with its pros and cons.
-The list is not exhaustive and is meant to illustrate the broad
-support for fronting that exists.
-Of the services listed, we have so far deployed \meek
-only on Google App Engine and Amazon CloudFront.
-For the others, we have only checked that fronting works.
-Recall that even web services that support fronting
-will front only for their own customers,
-so new each deployment typically requires an investment of time and money.
+Pricing across services varies widely,
+and depends on complicated factors such as geographical region,
+bandwidth tiers, and free thresholds.
+Some services charge for bandwidth,
+some for time, and some for other resources.
+Most services charge between \$0.10 and \$0.20 per GB;
+usually bandwidth is cheaper in North America and Europe
+than in the rest of the world.
 
-Google App Engine~\cite{googleappengine}
+Recall that even services that support domain fronting
+will front only for the domains of their own customers.
+Deployment on a new service typically requires becoming a customer,
+and an outlay of time and money.
+Of the services surveyed, we have deployed domain fronting in some form
+on Google App Engine, Amazon CloudFront, Microsoft Azure, CloudFlare, and Fastly.
+For the others, we have only checked that domain fronting
+(or some similar technique)
+is likely to work.
+
+\smallskip
+
+% https://cloud.google.com/appengine/pricing
+\textbf{Google App Engine}~\cite{googleappengine}
 is a web application platform.
+Users can upload a web app needing nothing more than a Google account.
 Each application gets a user-specified subdomain of \urll{appspot.com},
-which can be fronted through almost any Google domain,
+for which almost any Google domain can serve as a front,
 including google.com, gmail.com, googleapis.com, and many others.
-App Engine can run only web applications,
-not a full Tor bridge;
-for that reason we use a tiny ``reflector'' application
-that merely copies incoming requests to a Tor bridge hosted elsewhere.
-Fronting through App Engine is attractive in the case where even though
-the censor blocks
-\urll{appspot.com}---which could well occur,
-because of the ease of building a proxy there---at least one
-other Google service remains reachable.
-Applications that use $< 1$~GB of bandwidth daily
-are free of charge,
-making possible an upload-your-own-app model
-à la GoAgent.
+App Engine can run only web applications serving short-lived requests,
+not a general-purpose proxy such as a Tor bridge.
+For that reason we use a tiny ``reflector'' application
+that merely forwards incoming requests to a long-lived proxy running elsewhere.
+Fronting through App Engine is attractive in the case where the censor blocks
+\urll{appspot.com} but at least one
+other Google domain is reachable.
+App Engine costs \$0.12/GB and \$0.05 for each ``instance hour''
+(the number of running instances of the app is adjusted dynamically
+to meet load, and you pay for each instance after the first).
+Applications are free of charge if they stay below certain
+usage thresholds, for example 1~GB of bandwidth daily,
+making possible a distributed, upload-your-own-app model
+in the style of GoAgent.
 
-Amazon CloudFront~\cite{cloudfront}
-(not to be confused with CloudFlare; see below)
+% https://aws.amazon.com/cloudfront/pricing/
+\textbf{Amazon CloudFront}~\cite{cloudfront}
 is the CDN of Amazon Web Services.
-A CloudFront ``distribution'' associates
+A CloudFront ``distribution,'' as a CDN configuration is called, associates
 an automatically generated subdomain of \urll{cloudfront.net}
-with an origin server,
-which in our case is an instance of \meekserver.
-The front domain may be any other of CloudFront's automatically generated subdomains, all
-of which support HTTPS through a wildcard certificate.
+with an origin server.
+The front domain may be any other \urll{cloudfront.net} subdomain
+(all of which support HTTPS through a wildcard certificate),
+or any other DNS alias for them.
+CloudFront is easy to set up:
+one must only set the origin domain and no reflector app is needed.
+Pricing per GB ranges from \$0.085 for the United States and Europe,
+up to \$0.25 for South America,
+with price breaks starting at 10~TB/month.
+There is an additional charge per 10,000 HTTPS requests,
+ranging from \$0.0075 in the United States
+to \$0.0160 in South America.
 CloudFront has a usage tier that is free of charge for a year,
 subject to a bandwidth limit of 50~GB/month.
 
-Microsoft Azure~\cite{azure}
+% https://azure.microsoft.com/en-us/pricing/details/cdn/
+\textbf{Microsoft Azure}~\cite{azure}
 is a cloud computing platform that features a CDN.
-Similarly to CloudFront, users get automatically generated subdomains
-of \urll{vo.msecnd.net},
-all of which can front for each other.
-The CDN works only for Azure domains, however,
-so as with App Engine, it is necessary to run a trivial reflector app
-that merely forwards requests out of Azure toward an external proxy.
-There are other front domain names, like \urll{ajax.aspnetcdn.com},
-that may provide entangling with high collateral damage.
+Like CloudFront, Azure assigns automatically generated subdomains
+of \urll{vo.msecnd.net}.
+any of which can front for any other.
+There are other possible front domain names, like \urll{ajax.aspnetcdn.com},
+that are used as infrastructure by many web sites,
+lending them high collateral damage.
+Unlike CloudFront's, Azure's CDN works only for Azure-affiliated domains,
+so as with App Engine, it is necessary to run a reflector app on Azure
+that forwards requests to some other proxy proxy.
 
-CloudFlare~\cite{cloudflare}
+% https://www.cloudflare.com/plans
+\textbf{CloudFlare}~\cite{cloudflare}
 is a CDN also marketed as protection against
 denial-of-service attacks.
-It appears that any domain name on CloudFlare
-can front for any other, even custom user-selected domains;
-however it is not obvious which one is best to use as a front.
-The front domain needs to be a popular one
-(causing high collateral damage if blocked),
-or the censor may simply block it entirely.
-It is doubly bad when a domain is blocked in this way,
-because not only is circumvention foiled,
-but some unsuspecting third party has just had their web site blocked.
-A solution may be to round-robin through
-a pool of popular domain names;
-or to use ``domainless'' fronting that does not send SNI.
-\vp{Would be quite valuable to more broadly assess the viability
-of using domainless fronting}
-% Though CloudFlare supports domain fronting,
-% its terms of service~\cite{cloudflare-terms}
-% seem to prohibit the kind of tunneled proxying that \meek does:
-% \begin{quote}
-% \textsc{Section 10: Limitation on non-HTML caching}\\
-% You acknowledge that CloudFlare's Service is offered as a platform to cache and
-% serve web pages and websites and is not offered for other purposes
-% \ldots\ you understand and agree to use the Service solely
-% for the purpose of hosting and serving web pages\ldots
-% \end{quote}
+Almost any domain name on CloudFlare
+can front for any other, even custom user-controlled domains.
+(We have found some domains, like \urll{imgur.com},
+that do not work as fronts, though they can be fronted to.)
+CloudFlare charges per month and does not separately charge for bandwidth.
+There is a free tier intended for small web sites,
+which would be adequate for a personal domain-fronting installation.
+The ``business'' plan is \$200/month.
 
-Akamai~\cite{akamai-site} is a large CDN.
-Requests may be fronted through the special HTTPS domain
-\urll{a248.e.akamai.net},
-which serves a certificate also good for \urll{*.akamaihd.net}.
-The collateral damage of blocking Akamai is enormous:
-in 2010 it carried 15--20\% of all web traffic~\cite{akamai}.
-Akamai costs more than other CDNs;
-it would likely require institutional support
-to keep a circumvention system running on it in the long term.
-
-Fastly~\cite{fastly} is a CDN.
-It is the only one of the services we tested that
-appears to enforce SNI consistency:
+% https://www.fastly.com/pricing/
+\textbf{Fastly}~\cite{fastly} is a CDN.
+It is unusual in that it validates the SNI:
 if the SNI and Host do not match,
 the Fastly edge server returns an HTTP 400 (``Bad Request'') error.
-However, if the TLS ClientHello omits SNI, then the Host may be any Fastly domain.
-It is the only service we have found
-that requires the ``domainless'' fronting style.
+However, if the TLS ClientHello simply omits SNI, then the Host may be any Fastly domain.
+Fastly therefore requires the ``domainless'' fronting style.
+Fastly's pricing model is similar to CloudFront's.
+They charge between \$0.12 and \$0.19 per GB
+and \$0.0075 and \$0.009 per 10,000 requests, depending on region.
+
+% http://cachesimple.com/get.php?p=plans
+\textbf{Akamai}~\cite{akamai-site} is a large CDN.
+Requests may be fronted through the special HTTPS domain
+\urll{a248.e.akamai.net},
+or other customer-configured DNS aliases,
+though as with CloudFlare it appears that certain domains
+get special treatment and do not work as fronts.
+Akamai has to potential to provide a lot of cover:
+in 2010 it carried 15--20\% of all web traffic~\cite{akamai}.
+Akamai does not publish pricing details,
+but it is reputed to be among the pricier CDNs.
+We found a reseller, Cache Simple,
+that charges \$400 for 1000~GB/month, and \$0.50/GB after that.
+The special domain
+\urll{a248.e.akamai.net}
+began to be DNS-poisoned in China in late September~2014~\cite{akamai-greatfire}
+(possibly because it had been used to mirror blocked web sites),
+necessitating an alternative front domain in that country.
+
+\textbf{Level~3}~\cite{level3}
+is a tier-1 network operator that has a CDN.
+Unlike other services in this section,
+Level~3 does not appear to support domain fronting.
+However, we mention it because it may be possible to build similar functionality
+using distinct URL paths under the domain \urll{secure.footprint.net}
+(essentially using the path, rather than the Host header, as a hidden tag).
+Level~3 does not publish pricing data.
+We found a reseller, VPS.NET, that quotes
+\$34.95 for the first 1000~GB and \$200 thereafter.
+As with \urll{a248.e.akamai.net},
+the domain \urll{secure.footprint.net} is
+currently DNS-poisoned in China.
+
+% \textbf{EdgeCast}~\cite{edgecast}
+% GFW blocking of edgecast.net.
+
+\smallskip
+
+There are other potential domain-fronting deployments apart from CDNs.
+For example, there are cheap web hosts that support both PHP and
+HTTPS (with a shared certificate).
+These features are enough to support a reflector written in PHP,
+which users can upload under their own initiative.
+In this do-it-yourself model, blocking resistance comes not from a strong front domain,
+but from the diffuseness of many proxies, each carrying only a small amount of traffic.
+
+% https://lists.torproject.org/pipermail/tor-dev/2015-February/008239.html
+Another alternative is deployment with the cooperation of an existing important web site,
+the blocking of which would result in high collateral damage.
+It is a nice feature of domain fronting that it does not require cooperating
+by the intermediate web service,
+but if you have cooperation, you can achieve greater efficiency.
+The important web site could, for example, reserve a
+magic URL path or domain name, and forward matching requests
+to a proxy running locally.
+The web site does two jobs:
+its ordinary high-value operations that make it expensive to block,
+and a side job of handling circumvention traffic.
+The censor cannot tell which is which
+because the difference is confused by HTTPS.
 
 
 \section{Deployment on Tor: meek}
@@ -1741,6 +1806,17 @@ is that it is easier for a volunteer to upload a PHP file to a web host
 than to set up and maintain a Tor bridge.
 \vp{Should also discuss backends that take users directly to content,
 rather than providing ingress to Tor.}
+
+% Moved from CloudFlare section:
+% The front domain needs to be a popular one
+% (causing high collateral damage if blocked),
+% or the censor may simply block it entirely.
+% It is doubly bad when a domain is blocked in this way,
+% because not only is circumvention foiled,
+% but some unsuspecting third party has just had their web site blocked.
+% A solution may be to round-robin through
+% a pool of popular domain names;
+% or to use ``domainless'' fronting that does not send SNI.
 
 \section{Summary}
 \label{sec:summary}
